@@ -329,7 +329,7 @@ const Home = () => {
       <div className='flex items-center justify-center px-4 sm:px-6 lg:px-8'>
         <div className='flex flex-col w-full max-w-7xl'>
           <div className="flex items-center justify-between mb-8">
-            <h2 className='text-2xl sm:text-3xl lg:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-green-300 to-green-800 flex items-center gap-3'>
+            <h2 className='text-2xl sm:text-3xl lg:text-5xl ZaptronFont text-transparent bg-clip-text bg-gradient-to-b from-green-300 to-green-800 flex items-center gap-3'>
               <span className="relative">
                 <span className="h-3 w-3 rounded-full bg-green-400 animate-pulse shadow-lg inline-block"></span>
                 <span className="absolute inset-0 h-3 w-3 rounded-full bg-green-400 animate-ping"></span>
@@ -359,7 +359,7 @@ const Home = () => {
       <div className='flex items-center justify-center mt-8 sm:mt-10 px-4 sm:px-6 lg:px-8'>
         <div className='flex flex-col w-full max-w-7xl'>
           <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6'>
-            <h2 className='text-2xl sm:text-3xl lg:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-300 to-red-500 flex items-center gap-3'>
+            <h2 className='text-2xl sm:text-3xl lg:text-5xl ZaptronFont text-transparent bg-clip-text bg-gradient-to-r from-red-300 to-red-500 flex items-center gap-3'>
               <span className="h-3 w-3 rounded-full bg-red-400 opacity-50"></span>
               Expired Hackathons
             </h2>
