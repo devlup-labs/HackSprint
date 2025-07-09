@@ -9,7 +9,9 @@ import Quest from './pages/Quest'
 import About from './pages/About'
 import Login from './pages/Login'
 import NotFoundPage from './pages/NotFound';
-import { GoogleOAuthProvider } from '@react-oauth/google'
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import SignUp from './pages/SignUp';
+import './App.css';
 
 function App() {
   const GoogleAuthWrapper = () => {
@@ -27,8 +29,13 @@ function App() {
           <Route path="/" element={<Home />} caseSensitive></Route>
           <Route path="/quest" element={<Quest />} caseSensitive></Route>
           <Route path="/about" element={<About />} caseSensitive></Route>
+<<<<<<< HEAD
           <Route path='/login' element={<GoogleAuthWrapper />} caseSensitive></Route>
           <Route path="*" element={<NotFoundPage />} />
+=======
+          <Route path='/login' element={<Login />} caseSensitive></Route>
+          <Route path='/signUp' element={<SignUp />} caseSensitive></Route>
+>>>>>>> Redesigned Login and Signup UI with improved layout and styles
         </Routes>
 
         <HideRoute>
