@@ -29,13 +29,9 @@ function App() {
           <Route path="/" element={<Home />} caseSensitive></Route>
           <Route path="/quest" element={<Quest />} caseSensitive></Route>
           <Route path="/about" element={<About />} caseSensitive></Route>
-<<<<<<< HEAD
           <Route path='/login' element={<GoogleAuthWrapper />} caseSensitive></Route>
           <Route path="*" element={<NotFoundPage />} />
-=======
-          <Route path='/login' element={<Login />} caseSensitive></Route>
           <Route path='/signUp' element={<SignUp />} caseSensitive></Route>
->>>>>>> Redesigned Login and Signup UI with improved layout and styles
         </Routes>
 
         <HideRoute>

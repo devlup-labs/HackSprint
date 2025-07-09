@@ -23,9 +23,10 @@ function SignUp() {
 
   return (
     <>
-      <div className="min-h-screen flex flex-col items-center gap-6 bg-[rgb(6,10,33)] px-2">
+      <div className="min-h-screen flex flex-col items-center gap-1 bg-[rgb(6,10,33)] px-2 py-8">
         <p
           style={{
+            
             fontFamily: "techbit",
             color: "#19B03F",
             fontSize: "102px",

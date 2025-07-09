@@ -10,9 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-<<<<<<< HEAD
     "@react-oauth/google": "^0.12.2",
-    "@tailwindcss/vite": "^4.1.8",
+    "@tailwindcss/vite": "^4.1.11",
     "axios": "^1.10.0",
     "dotenv": "^16.5.0",
     "framer-motion": "^12.18.1",
@@ -23,13 +22,6 @@
     "react-router-dom": "^7.6.1",
     "react-toastify": "^11.0.5",
     "tailwindcss": "^4.1.8"
-=======
-    "@tailwindcss/vite": "^4.1.11",
-    "lucide-react": "^0.511.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-router-dom": "^7.6.1"
->>>>>>> Redesigned Login and Signup UI with improved layout and styles
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
