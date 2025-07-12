@@ -90,7 +90,7 @@ const NotFound = () => {
             }} />
 
             {/* ERROR Title with glitch effect */}
-            <h1 className={`text-6xl sm:text-8xl md:text-9xl lg:text-[10rem] xl:text-[180px] ZaptronFont text-transparent bg-clip-text bg-gradient-to-b from-red-600 to-red-800 tracking-widest z-10 text-center ${glitchActive ? 'glitch' : ''}`}
+            <h1 className={`text-8xl sm:text-8xl md:text-9xl lg:text-[10rem] xl:text-[180px] ZaptronFont text-transparent bg-clip-text bg-gradient-to-b from-red-600 to-red-800 tracking-widest z-10 text-center ${glitchActive ? 'glitch' : ''}`}
                 style={{ 
                     // fontFamily: "'Impact', 'Arial Black', sans-serif",
                     textShadow: glitchActive ? "2px 0 #ff00ff, -2px 0 #00ffff" : "none",

@@ -164,8 +164,8 @@ const Navbar = () => {
               {/* Profile/Status Section */}
               <div className="flex items-center space-x-2 lg:space-x-3 ml-2 lg:ml-6 pl-2 lg:pl-6 border-l border-green-500/30">
                 <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                  <span className="text-sm text-gray-400 font-mono hidden lg:inline">Online</span>
+                  {userInfo ? <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" /> : <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />}
+                  {userInfo ? <span className="text-sm text-gray-400 font-mono hidden lg:inline">Online</span> : <span className="text-sm text-gray-400 font-mono hidden lg:inline">Offline</span>}
                 </div>
 
                 <button className="w-7 h-7 lg:w-8 lg:h-8 cursor-pointer bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300 shadow-lg">
@@ -228,7 +228,7 @@ const Navbar = () => {
                     </div>
                     <div>
                       {userInfo ? <div className="text-sm font-medium text-white">{userInfo.name}</div> : <div className="text-sm font-medium text-white">Developer</div>}
-                      {userInfo ? <div className="text-xs text-gray-400">Active Session</div> : <div className="text-xs text-gray-400">Sleep Mode</div>}
+                      {userInfo ? <div className="text-xs text-gray-400">Active Session</div> : <div className="text-xs text-gray-400">Guest Mode</div>}
                     </div>
                   </div>
                   <Zap size={14} className="text-green-400 sm:w-4 sm:h-4" />
