@@ -13,12 +13,13 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import ActiveHackathons from './pages/ActiveHackathons';
 import ExpiredHackathons from './pages/ExpiredHackathons';
 import Dashboard from './pages/dashboard.jsx';
-import Signup from './pages/Signup.jsx';
+import Signup from './pages/SignUp.jsx';
 import Verification from './components/Verification.jsx';
 import ResetPassword from './components/ResetPassword.jsx';
 import RouteHandler from './components/RouteHandler.jsx'
 import { ToastContainer } from 'react-toastify';
 function App() {
+
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authWait, setAuthWait] = useState(false)
@@ -41,6 +42,7 @@ function App() {
         </HideRoute>
         <ToastContainer />
         <Routes>
+
           <Route path="/" element={<Home />} caseSensitive />
           <Route path="/activehackathons" element={<ActiveHackathons/>} caseSensitive></Route>
           <Route path="/expiredhackathons" element={<ExpiredHackathons/>} caseSensitive></Route>
@@ -52,8 +54,10 @@ function App() {
           <Route path="/account/verify-email" element={<Verification />} caseSensitive></Route>
           <Route path="/account/reset-password" element={<ResetPassword />} caseSensitive></Route>
           <Route path="/dashboard" element={<AuthenticateRoute element={<Dashboard />}/>} caseSensitive />
+
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
+
         <HideRoute>
           <Footer />
         </HideRoute>

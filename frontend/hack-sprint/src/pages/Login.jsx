@@ -1,51 +1,3 @@
-// import React, { useState, useEffect } from 'react'
-// import axios from 'axios'
-// import { googleAuth } from '../backendApis/api'
-// import { useGoogleLogin } from '@react-oauth/google'
-
-// const Login = () => {
-//     const [userData, setUserData] = useState([]);
-
-//     const responseGoogle = async (authResult) => {
-//         try {
-//             if (authResult['code']) {
-//                 const result = await googleAuth(authResult['code']);
-//                 const { name, email } = result.data.user;
-//                 const token = result.data.token;
-//                 // console.log(result);
-//                 localStorage.setItem("userToken", token);
-//                 localStorage.setItem("userEmail", email);
-//             }
-//         } catch (error) {
-//             console.error('Error while req google', error)
-//         }
-//     }
-
-//     const googleLogin = useGoogleLogin({
-//         onSuccess: responseGoogle,
-//         onError: responseGoogle,
-//         flow: 'auth-code'
-//     })
-
-//     const githubAuthLogin = () => {
-//         window.location.assign("https://github.com/login/oauth/authorize?client_id=" + import.meta.env.VITE_GOOGLE_CLIENT_ID)
-//     }
-
-//     return (
-//         <>
-//             <div className='min-h-screen flex justify-center items-center bg-gray-900'>
-//                 <div className='flex flex-col gap-5 items-center'>
-//                     <button onClick={googleLogin} className='text-white border-2 border-green-800 px-4 py-2 rounded-xl cursor-pointer'>Google Login</button>
-//                     <p className='text-white'>------Or-------</p>
-//                     <button onClick={githubAuthLogin} className='text-white border-2 border-green-800 px-4 py-2 rounded-xl cursor-pointer'>Github Login</button>
-//                 </div>
-//             </div>
-//         </>
-//     )
-// }
-
-// export default Login
-
 import React from "react";
 import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
@@ -79,23 +31,16 @@ function Login() {
       );
 
       if (data.success) {
-        toast.success(data.message, {
-          className: "text-sm max-w-xs",
-        });
+        toast.success(data.message, { className: "text-sm max-w-xs" });
         setIsLoggedIn(true);
-        localStorage.setItem("token", data.token)
-        localStorage.setItem("email", data.email)
-        // getUserData();
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("email", data.email);
         navigate("/");
       } else {
-        toast.error(data.message, {
-          className: "text-sm max-w-xs",
-        });
+        toast.error(data.message, { className: "text-sm max-w-xs" });
       }
     } catch (err) {
-      toast.error(err.message, {
-        className: "text-sm max-w-xs",
-      });
+      toast.error(err.message, { className: "text-sm max-w-xs" });
     }
   };
 
@@ -109,18 +54,15 @@ function Login() {
 
   return (
     <div className="flex items-center justify-center bg-gray-900 min-h-screen">
-      <div className="text-white shadow-[0_0_25px_#5fff60] p-10 rounded-xl w-full sm:w-136">
-        <h2 className="text-4xl font-medium text-center text-green-500 mb-3">
-          Login
-        </h2>
+      <div className="text-white shadow-[0_0_25px_#5fff60] p-6 sm:p-10 rounded-xl w-full max-w-md mx-4 sm:mx-0">
+        <h2 className="text-3xl font-medium text-center text-green-500 mb-3 sm:text-4xl">Login</h2>
         <p className="text-lg text-green-300 text-center mb-6">Login to your account!</p>
         <form onSubmit={handleLogin}>
           <div className="text-lg text-green-400 mb-6 flex items-center gap-3 px-5 py-2.5 w-full rounded-full bg-[#333A5C]">
-            {/* <i class="fa-regular fa-envelope"></i> */}
-            <i class="fa-solid fa-envelope"></i>
+            <i className="fa-solid fa-envelope"></i>
             <input
-              className="bg-transparent outline-none"
-              type="email"
+              className="bg-transparent outline-none w-full"
+              type="email" 
               placeholder="Email Id"
               required
               value={email}
@@ -129,9 +71,9 @@ function Login() {
           </div>
 
           <div className="text-lg text-green-400 mb-2 flex items-center gap-3 px-5 py-2.5 w-full rounded-full bg-[#333A5C]">
-            <i class="fa-solid fa-lock"></i>
+            <i className="fa-solid fa-lock"></i>
             <input
-              className="bg-transparent outline-none"
+              className="bg-transparent outline-none w-full"
               type="password"
               placeholder="Password"
               required
@@ -140,10 +82,7 @@ function Login() {
             />
           </div>
 
-          <a
-            className="text-sm px-4 text-green-500 cursor-pointer"
-            href="/account/reset-password"
-          >
+          <a className="text-sm px-4 text-green-500 cursor-pointer" href="/account/reset-password">
             Forgot password?
           </a>
 
@@ -156,14 +95,14 @@ function Login() {
             <Link to="/account/signup" className="text-green-500 cursor-pointer underline">Signup</Link>
           </p>
 
-          {/* <p className="text-center text-lg">--- or ---</p> */}
-          <div class="flex items-center justify-center my-4 mx-5">
-            <hr class="border-t border-green-300 flex-grow" />
-            <span class="px-4 text-green-500 text-lg">or</span>
-            <hr class="border-t border-green-300 flex-grow" />
+          <div className="flex items-center justify-center my-4 mx-5">
+            <hr className="border-t border-green-300 flex-grow" />
+            <span className="px-4 text-green-500 text-lg">or</span>
+            <hr className="border-t border-green-300 flex-grow" />
           </div>
         </form>
-        <GoogleAuthWrapper />
+
+        {/* <GoogleAuthWrapper /> */}
       </div>
     </div>
   );

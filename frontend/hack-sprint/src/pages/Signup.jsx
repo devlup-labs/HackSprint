@@ -53,8 +53,8 @@ function Signup() {
 
   return (
     <div className="flex items-center justify-center bg-gray-900 min-h-screen">
-      <div className="text-white p-8 shadow-[0_0_25px_#5fff60] p-10 rounded-xl w-full sm:w-136">
-        <h2 className="text-4xl font-medium text-center text-green-500 mb-3">
+      <div className="text-white shadow-[0_0_25px_#5fff60] p-6 sm:p-10 rounded-xl w-full max-w-md mx-4 sm:mx-0">
+        <h2 className="text-3xl sm:text-4xlis font-medium text-center text-green-500 mb-3">
           Signup
         </h2>
         <p className="text-lg text-green-300 text-center mb-6">Create your account!</p>
@@ -62,7 +62,7 @@ function Signup() {
           <div className="text-lg text-green-400 mb-6 flex items-center gap-3 px-5 py-2.5 w-full rounded-full bg-[#333A5C]">
             <i className="fa-solid fa-user"></i>
             <input
-              className="bg-transparent outline-none"
+              className="bg-transparent outline-none w-full"
               type="text"
               placeholder="Full Name"
               required
@@ -75,7 +75,7 @@ function Signup() {
             {/* <i class="fa-regular fa-envelope"></i> */}
             <i className="fa-solid fa-envelope"></i>
             <input
-              className="bg-transparent outline-none"
+              className="bg-transparent outline-none w-full"
               type="email"
               placeholder="Email Id"
               required
@@ -113,7 +113,7 @@ function Signup() {
           </div>
 
         </form>
-        <GoogleAuthWrapper />
+        {/* <GoogleAuthWrapper /> */}
       </div>
     </div>
   );
