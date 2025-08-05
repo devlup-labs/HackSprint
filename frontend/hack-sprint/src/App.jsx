@@ -18,6 +18,7 @@ import Verification from './components/Verification.jsx';
 import ResetPassword from './components/ResetPassword.jsx';
 import RouteHandler from './components/RouteHandler.jsx'
 import { ToastContainer } from 'react-toastify';
+import HackathonDetails from './pages/ActiveHackathonDetails.jsx';
 function App() {
 
 
@@ -45,6 +46,7 @@ function App() {
 
           <Route path="/" element={<Home />} caseSensitive />
           <Route path="/activehackathons" element={<ActiveHackathons/>} caseSensitive></Route>
+          <Route path="/activehackathondetails" element={<HackathonDetails />} caseSensitive></Route>
           <Route path="/expiredhackathons" element={<ExpiredHackathons/>} caseSensitive></Route>
           <Route path="/quest" element={<Quest />} caseSensitive />
           <Route path="/about" element={<About />} caseSensitive />

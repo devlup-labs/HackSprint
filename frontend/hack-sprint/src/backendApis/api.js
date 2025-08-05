@@ -20,7 +20,7 @@ export const activeHackathons = ()=>{
         // console.log("data from DB = ",result.data.allHackathons);
         console.log("data from DB = ",result);
         // return result.data.allHackathons
-        return result;
+        return result.data;
 
     }).catch((err) => {
         console.log(err);

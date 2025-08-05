@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Loader from '../components/Loader'
 import { Users, Calendar, Timer, ArrowRight, Code, Trophy, Zap, Star, Github, ExternalLink } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 
 
@@ -60,7 +61,7 @@ const TypingText = ({ text, className = "" }) => {
   )
 }
 
-const HackathonCard = ({ hackathon, isExpired = false }) => {
+const HackathonCard = ({ hackathon, isExpired = false, onClick }) => {
   const [isHovered, setIsHovered] = useState(false)
 
   return (
@@ -70,6 +71,7 @@ const HackathonCard = ({ hackathon, isExpired = false }) => {
         }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={onClick} 
     >
       {/* Scan line effect */}
       <div className={`absolute inset-0 bg-gradient-to-r from-transparent via-green-400/20 to-transparent transform -skew-x-12 transition-transform duration-1000 ${isHovered ? 'translate-x-full' : '-translate-x-full'
@@ -145,8 +147,10 @@ const HackathonCard = ({ hackathon, isExpired = false }) => {
   )
 }
 
+
+
 const Home = () => {
-  const [loading, setLoading] = useState(true)
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 2000)
@@ -350,7 +354,13 @@ const Home = () => {
 
           <div className='space-y-4 sm:space-y-6'>
             {activeHackathons.map((hackathon, index) => (
-              <HackathonCard key={index} hackathon={hackathon} />
+              <HackathonCard 
+              key={index} hackathon={hackathon} 
+              onClick={()=>{
+                console.log("Card clicked");
+                navigate('/activehackathondetails', { state: hackathon })}
+              }
+              />
             ))}
           </div>
         </div>
