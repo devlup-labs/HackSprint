@@ -7,7 +7,9 @@ import HideRoute from './components/HideRoute';
 import Loader from './components/Loader';
 import Quest from './pages/Quest';
 import About from './pages/About';
+import Admin from './pages/Admin';
 import Login from './pages/Login.jsx';
+import Questions from './pages/Questions.jsx';
 import NotFoundPage from './pages/NotFound';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import ActiveHackathons from './pages/ActiveHackathons';
@@ -17,6 +19,7 @@ import Signup from './pages/Signup.jsx';
 import Verification from './components/Verification.jsx';
 import ResetPassword from './components/ResetPassword.jsx';
 import RouteHandler from './components/RouteHandler.jsx'
+import Hackathons from './pages/Hackathon.jsx';
 import { ToastContainer } from 'react-toastify';
 import HackathonDetails from './pages/Hackathon.jsx';
 import { RegistrationForm } from './hackathon/RegistrationForm.jsx';
@@ -46,18 +49,24 @@ function App() {
         <Routes>
 
           <Route path="/" element={<Home />} caseSensitive />
-          <Route path="/activehackathons" element={<ActiveHackathons/>} caseSensitive></Route>
-          <Route path="/expiredhackathons" element={<ExpiredHackathons/>} caseSensitive></Route>
+          <Route path="/activehackathons" element={<ActiveHackathons />} caseSensitive></Route>
+          <Route path="/expiredhackathons" element={<ExpiredHackathons />} caseSensitive></Route>
           <Route path="/quest" element={<Quest />} caseSensitive />
           <Route path="/about" element={<About />} caseSensitive />
+          <Route path="/hackathons" element={<Hackathons />} caseSensitive />
+          <Route path="/admin" element={<Admin />} caseSensitive />
+          <Route path="/questions" element={<Questions />} caseSensitive />
           {/* <Route path="/login" element={<GoogleAuthWrapper />} caseSensitive /> */}
           <Route path="/account/login" element={<Login />} caseSensitive></Route>
           <Route path="/account/signup" element={<Signup />} caseSensitive></Route>
           <Route path="/account/verify-email" element={<Verification />} caseSensitive></Route>
           <Route path="/account/reset-password" element={<ResetPassword />} caseSensitive></Route>
-          <Route path="/dashboard" element={<Dashboard />} caseSensitive />
+
           <Route path="/hackathons/:id" element={<HackathonDetails />} />
           <Route path="/hackathons/RegistrationForm" element={<RegistrationForm />} />
+
+          <Route path="/dashboard" element={<AuthenticateRoute element={<Dashboard />} />} caseSensitive />
+
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
 

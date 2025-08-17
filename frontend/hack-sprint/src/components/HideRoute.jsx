@@ -5,7 +5,9 @@ const HideRoute = ({ children }) => {
     const location = useLocation();
     const [showNavbar, setShowNavbar] = useState(true);
 
-    const navVisible = ["/", "/dashboard", "/quest", "/about", "/expiredhackathons"];
+
+    const navVisible = ["/", "/dashboard", "/quest", "/about", "/hackathons", "/expiredhackathons"];
+
 
     useEffect(() => {
         // Check static paths

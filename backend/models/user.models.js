@@ -59,7 +59,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-
+    isGitHubloggedIn:{
+      type : Boolean
+    },
+    isGoogleLoggedIn:{
+      type : Boolean
+    },
     verificationTokenExpiresAt: Date,
     // Submissions
   },
@@ -69,4 +74,3 @@ const userSchema = new mongoose.Schema(
 const UserModel = mongoose.model("users", userSchema)
 
 export default UserModel
-

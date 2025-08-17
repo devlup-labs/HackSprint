@@ -286,6 +286,7 @@ const Navbar = () => {
               {/* Profile/Status Section */}
               <div className="flex items-center space-x-2 lg:space-x-3 ml-2 lg:ml-6 pl-2 lg:pl-6 border-l border-green-500/30">
                 <div className="flex items-center space-x-2">
+
                   {userLoading ? (
                     <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
                   ) : isLoggedIn && userInfo ? (
@@ -296,6 +297,10 @@ const Navbar = () => {
                   <span className="text-sm text-gray-400 font-mono hidden lg:inline">
                     {userLoading ? 'Checking...' : isLoggedIn && userInfo ? 'Online' : 'Offline'}
                   </span>
+
+                  {userInfo ? <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" /> : <div className="" />}
+                  {userInfo ? <span className="text-sm text-gray-400 font-mono hidden lg:inline">Online</span> : <span className="text-sm text-gray-400 font-mono hidden lg:inline"></span>}
+
                 </div>
 
                 {/* User Avatar/Profile Button */}
