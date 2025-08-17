@@ -37,3 +37,7 @@ export const expiredHackathons = ()=>{
         console.log(error);
     })
 }
+export const getHackathonById = (id) => {
+    // This endpoint fetches a specific hackathon. e.g., /api/hackathons/60d21b4667d0d8992e610c85
+    return axios.get(`http://localhost:3000/api/hackathons/${id}`);
+}

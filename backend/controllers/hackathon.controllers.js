@@ -49,3 +49,19 @@ export const sendExpiredHackathons = async(req,res)=>{
         })
     }
 }
+export const getHackathonById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const hackathon = await hackathonModel.findById(id);
+
+        if (!hackathon) {
+            return res.status(404).json({ message: "Hackathon not found" });
+        }
+
+        res.status(200).json(hackathon);
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+};

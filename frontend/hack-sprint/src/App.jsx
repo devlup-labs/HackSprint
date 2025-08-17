@@ -18,6 +18,8 @@ import Verification from './components/Verification.jsx';
 import ResetPassword from './components/ResetPassword.jsx';
 import RouteHandler from './components/RouteHandler.jsx'
 import { ToastContainer } from 'react-toastify';
+import HackathonDetails from './pages/Hackathon.jsx';
+import { RegistrationForm } from './hackathon/RegistrationForm.jsx';
 function App() {
 
 
@@ -35,7 +37,7 @@ function App() {
   return (
     <>
       <Router>
-        <RouteHandler setIsAuthenticated={setIsAuthenticated} setAuthWait={setAuthWait} />
+        {/* <RouteHandler setIsAuthenticated={setIsAuthenticated} setAuthWait={setAuthWait} /> */}
         <Loader />
         <HideRoute>
           <Navbar />
@@ -53,7 +55,9 @@ function App() {
           <Route path="/account/signup" element={<Signup />} caseSensitive></Route>
           <Route path="/account/verify-email" element={<Verification />} caseSensitive></Route>
           <Route path="/account/reset-password" element={<ResetPassword />} caseSensitive></Route>
-          <Route path="/dashboard" element={<AuthenticateRoute element={<Dashboard />}/>} caseSensitive />
+          <Route path="/dashboard" element={<Dashboard />} caseSensitive />
+          <Route path="/hackathons/:id" element={<HackathonDetails />} />
+          <Route path="/hackathons/RegistrationForm" element={<RegistrationForm />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
 
