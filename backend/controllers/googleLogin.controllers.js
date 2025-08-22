@@ -5,7 +5,7 @@ import UserModel from '../models/user.models.js'
 import axios from 'axios'
 import jwt from 'jsonwebtoken'
 import { google } from 'googleapis'
-import { transporter } from "../nodemailer/nodemailerConfig.js";
+// import { transporter } from "../nodemailer/nodemailerConfig.js";
 
 export const googleAuthLogin = async (req, res) => {
     try {

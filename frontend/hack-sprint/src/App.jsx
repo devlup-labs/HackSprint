@@ -24,6 +24,8 @@ import AllHackathons from './pages/AllHackathons.jsx'
 import { ToastContainer } from 'react-toastify';
 import HackathonDetails from './pages/Hackathon.jsx';
 import { RegistrationForm } from './hackathon/RegistrationForm.jsx';
+import VerifyEmail from './components/verifyEmail.jsx';
+import ForgotPassword from './components/forgotPassword.jsx';
 function App() {
 
 
@@ -64,12 +66,14 @@ function App() {
           <Route path="/questions" element={<Questions />} caseSensitive />
           {/* <Route path="/login" element={<GoogleAuthWrapper />} caseSensitive /> */}
           <Route path="/account/login" element={<Login />} caseSensitive></Route>
-          {/* <Route path="/account/signup" element={<Signup />} caseSensitive></Route> */}
+          <Route path="/account/signup" element={<Signup />} caseSensitive></Route>
           <Route path="/account/verify-email" element={<Verification />} caseSensitive></Route>
           <Route path="/account/reset-password" element={<ResetPassword />} caseSensitive></Route>
           <Route path="/hackathon/:id" element={<HackathonDetails />} />
           <Route path="/hackathon/RegistrationForm/:id" element={<RegistrationForm />} />
           <Route path="/dashboard" element={<AuthenticateRoute element={<Dashboard />} />} caseSensitive />
+          <Route path="/verify" element={<VerifyEmail />} />
+          <Route path="/account/forgot-password" element={<ForgotPassword />} caseSensitive></Route>
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
 

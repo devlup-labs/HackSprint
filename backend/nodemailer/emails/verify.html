@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your HackSprint Account</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            background-color: #f9fafb;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            padding: 32px 24px;
+            text-align: center;
+            color: white;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        
+        /* Added white background circle behind logo for visibility */
+        .logo-background {
+            background-color: white;
+            border-radius: 50%;
+            padding: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+        
+        .tagline {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+        
+        .content {
+            padding: 40px 32px;
+        }
+        
+        .greeting {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 16px;
+        }
+        
+        .message {
+            font-size: 16px;
+            color: #4b5563;
+            margin-bottom: 32px;
+            line-height: 1.7;
+        }
+        
+        .verification-box {
+            background-color: #f0fdf4;
+            border: 2px solid #bbf7d0;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .verification-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #059669;
+            margin-bottom: 16px;
+        }
+        
+        .verify-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            text-decoration: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.3);
+        }
+        
+        .verify-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px -1px rgba(5, 150, 105, 0.4);
+        }
+        
+        .security-note {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 24px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .security-title {
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 8px;
+        }
+        
+        .security-text {
+            font-size: 14px;
+            color: #78350f;
+            line-height: 1.6;
+        }
+        
+        .alternative-text {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 24px;
+            padding: 16px;
+            background-color: #f9fafb;
+            border-radius: 8px;
+        }
+        
+        .link-text {
+            word-break: break-all;
+            color: #059669;
+            text-decoration: none;
+        }
+        
+        .footer {
+            background-color: #f9fafb;
+            padding: 32px 24px;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .footer-text {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 16px;
+        }
+        
+        .contact-info {
+            font-size: 14px;
+            color: #059669;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .social-links {
+            margin-top: 16px;
+        }
+        
+        .social-link {
+            display: inline-block;
+            margin: 0 8px;
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 600px) {
+            .email-container {
+                margin: 0;
+                border-radius: 0;
+            }
+            
+            .content {
+                padding: 24px 20px;
+            }
+            
+            .header {
+                padding: 24px 20px;
+            }
+            
+            .greeting {
+                font-size: 20px;
+            }
+            
+            .verify-button {
+                padding: 12px 24px;
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <!-- Wrapped logo in white container for visibility against green background -->
+            <div class="logo-container">
+                <div class="logo-background">
+                    <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/hackSprint-NCVY1O9MgnZDEGP4uw0HvcMXKfv2vB.webp" alt="HackSprint Logo" style="width: 50px; height: 50px;">
+                </div>
+                <div class="logo">HackSprint</div>
+            </div>
+            <div class="tagline">IIT Jodhpur • Campus Hackathon Platform</div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content">
+            <h1 class="greeting">Hi {{name}}! 👋</h1>
+            
+            <p class="message">
+                Thanks for signing up for HackSprint with {{email}}! We're excited to have you join our community of innovators and builders at IIT Jodhpur.
+            </p>
+            
+            <p class="message">
+                To get started and secure your account, {{name}}, please verify your email address by clicking the button below:
+            </p>
+            
+            <!-- Verification Box -->
+            <div class="verification-box">
+                <div class="verification-title">🔐 Verify Your Email Address</div>
+                <a href="{{verifyUrl}}" class="verify-button">Verify My Account</a>
+            </div>
+            
+            <!-- Security Note -->
+            <div class="security-note">
+                <div class="security-title">🛡️ Security Notice</div>
+                <div class="security-text">
+                    This verification link will expire in 24 hours for your security. If you didn't create an account with HackSprint, please ignore this email.
+                </div>
+            </div>
+            
+            <!-- Alternative Link -->
+            <div class="alternative-text">
+                <strong>Having trouble with the button?</strong><br>
+                Copy and paste this link into your browser:<br>
+                <a href="{{verifyUrl}}" class="link-text">{{verifyUrl}}</a>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p class="footer-text">
+                Once verified, {{name}}, you'll be able to participate in hackathons, join teams, and showcase your projects on our platform.
+            </p>
+            
+            <p class="footer-text">
+                Need help? Contact us at <a href="mailto:{{support_email}}" class="contact-info">{{support_email}}</a>
+            </p>
+            
+            <div class="social-links">
+                <a href="#" class="social-link">Website</a> •
+                <a href="#" class="social-link">Discord</a> •
+                <a href="#" class="social-link">Instagram</a>
+            </div>
+            
+            <p style="font-size: 12px; color: #9ca3af; margin-top: 16px;">
+                © 2024 HackSprint - IIT Jodhpur. This email was sent to {{email}}.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

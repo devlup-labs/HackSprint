@@ -1,7 +1,7 @@
 import express from 'express'
 import { Router } from 'express'
 
-import { sendExpiredHackathons, sendHackathons,sendInactiveHackathons,addhackathons,registerParticipants ,sendUpcomingHackathons,sendDetailsOfId} from '../controllers/hackathon.controllers.js'
+import { sendExpiredHackathons, sendHackathons,sendInactiveHackathons,addhackathons,sendUpcomingHackathons,sendDetailsOfId} from '../controllers/hackathon.controllers.js'
 const hackathonRoutes = Router();
 
 hackathonRoutes.get("/", sendHackathons)

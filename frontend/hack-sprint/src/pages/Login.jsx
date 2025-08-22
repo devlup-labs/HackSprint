@@ -82,7 +82,7 @@ function Login() {
             />
           </div>
 
-          <a className="text-sm px-4 text-green-500 cursor-pointer" href="/account/reset-password">
+          <a className="text-sm px-4 text-green-500 cursor-pointer" href="/account/forgot-password">
             Forgot password?
           </a>
 

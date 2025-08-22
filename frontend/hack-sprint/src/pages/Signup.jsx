@@ -27,16 +27,24 @@ function Signup() {
       });
 
       if (data.success) {
-        console.log(data.verifyToken)
-        localStorage.setItem("verifyToken", data.verifyToken)
-        navigate("/account/verify-email");
+        // console.log(data.verifyToken)
+        // localStorage.setItem("verifyToken", data.verifyToken)
+        // navigate("/account/verify-email");
+
+        toast.success(
+          "Signup successful! Please check your email to verify your account.",
+          {
+            className: "text-sm max-w-xs",
+          }
+        );
+        navigate("/account/login");
       } else {
         toast.error(data.message, {
           className: "text-sm max-w-xs",
         });
       }
     } catch (err) {
-      toast.error(data.message, {
+      toast.error(err.response?.data?.message || err.message, {
         className: "text-sm max-w-xs",
       });
     }
@@ -50,14 +58,15 @@ function Signup() {
     );
   };
 
-
   return (
     <div className="flex items-center justify-center bg-gray-900 min-h-screen">
       <div className="text-white shadow-[0_0_25px_#5fff60] p-6 sm:p-10 rounded-xl w-full max-w-md mx-4 sm:mx-0">
         <h2 className="text-3xl sm:text-4xlis font-medium text-center text-green-500 mb-3">
           Signup
         </h2>
-        <p className="text-lg text-green-300 text-center mb-6">Create your account!</p>
+        <p className="text-lg text-green-300 text-center mb-6">
+          Create your account!
+        </p>
         <form onSubmit={handleSignup}>
           <div className="text-lg text-green-400 mb-6 flex items-center gap-3 px-5 py-2.5 w-full rounded-full bg-[#333A5C]">
             <i className="fa-solid fa-user"></i>
@@ -102,7 +111,12 @@ function Signup() {
 
           <p className="text-md text-green-300 px-4 mb-3">
             Alread have an account? &nbsp;{" "}
-            <Link to="/account/login" className="text-green-500 cursor-pointer underline">Login</Link>
+            <Link
+              to="/account/login"
+              className="text-green-500 cursor-pointer underline"
+            >
+              Login
+            </Link>
           </p>
 
           {/* <p className="text-center text-lg">--- or ---</p> */}
@@ -111,7 +125,6 @@ function Signup() {
             <span className="px-4 text-green-500 text-lg">or</span>
             <hr className="border-t border-green-300 flex-grow" />
           </div>
-
         </form>
         <GoogleAuthWrapper />
       </div>
