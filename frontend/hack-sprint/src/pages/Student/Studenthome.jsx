@@ -119,53 +119,69 @@ const HowItWorks = () => {
   ];
 
   return (
-    <section className="sh-fade relative z-10 py-28 px-1 md:px-5">
-      <div className="max-w-[1200px] mx-auto">
-        <div className="text-center mb-20">
-          <div className="font-jb inline-block text-[0.6rem] tracking-[0.2em] uppercase text-[#5fff60] border border-[rgba(95,255,96,0.22)] px-[0.75rem] py-[0.22rem] rounded-[2px] mb-4">
+    <section className="sh-fade relative z-10 py-24 px-4 sm:px-6 md:px-10">
+      <div className="max-w-5xl lg:max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-15 md:mb-20 flex flex-col items-center">
+          <div className="font-jb inline-block text-[0.6rem] sm:text-[0.65rem] tracking-[0.2em] uppercase text-[#5fff60] border border-[rgba(95,255,96,0.22)] px-[0.85rem] py-[0.25rem] rounded-[2px] mb-4">
             Process
           </div>
+
           <h2
-            className="font-syne font-extrabold text-white tracking-tight leading-none"
-            style={{ fontSize: "clamp(2.4rem,5vw,4rem)" }}
+            className="font-syne font-extrabold text-white tracking-tight leading-none
+            text-[2.2rem] sm:text-[2.6rem] md:text-[3.2rem] lg:text-[3.8rem] xl:text-[4rem]"
           >
             How It <span className="text-[#5fff60]">Works.</span>
           </h2>
-          <p className="font-jb text-[0.75rem] text-[rgba(180,220,180,0.48)] mt-4 tracking-[0.04em] max-w-md mx-auto">
+
+          <p
+            className="font-jb text-[0.8rem] sm:text-[0.85rem] md:text-[0.9rem]
+            text-[rgba(180,220,180,0.48)] mt-4 tracking-[0.04em] max-w-md mx-auto px-2"
+          >
             Four steps to kick off your hackathon journey
           </p>
         </div>
 
         {/* Desktop */}
         <div className="hidden lg:block relative">
+          {/* line */}
           <div className="absolute top-[68px] left-[calc(12.5%+40px)] right-[calc(12.5%+40px)] h-px bg-gradient-to-r from-[rgba(95,255,96,0.08)] via-[rgba(95,255,96,0.5)] to-[rgba(95,255,96,0.08)]" />
+
+          {/* animated dot */}
           <div className="absolute top-[61px] left-[calc(12.5%+40px)] right-[calc(12.5%+40px)] h-[16px] overflow-hidden pointer-events-none">
             <div className="sh-dot absolute top-[5px] h-[3px] w-12 bg-gradient-to-r from-transparent via-[#5fff60] to-transparent rounded-full" />
           </div>
+
           <div className="grid grid-cols-4 gap-6">
             {steps.map((s, i) => {
               const Icon = s.icon;
               return (
                 <div
                   key={i}
-                  className="sh-step flex flex-col items-center text-center group transition-transform duration-300"
+                  className="sh-step flex flex-col items-center text-center group"
                 >
+                  {/* icon */}
                   <div className="relative mb-8 z-10">
                     <div className="w-[80px] h-[80px] rounded-full bg-[#0a0a0a] border-2 border-[rgba(95,255,96,0.22)] group-hover:border-[rgba(95,255,96,0.7)] flex items-center justify-center transition-all duration-300 group-hover:shadow-[0_0_28px_rgba(95,255,96,0.22)]">
                       <Icon size={28} className="text-[#5fff60]" />
                     </div>
+
                     <span className="absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full bg-[#5fff60] text-[#050905] text-[0.6rem] font-bold font-jb flex items-center justify-center">
                       {i + 1}
                     </span>
                   </div>
-                  <div className="sh-card relative w-full p-6 bg-[rgba(10,12,10,0.88)] border border-[rgba(95,255,96,0.1)] rounded-[4px] backdrop-blur-sm group-hover:border-[rgba(95,255,96,0.3)] transition-all duration-300">
-                    <div className="font-jb text-[0.58rem] tracking-[0.16em] text-[rgba(95,255,96,0.38)] mb-2">
+
+                  {/* card */}
+                  <div className="sh-card w-full p-6 bg-[rgba(10,12,10,0.88)] border border-[rgba(95,255,96,0.1)] rounded-[4px] backdrop-blur-sm group-hover:border-[rgba(95,255,96,0.3)] transition-all duration-300">
+                    <div className="font-jb text-[0.6rem] tracking-[0.16em] text-[rgba(95,255,96,0.38)] mb-2">
                       {s.n}
                     </div>
-                    <h3 className="font-syne text-[1.15rem] font-extrabold text-white mb-3 group-hover:text-[#5fff60] transition-colors">
+
+                    <h3 className="font-syne text-[1.1rem] font-extrabold text-white mb-3 group-hover:text-[#5fff60] transition-colors">
                       {s.title}
                     </h3>
-                    <p className="font-jb text-[0.68rem] text-[rgba(180,220,180,0.48)] leading-relaxed">
+
+                    <p className="font-jb text-[0.75rem] text-[rgba(180,220,180,0.48)] leading-relaxed">
                       {s.desc}
                     </p>
                   </div>
@@ -176,24 +192,31 @@ const HowItWorks = () => {
         </div>
 
         {/* Mobile */}
-        <div className="lg:hidden relative pl-10">
-          <div className="absolute left-4 top-0 bottom-0 w-px bg-gradient-to-b from-[rgba(95,255,96,0.08)] via-[rgba(95,255,96,0.4)] to-[rgba(95,255,96,0.08)]" />
-          <div className="flex flex-col gap-7">
+        <div className="lg:hidden relative mt-6">
+          {/* vertical line */}
+          <div className="absolute left-5 top-0 bottom-0 w-px bg-gradient-to-b from-[rgba(95,255,96,0.08)] via-[rgba(95,255,96,0.4)] to-[rgba(95,255,96,0.08)]" />
+
+          <div className="flex flex-col gap-8">
             {steps.map((s, i) => {
               const Icon = s.icon;
               return (
-                <div key={i} className="relative flex gap-5 group">
-                  <div className="absolute -left-[30px] w-12 h-12 rounded-full bg-[#0a0a0a] border-2 border-[rgba(95,255,96,0.22)] group-hover:border-[rgba(95,255,96,0.6)] flex items-center justify-center flex-shrink-0 transition-all duration-300">
+                <div key={i} className="relative flex gap-4">
+                  {/* icon */}
+                  <div className="absolute left-0 w-10 h-10 rounded-full bg-[#0a0a0a] border-2 border-[rgba(95,255,96,0.22)] flex items-center justify-center">
                     <Icon size={16} className="text-[#5fff60]" />
                   </div>
-                  <div className="sh-card relative ml-4 p-6 w-full bg-[rgba(10,12,10,0.88)] border border-[rgba(95,255,96,0.1)] rounded-[4px] group-hover:border-[rgba(95,255,96,0.28)] transition-all duration-300">
-                    <div className="font-jb text-[0.58rem] tracking-[0.16em] text-[rgba(95,255,96,0.38)] mb-1">
+
+                  {/* card */}
+                  <div className="ml-14 p-5 w-full bg-[rgba(10,12,10,0.88)] border border-[rgba(95,255,96,0.1)] rounded-[4px]">
+                    <div className="font-jb text-[0.6rem] tracking-[0.16em] text-[rgba(95,255,96,0.38)] mb-1">
                       {s.n}
                     </div>
+
                     <h3 className="font-syne text-[1rem] font-extrabold text-white mb-2">
                       {s.title}
                     </h3>
-                    <p className="font-jb text-[0.68rem] text-[rgba(180,220,180,0.48)] leading-relaxed">
+
+                    <p className="font-jb text-[0.75rem] text-[rgba(180,220,180,0.48)] leading-relaxed">
                       {s.desc}
                     </p>
                   </div>
@@ -258,7 +281,7 @@ const Skills = () => {
   return (
     <section className="sh-fade relative z-10 py-28 px-1 md:px-5">
       <div className="max-w-[1200px] mx-auto">
-        <div className="text-center mb-20">
+        <div className="text-center mb-15 md:mb-20">
           <div className="font-jb inline-block text-[0.6rem] tracking-[0.2em] uppercase text-[#5fff60] border border-[rgba(95,255,96,0.22)] px-[0.75rem] py-[0.22rem] rounded-[2px] mb-4">
             Skills
           </div>
@@ -273,7 +296,7 @@ const Skills = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 px-4 md:px-0">
           {skills.map((sk, i) => {
             const Icon = sk.icon;
             return (
@@ -363,25 +386,29 @@ export default function StudentHome() {
       <Styles />
       <div className="sh-bg font-jb min-h-screen bg-[#0a0a0a] text-[#e8ffe8] overflow-hidden">
         {/* ── Hero ── */}
-        <section className="relative z-10 min-h-[calc(100vh-56px)] flex flex-col items-center justify-center text-center px-1 md:px-5 py-20 overflow-hidden">
+        <section className="relative z-10 min-h-screen flex flex-col items-center justify-center text-center px-4 sm:px-6 md:px-10 py-20 overflow-hidden">
           {/* ambient glow */}
           <div className="pointer-events-none absolute top-[-80px] left-1/2 -translate-x-1/2 w-[700px] h-[400px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(95,255,96,0.07)_0%,transparent_70%)]" />
 
-          <div className="relative z-10 max-w-[780px] mx-auto">
+          <div className="relative z-10 w-full max-w-4xl mx-auto flex flex-col items-center">
             {/* eyebrow */}
-            <div className="sh-a1 font-jb inline-flex items-center gap-[0.45rem] text-[0.58rem] tracking-[0.2em] uppercase text-[#5fff60] border border-[rgba(95,255,96,0.25)] bg-[rgba(95,255,96,0.06)] px-[0.85rem] py-[0.3rem] rounded-[2px] mb-7">
+            <div className="sh-a1 font-jb inline-flex items-center gap-[0.45rem] text-[0.6rem] sm:text-[0.65rem] tracking-[0.2em] uppercase text-[#5fff60] border border-[rgba(95,255,96,0.25)] bg-[rgba(95,255,96,0.06)] px-[0.9rem] py-[0.35rem] rounded-[2px] mb-6">
               <Sparkles size={10} /> Join the Innovation
             </div>
 
+            {/* heading */}
             <h1
-              className="sh-a2 font-syne font-extrabold leading-[1.0] tracking-[-0.03em] text-white mb-5"
-              style={{ fontSize: "clamp(2.6rem,6.5vw,5rem)" }}
+              className="sh-a2 font-syne font-extrabold leading-[1] tracking-[-0.03em] text-white mb-5
+      text-[2.4rem] sm:text-[3rem] md:text-[3.8rem] lg:text-[4.5rem] xl:text-[5rem]"
             >
               Hackathons for <span className="text-[#5fff60]">Students</span>
             </h1>
 
             {/* body */}
-            <p className="sh-a3 font-jb text-[0.75rem] text-[rgba(180,220,180,0.48)] leading-relaxed max-w-[520px] mx-auto mb-9 tracking-[0.02em]">
+            <p
+              className="sh-a3 font-jb text-[0.8rem] sm:text-[0.85rem] md:text-[0.9rem]
+      text-[rgba(180,220,180,0.48)] leading-relaxed max-w-[520px] mx-auto mb-9 tracking-[0.02em] px-1"
+            >
               Join hackathons, learn new skills, collaborate with peers, and
               bring your ideas to life. Build real projects, gain mentorship,
               and grow your portfolio.
@@ -391,25 +418,26 @@ export default function StudentHome() {
             <div className="sh-a4 flex flex-wrap items-center justify-center gap-3">
               <Link
                 to="/hackathons"
-                className="font-jb inline-flex items-center gap-[0.5rem] text-[0.65rem] tracking-[0.12em] uppercase px-7 py-[0.75rem] rounded-[3px] border cursor-pointer transition-all duration-200 bg-[#5fff60] border-[#5fff60] text-[#050905] font-bold hover:bg-[#7fff80] hover:shadow-[0_0_24px_rgba(95,255,96,0.32)]"
+                className="font-jb inline-flex items-center gap-[0.5rem] text-[0.7rem] tracking-[0.12em] uppercase px-6 sm:px-7 py-[0.75rem] rounded-[3px] border cursor-pointer transition-all duration-200 bg-[#5fff60] border-[#5fff60] text-[#050905] font-bold hover:bg-[#7fff80] hover:shadow-[0_0_24px_rgba(95,255,96,0.32)]"
               >
                 Browse Hackathons <ArrowRight size={13} />
               </Link>
+
               <button
                 onClick={() =>
                   document
                     .getElementById("how-it-works")
                     ?.scrollIntoView({ behavior: "smooth" })
                 }
-                className="font-jb inline-flex items-center gap-[0.4rem] text-[0.65rem] tracking-[0.12em] uppercase px-7 py-[0.75rem] rounded-[3px] border cursor-pointer transition-all duration-150 bg-transparent border-[rgba(95,255,96,0.2)] text-[rgba(95,255,96,0.6)] hover:border-[rgba(95,255,96,0.42)] hover:text-[#5fff60]"
+                className="font-jb inline-flex items-center gap-[0.4rem] text-[0.7rem] tracking-[0.12em] uppercase px-6 sm:px-7 py-[0.75rem] rounded-[3px] border cursor-pointer transition-all duration-150 bg-transparent border-[rgba(95,255,96,0.2)] text-[rgba(95,255,96,0.6)] hover:border-[rgba(95,255,96,0.42)] hover:text-[#5fff60]"
               >
                 How it works
               </button>
             </div>
 
             {/* scroll hint */}
-            <div className="sh-pulse mt-12 flex flex-col items-center gap-[0.35rem]">
-              <span className="font-jb text-[0.48rem] tracking-[0.2em] uppercase text-[rgba(95,255,96,0.7)]">
+            <div className="sh-pulse mt-12 flex flex-col items-center gap-[0.4rem]">
+              <span className="font-jb text-[0.5rem] tracking-[0.2em] uppercase text-[rgba(95,255,96,0.7)]">
                 Scroll to explore
               </span>
               <div className="w-px h-7 bg-gradient-to-b from-[rgba(95,255,96,0.7)] to-transparent" />

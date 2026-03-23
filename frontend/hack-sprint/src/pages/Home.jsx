@@ -604,7 +604,7 @@ const Home = () => {
       <Navbar navigate={navigate} userType={userType} />
 
       {/* ── Hero ── */}
-      <section className="relative z-10 min-h-[calc(100vh-56px)] flex flex-col items-center justify-center px-5 py-20 text-center overflow-hidden">
+      <section className="relative z-10 min-h-[calc(100vh-56px)] flex flex-col items-center justify-center py-20 text-center overflow-hidden">
         <div className="hm-ring w-[700px] h-[700px]" />
         <div className="hm-ring hm-ring-2 w-[480px] h-[480px]" />
 
@@ -637,14 +637,14 @@ const Home = () => {
 
         <div className="relative z-10 max-w-[1000px] mx-auto">
           {/* eyebrow */}
-          <div className="hm-a1 font-jb inline-flex items-center gap-[0.45rem] text-[0.6rem] tracking-[0.2em] uppercase text-[#5fff60] border border-[rgba(95,255,96,0.25)] bg-[rgba(95,255,96,0.06)] px-[0.85rem] py-[0.32rem] rounded-[2px] mb-8">
+          <div className="hm-a1 font-jb inline-flex items-center gap-[0.45rem] text-[0.6rem] tracking-[0.2em] uppercase text-[#5fff60] border border-[rgba(95,255,96,0.25)] bg-[rgba(95,255,96,0.06)] px-[0.85rem] py-[0.32rem] rounded-[2px] mb-5 md:mb-8">
             <Sparkles size={11} /> Welcome to the Future of Innovation
           </div>
 
           {/* big title */}
           <h1
-            className="hm-a2 font-syne font-extrabold leading-[0.92] tracking-[-0.04em] text-white mb-3"
-            style={{ fontSize: "clamp(2.6rem,8vw,6rem)" }}
+            className="hm-a2 font-syne font-extrabold leading-[0.92] tracking-[-0.04em] text-white mb-3
+  text-[2.6rem] sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl"
           >
             Hack<span className="text-[#5fff60]">Sprint</span>
           </h1>

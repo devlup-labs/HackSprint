@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import Home from "./pages/Home";
 import GithubAuthHandler from "./components/GithubAuthHandler.jsx";
+import { Download } from "lucide-react";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import HideRoute from "./components/HideRoute";
@@ -47,6 +48,7 @@ import LegalSupportPage from "./pages/TermsCond.jsx";
 import CreateHackathonPage from "./pages/Admin/CreateHackathonPage.jsx";
 import AdminNavbar from "./components/Admin/AdminNavbar.jsx";
 import HideAdminRoutes from "./components/Admin/HideAdminRoutes.jsx";
+import Chatbot from "./components/Chatbot.jsx";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -97,22 +99,21 @@ function App() {
         <button
           onClick={handleInstallClick}
           className="
-          fixed bottom-5 right-5 z-[9999]
-          px-4 py-2
-          bg-[#0b0f0b]
-          text-[#5fff60]
-          border border-[#5fff60]/30
-          rounded-lg
-          font-mono
-          animate-[shake_1.5s_ease-in-out_infinite]
-      
-          hover:bg-[#5fff60]/10
-          hover:border-[#5fff60]
-          hover:shadow-[0_0_12px_rgba(95,255,96,0.4)]
-          active:scale-95
+          fixed bottom-20 cursor-pointer md:bottom-22 right-5 md:right-7 z-[9999]
+      p-3
+      bg-[#0b0f0b]
+      text-[#5fff60]
+      border border-[#5fff60]/30
+      rounded-full
+
+      hover:bg-[#5fff60]/10
+      hover:border-[#5fff60]
+      hover:shadow-[0_0_12px_rgba(95,255,96,0.4)]
+      active:scale-95
+      transition-all duration-200
         "
         >
-          Download App
+          <Download size={25} />
         </button>
       )}
       <Router>
@@ -129,6 +130,7 @@ function App() {
           <AdminNavbar />
         </HideAdminRoutes>
         <ToastContainer />
+        <Chatbot />
         <Routes>
           <Route path="/" element={<Home />} caseSensitive />
           <Route path="/studenthome" element={<Studenthome />} caseSensitive />

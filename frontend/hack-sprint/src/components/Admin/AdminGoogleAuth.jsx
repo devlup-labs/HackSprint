@@ -38,7 +38,7 @@ export default function AdminGoogleLogin() {
       onClick={googleLogin}
       className="text-lg text-center text-yellow-400 cursor-pointer w-full py-1.5 mt-3 mb-3 rounded-full bg-yellow-400/10 border-2 border-yellow-400 hover:bg-yellow-400/20 transition-all"
     >
-      <i className="fa-brands fa-google"></i> &nbsp; Admin Login with Google
+      <i className="fa-brands fa-google"></i> &nbsp; Login with Google
     </button>
   );
 }

@@ -183,7 +183,7 @@ const HowItWorks = () => {
   ];
 
   return (
-    <section className="relative z-10 py-28 px-1 md:px-5">
+    <section className="relative z-10 py-28">
       <div className="max-w-[1200px] mx-auto">
         {/* heading */}
         <div className="text-center mb-20">
@@ -191,7 +191,7 @@ const HowItWorks = () => {
             className="font-syne font-extrabold text-white tracking-tight leading-none"
             style={{ fontSize: "clamp(2.4rem,5vw,4rem)" }}
           >
-            How It <span className="text-[#5fff60]">Works.</span>
+            How It <span className="text-[#5fff60]">Works</span>
           </h2>
           <p className="font-jb text-[0.75rem] text-[rgba(180,220,180,0.48)] mt-4 tracking-[0.05em] max-w-md mx-auto">
             Four focused steps to launch your hackathon successfully
@@ -244,7 +244,7 @@ const HowItWorks = () => {
         </div>
 
         {/* Mobile vertical */}
-        <div className="lg:hidden relative pl-10">
+        <div className="lg:hidden relative px-8 ml-4 md:ml-0 md:px-0 md:pl-10">
           <div className="absolute left-4 top-0 bottom-0 w-px bg-gradient-to-b from-[rgba(95,255,96,0.08)] via-[rgba(95,255,96,0.4)] to-[rgba(95,255,96,0.08)]" />
           <div className="flex flex-col gap-7">
             {steps.map((s, i) => {
@@ -324,17 +324,21 @@ const Benefits = ({ navigate }) => {
   ];
 
   return (
-    <section className="relative z-10 py-28 px-2 md:px-5">
+    <section className="relative z-10 py-28 px-4 md:px-5">
       <div className="max-w-[1200px] mx-auto">
         {/* heading */}
-        <div className="text-center mb-20">
+        <div className="text-center mb-15 md:mb-20">
           <h2
-            className="font-syne font-extrabold text-white tracking-tight leading-none"
-            style={{ fontSize: "clamp(2.4rem,5vw,4rem)" }}
+            className="font-syne font-extrabold text-white tracking-tight leading-none
+    text-[2rem] sm:text-4xl md:text-5xl lg:text-6xl xl:text-[4rem]"
           >
             Why Organize <span className="text-[#5fff60]">Here?</span>
           </h2>
-          <p className="font-jb text-[0.75rem] text-[rgba(180,220,180,0.48)] mt-4 tracking-[0.05em] max-w-md mx-auto">
+
+          <p
+            className="font-jb text-[0.75rem] sm:text-[0.8rem] md:text-[0.85rem]
+    text-[rgba(180,220,180,0.48)] mt-4 tracking-[0.05em] max-w-md mx-auto"
+          >
             Powerful tools to maximise your hackathon's impact
           </p>
         </div>
@@ -430,12 +434,12 @@ export default function OrganizerHome() {
   return (
     <>
       <Styles />
-      <div className="oh-bg font-jb min-h-screen bg-[#0a0a0a] text-[#e8ffe8] overflow-x-hidden">
+      <div className="oh-bg font-jb min-h-screen bg-[#0a0a0a] text-[#e8ffe8] overflow-hidden">
         {/* Navbar */}
         <Navbar navigate={navigate} />
 
         {/* ── Hero ── */}
-        <section className="relative z-10 pt-35 pb-20 px-2 md:px-5 text-center overflow-hidden">
+        <section className="relative z-10 pt-35 pb-20 text-center overflow-hidden">
           {/* large ambient glow blobs */}
           <div className="pointer-events-none absolute top-[-120px] left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(95,255,96,0.09)_0%,transparent_70%)]" />
           <div className="pointer-events-none absolute top-[60px] left-[-10%] w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(95,255,96,0.04)_0%,transparent_70%)]" />
@@ -448,11 +452,10 @@ export default function OrganizerHome() {
             style={{ animationDuration: "25s", animationDirection: "reverse" }}
           />
 
-          <div className="relative z-10 w-full max-w-[1100px] mx-auto">
-            {/* giant title — fills the width */}
+          <div className="relative z-10 w-full max-w-7xl mx-auto">
             <h1
-              className="oh-reveal-2 font-syne font-extrabold leading-[0.95] tracking-[-0.04em] text-white mb-6"
-              style={{ fontSize: "clamp(2.5rem, 8vw, 6rem)" }}
+              className="oh-reveal-2 font-syne font-extrabold leading-[0.95] tracking-[-0.04em] text-white mb-6
+  text-[2.5rem] sm:text-5xl md:text-6xl lg:text-7xl xl:text-[6rem]"
             >
               Organize
               <br />
@@ -461,8 +464,10 @@ export default function OrganizerHome() {
               <span className="text-[#5fff60]">with Ease</span>
             </h1>
 
-            {/* sub — wider, not too narrow */}
-            <p className="oh-reveal-3 font-jb text-[clamp(0.7rem,1.4vw,0.85rem)] text-[rgba(180,220,180,0.5)] leading-relaxed mb-10 max-w-[680px] mx-auto tracking-[0.02em]">
+            <p
+              className="oh-reveal-3 font-jb text-[0.7rem] sm:text-[0.75rem] md:text-[0.8rem] lg:text-[0.85rem]
+  text-[rgba(180,220,180,0.5)] leading-relaxed mb-10 max-w-[680px] mx-auto tracking-[0.02em]"
+            >
               Launch, manage, and scale your hackathons on our platform. Connect
               with innovators, showcase challenges, and drive impactful
               solutions effortlessly.
