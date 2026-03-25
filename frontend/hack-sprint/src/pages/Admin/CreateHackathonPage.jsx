@@ -742,11 +742,11 @@ const debugFormData = (fd) => {
   if (import.meta.env.DEV) {
     console.group("[FormData entries]");
     for (const [key, value] of fd.entries()) {
-      console.log(
-        key,
-        "→",
-        value instanceof File ? `File(${value.name}, ${value.size}B)` : value
-      );
+      // console.log(
+      //   key,
+      //   "→",
+      //   value instanceof File ? `File(${value.name}, ${value.size}B)` : value
+      // );
     }
     console.groupEnd();
   }
@@ -805,7 +805,7 @@ const CreateHackathonPage = () => {
       try {
         const res = await getAdminDetails();
         const admin = res.data.admin;
-        console.log("[Admin Data]", admin);
+        // console.log("[Admin Data]", admin);
         setAdminData(admin);
       } catch {
         toast.error("You must be logged in to create a hackathon.");
@@ -903,12 +903,12 @@ const CreateHackathonPage = () => {
         setIsSubmitting(false);
         return;
       }
-      console.log(
-        "[Admin ID being sent]",
-        adminId,
-        "| Full adminData keys:",
-        Object.keys(adminData)
-      );
+      // console.log(
+      //   "[Admin ID being sent]",
+      //   adminId,
+      //   "| Full adminData keys:",
+      //   Object.keys(adminData)
+      // );
       fd.append("adminId", String(adminId));
       if (bannerFile) fd.append("image", bannerFile);
       debugFormData(fd);
