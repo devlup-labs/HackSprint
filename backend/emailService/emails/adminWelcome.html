@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Welcome — HackSprint</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #07070e;
+      font-family: 'Syne', sans-serif;
+      padding: 40px 16px;
+      margin: 0;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    /* ── BADGE PULSE ── */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .badge-dot {
+      display: inline-block;
+      width: 7px; height: 7px;
+      background: #f97316;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    a { color: inherit; }
+  </style>
+</head>
+<body>
+
+  <!-- OUTER WRAPPER -->
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#07070e">
+    <tr>
+      <td align="center" style="padding: 40px 16px;">
+
+        <!-- MAIN CARD -->
+        <table width="620" border="0" cellpadding="0" cellspacing="0" style="max-width:620px; width:100%;">
+
+          <!-- ══ HERO ══ -->
+          <tr>
+            <td style="background:#0d0d1c; border:1px solid #1a1a35; border-radius:20px 20px 0 0; padding:52px 48px 44px; font-family:'Syne',sans-serif;">
+
+              <!-- Logo Row -->
+              <table border="0" cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
+                <tr>
+                  <td style="padding-left:14px;">
+                    <div style="font-size:26px; font-weight:800; color:#ffffff; letter-spacing:-0.02em; font-family:'Syne',sans-serif;">HackSprint
+                      <span style="display:inline-block; background:rgba(249,115,22,0.12); border:1px solid rgba(249,115,22,0.28); color:#f97316; font-family:'Space Mono',monospace; font-size:9px; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; padding:3px 9px; border-radius:4px; vertical-align:middle; margin-left:8px;">Admin</span>
+                    </div>
+                    <div style="font-size:11px; color:#374151; font-family:'Space Mono',monospace; letter-spacing:0.1em; text-transform:uppercase; margin-top:2px;">IIT Jodhpur · Control Center</div>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Heading -->
+              <h1 style="font-size:34px; font-weight:800; color:#ffffff; line-height:1.15; letter-spacing:-0.03em; margin-bottom:16px; font-family:'Syne',sans-serif;">
+                Welcome,<br>
+                <span style="background:linear-gradient(90deg,#f97316,#facc15); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">{{name}}</span>
+              </h1>
+              <p style="color:#9ca3af; font-size:15px; line-height:1.7; margin-top:16px; font-family:'Syne',sans-serif;">
+                You now have full control over your hackathons. Create hackathons,
+                manage participants, review submissions, and run the entire event lifecycle
+                all from one powerful dashboard.
+              </p>
+
+            </td>
+          </tr>
+
+          <!-- ══ GRADIENT DIVIDER ══ -->
+          <tr>
+            <td style="background:linear-gradient(90deg,#f97316 0%,#facc15 50%,#7c3aed 100%); height:3px; font-size:0; line-height:0;">&nbsp;</td>
+          </tr>
+
+          <!-- ══ BODY ══ -->
+          <tr>
+            <td style="background:#0d0d1c; border-left:1px solid #1a1a35; border-right:1px solid #1a1a35; padding:44px 48px;">
+
+              <!-- ── ACTION CARDS (table rows) ── -->
+
+              <!-- Card 1 -->
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background:#111125; border:1px solid #1a1a35; border-radius:14px; margin-bottom:12px; border-left:3px solid #f97316;">
+                <tr>
+                  <td style="padding:20px 22px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="50" valign="top">
+                          <div style="width:42px; height:42px; background:rgba(249,115,22,0.12); border-radius:10px; text-align:center; line-height:42px; font-size:20px;">🚀</div>
+                        </td>
+                        <td style="padding-left:14px;" valign="top">
+                          <div style="font-weight:700; color:#ffffff; font-size:14.5px; margin-bottom:5px; font-family:'Syne',sans-serif;">Create a Hackathon</div>
+                          <div style="color:#6b7280; font-size:13px; line-height:1.55; font-family:'Syne',sans-serif;">Launch new events in minutes — set themes, deadlines, team sizes, prizes, and problem statements all from the creator panel.</div>
+                          <div style="display:inline-block; background:rgba(249,115,22,0.12); color:#f97316; border:1px solid rgba(249,115,22,0.25); font-family:'Space Mono',monospace; font-size:9px; text-transform:uppercase; letter-spacing:0.1em; padding:2px 10px; border-radius:100px; margin-top:8px;">Event Management</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Card 2 -->
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background:#111125; border:1px solid #1a1a35; border-radius:14px; margin-bottom:12px; border-left:3px solid #7c3aed;">
+                <tr>
+                  <td style="padding:20px 22px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="50" valign="top">
+                          <div style="width:42px; height:42px; background:rgba(124,58,237,0.12); border-radius:10px; text-align:center; line-height:42px; font-size:20px;">👥</div>
+                        </td>
+                        <td style="padding-left:14px;" valign="top">
+                          <div style="font-weight:700; color:#ffffff; font-size:14.5px; margin-bottom:5px; font-family:'Syne',sans-serif;">Monitor Participants</div>
+                          <div style="color:#6b7280; font-size:13px; line-height:1.55; font-family:'Syne',sans-serif;">Track registrations in real time. View team formations, individual profiles, skill tags, and engagement status across all active events.</div>
+                          <div style="display:inline-block; background:rgba(124,58,237,0.12); color:#a78bfa; border:1px solid rgba(124,58,237,0.25); font-family:'Space Mono',monospace; font-size:9px; text-transform:uppercase; letter-spacing:0.1em; padding:2px 10px; border-radius:100px; margin-top:8px;">Participants</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Card 3 -->
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background:#111125; border:1px solid #1a1a35; border-radius:14px; margin-bottom:12px; border-left:3px solid #0ea5e9;">
+                <tr>
+                  <td style="padding:20px 22px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="50" valign="top">
+                          <div style="width:42px; height:42px; background:rgba(14,165,233,0.12); border-radius:10px; text-align:center; line-height:42px; font-size:20px;">📦</div>
+                        </td>
+                        <td style="padding-left:14px;" valign="top">
+                          <div style="font-weight:700; color:#ffffff; font-size:14.5px; margin-bottom:5px; font-family:'Syne',sans-serif;">Review Submissions</div>
+                          <div style="color:#6b7280; font-size:13px; line-height:1.55; font-family:'Syne',sans-serif;">Browse all project submissions with links, screenshots, and descriptions. Assign scores, leave feedback, and manage the judging pipeline.</div>
+                          <div style="display:inline-block; background:rgba(14,165,233,0.12); color:#38bdf8; border:1px solid rgba(14,165,233,0.25); font-family:'Space Mono',monospace; font-size:9px; text-transform:uppercase; letter-spacing:0.1em; padding:2px 10px; border-radius:100px; margin-top:8px;">Judging</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Card 5 -->
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background:#111125; border:1px solid #1a1a35; border-radius:14px; margin-bottom:36px; border-left:3px solid #ec4899;">
+                <tr>
+                  <td style="padding:20px 22px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="50" valign="top">
+                          <div style="width:42px; height:42px; background:rgba(236,72,153,0.12); border-radius:10px; text-align:center; line-height:42px; font-size:20px;">📣</div>
+                        </td>
+                        <td style="padding-left:14px;" valign="top">
+                          <div style="font-weight:700; color:#ffffff; font-size:14.5px; margin-bottom:5px; font-family:'Syne',sans-serif;">Send Announcements</div>
+                          <div style="color:#6b7280; font-size:13px; line-height:1.55; font-family:'Syne',sans-serif;">Broadcast updates, reminders, and result notifications directly to all participants via email and in-app alerts.</div>
+                          <div style="display:inline-block; background:rgba(236,72,153,0.12); color:#f472b6; border:1px solid rgba(236,72,153,0.25); font-family:'Space Mono',monospace; font-size:9px; text-transform:uppercase; letter-spacing:0.1em; padding:2px 10px; border-radius:100px; margin-top:8px;">Communications</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- ── NOTICE BOX ── -->
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background:rgba(249,115,22,0.06); border:1px solid rgba(249,115,22,0.2); border-radius:12px; margin-bottom:32px;">
+                <tr>
+                  <td style="padding:18px 20px;">
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td width="28" valign="top" style="font-size:18px; padding-top:1px;">⚠️</td>
+                        <td style="padding-left:12px; color:#9ca3af; font-size:13px; line-height:1.6; font-family:'Syne',sans-serif;">
+                          <strong style="color:#f97316;">Admin Responsibility Notice:</strong> Your account has elevated privileges. Any actions taken like publishing events, updating results, or editing hackathons are logged and tied to your admin ID. Please act responsibly.
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- ── CTA ── -->
+              <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="padding-bottom:8px;">
+                    <a href="https://hacksprint.devluplabs.tech/admin"
+                       style="display:inline-block; background:linear-gradient(135deg,#f97316,#facc15); color:#07070e; font-family:'Syne',sans-serif; font-weight:700; font-size:15px; padding:16px 40px; border-radius:100px; text-decoration:none; letter-spacing:0.01em;">
+                      → Open Admin Dashboard
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- ══ FOOTER ══ -->
+          <tr>
+            <td style="background:#07070e; border:1px solid #1a1a35; border-top:none; border-radius:0 0 20px 20px; padding:32px 48px; text-align:center;">
+
+              <!-- Footer links -->
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+                <tr>
+                  <td align="center">
+                    <a href="https://hacksprint.devluplabs.tech" style="color:#4b5563; text-decoration:none; font-size:12px; font-family:'Space Mono',monospace; text-transform:uppercase; letter-spacing:0.08em; margin:0 12px;">Website</a>
+                    <a href="https://www.instagram.com/hack.sprint" style="color:#4b5563; text-decoration:none; font-size:12px; font-family:'Space Mono',monospace; text-transform:uppercase; letter-spacing:0.08em; margin:0 12px;">Instagram</a>
+                    <a href="https://github.com/devlup-labs/HackSprint" style="color:#4b5563; text-decoration:none; font-size:12px; font-family:'Space Mono',monospace; text-transform:uppercase; letter-spacing:0.08em; margin:0 12px;">Github</a>
+                    <a href="https://www.linkedin.com/company/hacksprintiitj/" style="color:#4b5563; text-decoration:none; font-size:12px; font-family:'Space Mono',monospace; text-transform:uppercase; letter-spacing:0.08em; margin:0 12px;">LinkedIn</a>
+                  </td>
+                </tr>
+              </table>
+
+              <div style="font-size:12px; color:#374151; line-height:1.6; font-family:'Space Mono',monospace;">
+                <strong style="color:#6b7280;">HackSprint · IIT Jodhpur · Admin Panel</strong>
+              </div>
+
+            </td>
+          </tr>
+
+        </table>
+        <!-- /MAIN CARD -->
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

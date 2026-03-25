@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import Admin from "../models/admin.model.js";
 import { oauth2client } from "../utils/googleAuth.utils.js";
+import { sendMail } from "../emailService/brevoEmail.js";
 import axios from "axios";
 
 export const adminSignup = async (req, res) => {
@@ -87,15 +88,7 @@ export const adminGoogleLogin = async (req, res) => {
 
     const { name, email } = userRes.data;
 
-    // if (!email.endsWith("@iitj.ac.in")) {
-    //   return res.status(403).json({
-    //     message: "Only authorized admin emails allowed",
-    //     success: false,
-    //   });
-    // }
-
     let admin = await Admin.findOne({ email });
-
     let isFirstTime = false;
 
     if (!admin) {
@@ -105,6 +98,18 @@ export const adminGoogleLogin = async (req, res) => {
         adminName: name,
         email,
         provider: "google",
+      });
+    }
+
+    if (isFirstTime) {
+      await sendMail({
+        to: admin.email,
+        subject: "Welcome Admin 🎉 - HackSprint",
+        templateName: "adminWelcome",
+        data: {
+          name: admin.adminName,
+          email: admin.email,
+        },
       });
     }
 

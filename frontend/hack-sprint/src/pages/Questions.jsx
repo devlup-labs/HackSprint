@@ -75,7 +75,7 @@ const Questions = () => {
   const navigate = useNavigate();
   const [quizStarted, setQuizStarted] = useState(false);
   const [currentQ, setCurrentQ] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(10);
+  const [timeLeft, setTimeLeft] = useState(59);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showExplanation, setShowExplanation] = useState(false);
   const [explanationTimer, setExplanationTimer] = useState(0);
@@ -108,7 +108,7 @@ const Questions = () => {
   const resetState = () => {
     setQuizStarted(false);
     setCurrentQ(0);
-    setTimeLeft(10);
+    setTimeLeft(59);
     setSelectedAnswer(null);
     setShowExplanation(false);
     setExplanationTimer(0);
@@ -126,7 +126,7 @@ const Questions = () => {
     if (s.getItem(KEYS.IDX) !== null)
       setCurrentQ(parseInt(s.getItem(KEYS.IDX), 10));
     if (s.getItem(KEYS.TIME) !== null)
-      setTimeLeft(parseInt(s.getItem(KEYS.TIME), 10));
+      setTimeLeft(parseInt(s.getItem(KEYS.TIME), 59));
     if (s.getItem(KEYS.ANSWERS) !== null)
       setUserAnswers(JSON.parse(s.getItem(KEYS.ANSWERS)));
     if (s.getItem(KEYS.STARTED) !== null)
@@ -184,11 +184,11 @@ const Questions = () => {
         if (fromToday()) {
           if (!localStorage.getItem(KEYS.STARTED)) {
             setQuizStarted(true);
-            setTimeLeft(10);
+            setTimeLeft(59);
           }
         } else {
           setQuizStarted(true);
-          setTimeLeft(10);
+          setTimeLeft(59);
           localStorage.setItem(KEYS.DATE, getDate());
         }
       }
@@ -219,7 +219,7 @@ const Questions = () => {
     setUserAnswers(a);
     if (currentQ < questions.length - 1) {
       setCurrentQ((p) => p + 1);
-      setTimeLeft(10);
+      setTimeLeft(59);
       setSelectedAnswer(null);
     } else {
       try {
@@ -241,7 +241,7 @@ const Questions = () => {
     a[currentQ] = {
       selectedAnswer: idx,
       isCorrect: correct,
-      timeSpent: 10 - timeLeft,
+      timeSpent: 59 - timeLeft,
     };
     setUserAnswers(a);
     try {
@@ -254,7 +254,7 @@ const Questions = () => {
       });
     } catch {}
     setShowExplanation(true);
-    setExplanationTimer(correct ? 5 : 10);
+    setExplanationTimer(correct ? 15 : 30);
   };
 
   const moveNext = () => {
@@ -263,7 +263,7 @@ const Questions = () => {
     setExplanationTimer(0);
     if (currentQ < questions.length - 1) {
       setCurrentQ((p) => p + 1);
-      setTimeLeft(10);
+      setTimeLeft(59);
     } else setQuizCompleted(true);
   };
 
@@ -466,7 +466,7 @@ const Questions = () => {
 
   const q = questions[currentQ];
   const progress = Math.round(((currentQ + 1) / questions.length) * 100);
-  const urgent = timeLeft <= 5;
+  const urgent = timeLeft <= 10;
 
   return (
     <div

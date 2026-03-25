@@ -194,7 +194,7 @@ const Chatbot = () => {
   const [messages, setMessages] = useState([
     {
       role: "bot",
-      text: "👋 Hey! I'm HackSprint Bot. Ask me anything about the hackathon!",
+      text: "👋 Hey! I'm HackSprint Bot. Ask me anything about the platform!",
       time: new Date(),
     },
   ]);

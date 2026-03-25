@@ -9,6 +9,7 @@ import TeamModel from "../models/team.js";
 import { PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import s3Client from "../config/aws.js";
 import fs from "fs";
+import { sendMail } from "../emailService/brevoEmail.js";
 
 // Get all hackathons created by a specific admin
 export const getAllHackathons = async (req, res) => {
@@ -332,7 +333,6 @@ export const approveHackathon = async (req, res) => {
   try {
     const { pendingHackathonId, adminId } = req.body;
 
-    // 🔒 Validate admin
     const admin = await Admin.findById(adminId);
     if (!admin || !admin.controller) {
       return res.status(403).json({
@@ -341,7 +341,6 @@ export const approveHackathon = async (req, res) => {
       });
     }
 
-    // 🔍 Find pending hackathon
     const pending = await PendingHackathon.findById(pendingHackathonId);
     if (!pending) {
       return res.status(404).json({
@@ -350,7 +349,6 @@ export const approveHackathon = async (req, res) => {
       });
     }
 
-    // 🚫 Prevent duplicate approval
     if (pending.approvals.includes(adminId)) {
       return res.status(400).json({
         success: false,
@@ -358,17 +356,14 @@ export const approveHackathon = async (req, res) => {
       });
     }
 
-    // 🔁 If previously rejected → reset rejection
     if (pending.approvalStatus === "rejected") {
       pending.rejectionDetails = {};
       pending.approvalStatus = "pending";
     }
 
-    // ✅ Add approval
     pending.approvals.push(adminId);
     await pending.save();
 
-    // 🔍 Get all controllers
     const controllers = await Admin.find({ controller: true }).select("_id");
     const allControllerIds = controllers.map((c) => c._id.toString());
     const approvedIds = pending.approvals.map((a) => a.toString());
@@ -377,11 +372,12 @@ export const approveHackathon = async (req, res) => {
       approvedIds.includes(id)
     );
 
-    // 🚀 If all approved → move to main collection
+    const hackathonTitle = pending.title;
+    const createdBy = pending.createdBy;
+
     if (allApproved) {
       const pendingData = pending.toObject();
 
-      // 🧹 Clean unwanted fields
       delete pendingData._id;
       delete pendingData.approvals;
       delete pendingData.rejectionDetails;
@@ -389,12 +385,10 @@ export const approveHackathon = async (req, res) => {
       delete pendingData.updatedAt;
       delete pendingData.__v;
 
-      // Ensure gallery exists
       if (!pendingData.gallery) {
         pendingData.gallery = [];
       }
 
-      // 🧠 Compute active status safely
       const now = new Date();
 
       const isActive =
@@ -405,12 +399,74 @@ export const approveHackathon = async (req, res) => {
 
       pendingData.status = isActive;
 
-      // 💾 Save to main collection
       const hackathon = new hackathonModel(pendingData);
       await hackathon.save();
 
-      // 🗑 Delete from pending
+      const hackathonId = hackathon._id.toString();
+
       await PendingHackathon.findByIdAndDelete(pendingHackathonId);
+
+      setImmediate(async () => {
+        try {
+          if (pending.createdBy) {
+            const creator = await Admin.findById(pending.createdBy);
+
+            if (creator?.email) {
+              await sendMail({
+                to: creator.email,
+                subject: "🎉 Your Hackathon is Approved!",
+                templateName: "hackathonApproved",
+                data: {
+                  name: creator.adminName || "Admin",
+                  hackathonName: pending.title,
+                  hackathonLink: `${FRONTEND_URL}/hackathon/${hackathonId}`,
+                },
+              });
+            }
+          }
+
+          const users = await UserModel.find({
+            isVerified: true,
+            email: { $exists: true, $ne: null },
+          });
+
+          const uniqueUsers = [
+            ...new Map(
+              users.map((u) => [
+                u.email.toLowerCase(),
+                { email: u.email, name: u.name },
+              ])
+            ).values(),
+          ];
+
+          const BATCH_SIZE = 50;
+
+          for (let i = 0; i < uniqueUsers.length; i += BATCH_SIZE) {
+            const batch = uniqueUsers.slice(i, i + BATCH_SIZE);
+
+            await Promise.all(
+              batch.map((user) =>
+                sendMail({
+                  to: user.email,
+                  subject: `New Hackathon Live: ${pending.title}`,
+                  templateName: "hackathonLive",
+                  data: {
+                    name: user.name || "User",
+                    hackathonName: pending.title,
+                    hackathonLink: `${FRONTEND_URL}/hackathon/${hackathonId}`,
+                  },
+                })
+              )
+            );
+
+            await new Promise((res) => setTimeout(res, 500));
+          }
+
+          console.log("Hackathon emails sent");
+        } catch (err) {
+          console.error("Email error:", err);
+        }
+      });
 
       return res.status(200).json({
         success: true,
@@ -422,7 +478,6 @@ export const approveHackathon = async (req, res) => {
       });
     }
 
-    // ⏳ Waiting for other approvals
     return res.status(200).json({
       success: true,
       message: "Approved. Waiting for other controllers.",
@@ -442,7 +497,6 @@ export const rejectHackathon = async (req, res) => {
   try {
     const { pendingHackathonId, adminId, rejectionReason } = req.body;
 
-    // 🔒 Validate admin
     const admin = await Admin.findById(adminId);
     if (!admin || !admin.controller) {
       return res.status(403).json({
@@ -451,7 +505,6 @@ export const rejectHackathon = async (req, res) => {
       });
     }
 
-    // 🔍 Find hackathon
     const pending = await PendingHackathon.findById(pendingHackathonId);
     if (!pending) {
       return res.status(404).json({
@@ -460,7 +513,6 @@ export const rejectHackathon = async (req, res) => {
       });
     }
 
-    // 🚫 Prevent duplicate reject
     if (pending.approvalStatus === "rejected") {
       return res.status(400).json({
         success: false,
@@ -468,10 +520,8 @@ export const rejectHackathon = async (req, res) => {
       });
     }
 
-    // ✅ Set approval status
     pending.approvalStatus = "rejected";
 
-    // ✅ Store rejection details (NEW STRUCTURE)
     pending.rejectionDetails = {
       reason: rejectionReason || "",
       rejectedAt: new Date(),
@@ -479,6 +529,35 @@ export const rejectHackathon = async (req, res) => {
     };
 
     await pending.save();
+
+    const hackathonTitle = pending.title;
+    const createdBy = pending.createdBy;
+    const reason = rejectionReason || "Please review guidelines and update your submission.";
+
+    setImmediate(async () => {
+      try {
+        if (createdBy) {
+          const creator = await Admin.findById(createdBy);
+
+          if (creator?.email) {
+            await sendMail({
+              to: creator.email,
+              subject: "Hackathon Rejected",
+              templateName: "hackathonRejected",
+              data: {
+                name: creator.adminName || "Admin",
+                hackathonName: hackathonTitle,
+                reason: reason,
+              },
+            });
+          }
+        }
+
+        console.log("Rejection email sent");
+      } catch (err) {
+        console.error("Email error:", err);
+      }
+    });
 
     return res.status(200).json({
       success: true,

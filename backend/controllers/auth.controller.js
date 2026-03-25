@@ -1,10 +1,9 @@
-
 import UserModel from "../models/user.models.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { oauth2client } from "../utils/googleAuth.utils.js";
 import axios from "axios";
-import { sendMail } from "../nodemailer/nodemailerConfig.js";
+import { sendMail } from "../emailService/brevoEmail.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -262,13 +261,6 @@ const googleLogin = async (req, res) => {
 
     const { name, email } = userRes.data;
 
-    // if (!isIITJEmail(email)) {
-    //   return res.status(403).json({
-    //     message: "Only iitj emails are allowed.",
-    //     success: false,
-    //   });
-    // }
-
     let user = await UserModel.findOne({ email });
     let isFirstTime = false;
 
@@ -292,7 +284,7 @@ const googleLogin = async (req, res) => {
       await sendMail({
         to: user.email,
         subject: "Welcome to HackSprint 🎉",
-        templateName: "welcome",
+        templateName: "userWelcome",
         data: { name: user.name, email: user.email },
       });
     }
@@ -312,7 +304,6 @@ const googleLogin = async (req, res) => {
     });
   }
 };
-
 
 /**
  * GITHUB LOGIN - no email verification required
