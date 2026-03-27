@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import cron from "node-cron";
 import compression from "compression";
 import dotenv from "dotenv";
 import connectDB from "./db/database.js";
@@ -13,7 +14,6 @@ import dailyQuizRoutes from "./routes/dailyQuiz.routes.js";
 import registrationRoutes from "./routes/registration.routes.js";
 import submitRoutes from "./routes/submission.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
-import "./controllers/dailyQuiz.js";
 import teamRoutes from "./routes/team.routes.js";
 import { githubDataRoutes } from "./routes/githubData.routes.js";
 import voteRoutes from "./routes/vote.routes.js";
@@ -21,6 +21,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { Message } from "./models/message.model.js";
 import chatRoutes from "./routes/chat.routes.js";
+import { runDailyQuizAutomation } from "./api/dailyQuizAutomation.js";
 
 const app = express();
 const server = createServer(app);
@@ -32,7 +33,7 @@ const io = new Server(server, {
       "http://localhost:3000",
       "http://127.0.0.1:5173",
       "https://hack-sprint-iitj.vercel.app",
-      "https://hacksprint.devluplabs.tech"
+      "https://hacksprint.devluplabs.tech",
     ],
     methods: ["GET", "POST"],
     credentials: true,
@@ -95,7 +96,7 @@ const corsOptions = {
     "http://localhost:3000",
     "http://127.0.0.1:5173",
     "https://hack-sprint-iitj.vercel.app",
-    "https://hacksprint.devluplabs.tech"
+    "https://hacksprint.devluplabs.tech",
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   credentials: true,
@@ -105,8 +106,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(compression());
 app.use(express.json());
-
-// --- ROUTES SETUP ---
 
 app.use("/api/githubData", githubDataRoutes);
 app.use("/api/devquest", devquestRoutes);
@@ -120,10 +119,20 @@ app.use("/api", githubRoutes);
 app.use("/api", oauthRoutes);
 app.use("/api/account", authRoutes);
 app.use("/api/team", teamRoutes);
-app.use("/api/chat", chatRoutes); // Use chat routes
-app.use("/api/votes", voteRoutes); // Use vote routes
+app.use("/api/chat", chatRoutes);
+app.use("/api/votes", voteRoutes);
 
-// --- SERVER START ---
+app.get("/cron/daily-quiz", async (req, res) => {
+  if (req.query.secret !== process.env.CRON_SECRET) {
+    return res.status(403).send("Unauthorized");
+  }
+
+  console.log("Cron triggered");
+
+  await runDailyQuizAutomation();
+
+  res.send("Cron job executed");
+});
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Server running on ${PORT}`));
