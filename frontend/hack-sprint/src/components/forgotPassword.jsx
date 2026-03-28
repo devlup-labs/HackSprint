@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { AppContent } from "../context/AppContext";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { API } from "../backendApis/api";
 
 function ForgotPassword() {
   const { backendUrl } = useContext(AppContent);
@@ -11,7 +12,7 @@ function ForgotPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post(`${backendUrl}/api/account/send-reset-link`, {
+      const { data } = await API.post(`${backendUrl}/api/account/send-reset-link`, {
         email,
       });
 

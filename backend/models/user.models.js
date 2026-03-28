@@ -3,7 +3,7 @@ import mongoose, { Mongoose } from "mongoose";
 const userSchema = new mongoose.Schema(
   {
     image: {
-      type: String
+      type: String,
     },
     userName: {
       type: String,
@@ -22,17 +22,16 @@ const userSchema = new mongoose.Schema(
       enum: ["local", "google", "github"],
       default: "local",
     },
-
     name: {
       type: String,
       required: true,
     },
-
-    team: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Team",
-      default: null
-    },
+    teams: [
+      {
+        hackathon: { type: mongoose.Schema.Types.ObjectId, ref: "hackathons" },
+        team: { type: mongoose.Schema.Types.ObjectId, ref: "Team" },
+      },
+    ],
     role: {
       type: String,
       enum: ["participant", "organizer", "admin"],
@@ -62,34 +61,34 @@ const userSchema = new mongoose.Schema(
     },
     isGitHubloggedIn: {
       type: Boolean,
-      default: false
+      default: false,
     },
     isGoogleLoggedIn: {
       type: Boolean,
-      default: false
+      default: false,
     },
     gitHubLink: {
-      type: String
+      type: String,
     },
     gitHubAccessToken: {
       type: String,
-      default: ""
+      default: "",
     },
     streaks: {
       type: Number,
-      default: 0
+      default: 0,
     },
     points: {
       type: Number,
-      default: 0
+      default: 0,
     },
     devQuestionsCorrectlyAnswered: {
       type: Number,
-      default: 0
+      default: 0,
     },
     devQuestionsIncorrectlyAnswered: {
       type: Number,
-      default: 0
+      default: 0,
     },
     currentQuizPoints: { type: Number, default: 0 },
     currentQuizTotalPoints: { type: Number, default: 0 },
@@ -100,68 +99,70 @@ const userSchema = new mongoose.Schema(
         validator: function (v) {
           return /^\+?[0-9]{10,15}$/.test(v);
         },
-        message: props => `${props.value} is not a valid phone number!`
-      }
+        message: (props) => `${props.value} is not a valid phone number!`,
+      },
     },
     leaderOfHackathons: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "hackathons" }
+      { type: mongoose.Schema.Types.ObjectId, ref: "hackathons" },
     ],
     registeredHackathons: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "hackathons" }
+      { type: mongoose.Schema.Types.ObjectId, ref: "hackathons" },
     ],
     submittedHackathons: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "hackathons" }
+      { type: mongoose.Schema.Types.ObjectId, ref: "hackathons" },
     ],
-    wishlist: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "hackathons" }
-    ],
+    wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "hackathons" }],
     attemptedDevQuestions: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "dailyQuiz" }
+      { type: mongoose.Schema.Types.ObjectId, ref: "dailyQuiz" },
     ],
     devQuestionSubmittedTime: {
-      type: Date
+      type: Date,
     },
     education: [
       {
         institute: {
-          type: String, required: true
+          type: String,
+          required: true,
         },
         passOutYear: {
-          type: Number, required: true
+          type: String,
+          required: true,
         },
         department: {
-          type: String, required: true
+          type: String,
+          required: true,
         },
         location: {
-          type: String, required: true
-        }
-      }
+          type: String,
+          required: true,
+        },
+      },
     ],
     connectedApps: [
       {
         appName: { type: String, required: true },
-        appURL: { type: String, required: true }
-      }
+        appURL: { type: String, required: true },
+      },
     ],
     languages: [
       {
-        language: { type: String, required: true }
-      }
+        language: { type: String, required: true },
+      },
     ],
     skills: [
       {
-        skill: { type: String, required: true}
-      }
+        skill: { type: String, required: true },
+      },
     ],
     coins: {
       type: Number,
-      default: 0
+      default: 0,
     },
-    hackathonPoints:{
-      type : Number,
-      default :0
+    hackathonPoints: {
+      type: Number,
+      default: 0,
     },
-    verificationTokenExpiresAt: Date
+    verificationTokenExpiresAt: Date,
   },
   { timestamps: true }
 );
@@ -173,6 +174,6 @@ userSchema.virtual("submissions", {
 });
 userSchema.set("toObject", { virtuals: true });
 userSchema.set("toJSON", { virtuals: true });
-const UserModel = mongoose.model("users", userSchema)
+const UserModel = mongoose.model("users", userSchema);
 
-export default UserModel
+export default UserModel;

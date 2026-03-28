@@ -5,6 +5,7 @@ import { SidebarNav } from "../hackathon/Sidebar-nav";
 import { ContentSection } from "../hackathon/Content-section";
 import { SocialShare } from "../hackathon/Social-share";
 import { useParams } from "react-router-dom";
+import { API } from "../backendApis/api";
 
 const GridBackground = () => (
   <div className="absolute inset-0 pointer-events-none bg-[rgba(8,10,8,0.92)] backdrop-blur-xl"></div>
@@ -38,7 +39,7 @@ export default function HackathonDetails() {
       setLoading(true);
       setError("");
       try {
-        const res = await axios.get(
+        const res = await API.get(
           `${import.meta.env.VITE_API_BASE_URL}/api/hackathons/${id}`
         );
         if (!res.data) {
@@ -48,7 +49,7 @@ export default function HackathonDetails() {
           setHackathon(res.data);
         }
       } catch (err) {
-        console.error(err);
+        // console.error(err);
         setError("Failed to load hackathon details. Please try again later.");
         setHackathon(null);
       }

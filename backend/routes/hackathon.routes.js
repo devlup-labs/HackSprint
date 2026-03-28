@@ -4,7 +4,6 @@ import {
   getExpiredHackathons,
   getUpcomingHackathons,
   getHackathonById,
-  createHackathon,
   getHackathonResults,
   addGalleryImages,
   deleteGalleryImage,
@@ -18,6 +17,7 @@ import {
   uploadGalleryImages
 } from "../middlewares/Multerhackathon.js";
 import { verifyAuth } from "../middlewares/userAuth.js";
+import { adminAuth } from "../middlewares/adminAuth.js";
 
 const router = express.Router();
 
@@ -30,8 +30,7 @@ router.get("/wishlist/check/:hackathonId", verifyAuth, checkHackathonLiked);
 router.get("/:id", getHackathonById);
 router.get("/:id/results", getHackathonResults);
 router.get("/:hackathonId/gallery", getHackathonGallery);
-router.post("/", uploadHackathonImages, createHackathon);
-router.post("/:hackathonId/gallery", uploadGalleryImages, addGalleryImages);
-router.delete("/:hackathonId/gallery", deleteGalleryImage);
+router.post("/:hackathonId/gallery", adminAuth, uploadGalleryImages, addGalleryImages);
+router.delete("/:hackathonId/gallery", adminAuth, deleteGalleryImage);
 
 export default router;

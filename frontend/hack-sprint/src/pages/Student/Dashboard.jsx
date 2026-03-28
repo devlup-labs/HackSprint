@@ -41,6 +41,7 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import SubmissionForms from "../../hackathon/DashboardSubmission";
 import "../Styles/Dashboard.css";
+import { API } from "../../backendApis/api";
 
 const inputCls = [
   "w-full bg-[rgba(18,22,18,0.7)] border border-[rgba(95,255,96,0.12)] rounded-[3px]",
@@ -213,7 +214,7 @@ export const UserDashboard = () => {
       setData(res.data.userData);
       setUserId(res.data.userData._id);
     } catch (err) {
-      console.error(err);
+      // console.error(err);
     } finally {
       setLoading(false);
     }
@@ -249,7 +250,7 @@ export const UserDashboard = () => {
     if (!token) return;
     setLoadingWishlist(true);
     try {
-      const res = await axios.get(
+      const res = await API.get(
         `${import.meta.env.VITE_API_BASE_URL}/api/hackathons/wishlist`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -277,7 +278,7 @@ export const UserDashboard = () => {
       await fetchData();
       resetEducationForm();
     } catch (err) {
-      console.error(err);
+      // console.error(err);
     }
   };
   const handleDeleteEducation = async (idx) => {
@@ -321,7 +322,7 @@ export const UserDashboard = () => {
       await fetchData();
       resetForm();
     } catch (err) {
-      console.error(err);
+      // console.error(err);
     }
   };
   const handleDeleteApp = async (idx) => {
@@ -387,7 +388,7 @@ export const UserDashboard = () => {
       setSelectedSkill("");
       setIsAddingSkill(false);
     } catch (err) {
-      console.error(err);
+      // console.error(err);
     }
   };
   const handleDeleteSkill = async (skillName) => {

@@ -14,6 +14,7 @@ import {
   Clock,
   LinkIcon,
 } from "lucide-react";
+import { API } from "../backendApis/api";
 
 const mono = "font-[family-name:'JetBrains_Mono',monospace]";
 const syne = "font-[family-name:'Syne',sans-serif]";
@@ -169,10 +170,10 @@ const TeamDetails = () => {
       try {
         if (code) {
           const [teamRes, pendingRes] = await Promise.all([
-            axios.get(
+            API.get(
               `${import.meta.env.VITE_API_BASE_URL}/api/team/search/${code}`
             ),
-            axios.post(
+            API.post(
               `${import.meta.env.VITE_API_BASE_URL}/api/team/pendingRequests`,
               { teamCode: code }
             ),
@@ -222,7 +223,7 @@ const TeamDetails = () => {
   const handleRequestAction = async (userId, action) => {
     setActionLoading(true);
     try {
-      const r = await axios.post(
+      const r = await API.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/team/handleRequest`,
         { teamCode: teamData.code, userId, action }
       );

@@ -5,6 +5,7 @@ import {
   Settings, CheckCircle, AlertCircle, Info, Star, FileText,
   Target, Award, Images, X, UploadCloud, ImagePlus, Trash2
 } from 'lucide-react';
+import { API } from '../../backendApis/api';
 
 const ImageDropZone = ({ preview, onFileSelect, onClear, label = "Upload Image", accept = "image/*" }) => {
   const [isDragging, setIsDragging] = useState(false);
@@ -196,7 +197,7 @@ const Admin = () => {
       const fd = new FormData();
       fd.append('image', item.file);
       fd.append('caption', '');
-      await axios.post(
+      await API.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/hackathons/${hackathonId}/gallery`,
         fd,
         { headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${localStorage.getItem('token')}` } }
@@ -237,7 +238,7 @@ const Admin = () => {
       formData.append('gallery', JSON.stringify([]));
       if (bannerFile) formData.append('image', bannerFile);
 
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/hackathons`, formData, {
+      const response = await API.post(`${import.meta.env.VITE_API_BASE_URL}/api/hackathons`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 

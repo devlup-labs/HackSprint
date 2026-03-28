@@ -4,6 +4,7 @@ import { AppContent } from "../context/AppContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { API } from "../backendApis/api";
 
 function Verification({ length = 6 }) {
   // axios.defaults.withCredentials = true;
@@ -60,7 +61,7 @@ function Verification({ length = 6 }) {
 
       const verifyToken = localStorage.getItem("verifyToken");
 
-      const { data } = await axios.post(
+      const { data } = await API.post(
         `${backendUrl}/api/account/verify-email`,
         { verificationToken: otpValue },
         {

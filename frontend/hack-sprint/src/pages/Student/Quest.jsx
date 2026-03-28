@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CornerDownRight, X, Zap, Target, Cloud, Flame } from "lucide-react";
 import axios from "axios";
+import { API } from "../../backendApis/api";
 import "../Styles/Quest.css";
 
 const INFO_CARDS = [
@@ -69,14 +70,14 @@ const Quest = () => {
   }, [redirectCountdown, navigate]);
 
   useEffect(() => {
-    axios
+    API
       .get(`${import.meta.env.VITE_API_BASE_URL}/api/dailyquiz/today`)
       .then((r) => setTodayQuiz(r.data.dailyQuiz))
       .catch(console.error);
   }, []);
 
   useEffect(() => {
-    axios
+    API
       .get(`${import.meta.env.VITE_API_BASE_URL}/api/dailyquiz/allquiz`)
       .then((r) => {
         const data = r.data.quizData || [];

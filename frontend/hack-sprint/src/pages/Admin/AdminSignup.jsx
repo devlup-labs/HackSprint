@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { API } from "../../backendApis/api";
 import AdminGoogleLogin from "../../components/Admin/AdminGoogleAuth";
 
 function AdminSignup() {
@@ -16,7 +17,7 @@ function AdminSignup() {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post(
+      const { data } = await API.post(
         `${backendUrl}/api/admin/signup`,
         { adminName, email, password }
       );

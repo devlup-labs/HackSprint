@@ -77,7 +77,7 @@ const ChatInterface = ({ hackathonId }) => {
       const d = jwtDecode(token);
       setCurrentUser({ ...d, _id: d._id || d.id || d.userId });
     } catch (e) {
-      console.error(e);
+      // console.error(e);
     }
   }, []);
 
@@ -98,7 +98,7 @@ const ChatInterface = ({ hackathonId }) => {
         );
         if (r.ok) setMessages(await r.json());
       } catch {
-        console.error("Failed to fetch messages");
+        // console.error("Failed to fetch messages");
       } finally {
         setIsLoading(false);
       }

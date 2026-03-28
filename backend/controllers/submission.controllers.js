@@ -58,7 +58,8 @@ const uploadFiles = async (files, resourceType, hackathonId) => {
 
 export const submitHackathonSolution = async (req, res) => {
   try {
-    const { hackathonId, repoUrl, userId } = req.body || {};
+    const { hackathonId, repoUrl } = req.body || {};
+    const userId = req.user._id;
 
     if (!hackathonId || !userId) {
       return res.status(400).json({
@@ -241,7 +242,8 @@ export const submitHackathonSolution = async (req, res) => {
 
 export const getSubmissionStatus = async (req, res) => {
   try {
-    const { hackathonId, teamId, userId } = req.query;
+    const { hackathonId, teamId } = req.query;
+    const userId = req.user._id;
 
     if (!hackathonId || (!teamId && !userId)) {
       return res
@@ -335,7 +337,8 @@ export const getSubmissionsByHackathon = async (req, res) => {
 export const updateSubmission = async (req, res) => {
   try {
     const { id } = req.params;
-    const { repoUrl, userId } = req.body;
+    const { repoUrl } = req.body;
+    const userId = req.user._id;
 
     const submission = await SubmissionModel.findById(id);
     if (!submission) {
@@ -343,37 +346,28 @@ export const updateSubmission = async (req, res) => {
     }
 
     const hackathon = await hackathonModel.findById(submission.hackathon);
-
     const now = new Date();
 
     if (hackathon.submissionEndDate && now > hackathon.submissionEndDate) {
-      return res.status(403).json({
-        message: "Submission deadline passed",
-      });
+      return res.status(403).json({ message: "Submission deadline passed" });
     }
 
-    // 🔐 Authorization check
     if (submission.team) {
       const team = await TeamModel.findById(submission.team);
-
       if (team.leader.toString() !== userId.toString()) {
-        return res.status(403).json({
-          message: "Only team leader can update submission",
-        });
+        return res
+          .status(403)
+          .json({ message: "Only team leader can update submission" });
       }
     } else {
       if (submission.participant.toString() !== userId.toString()) {
-        return res.status(403).json({
-          message: "Unauthorized",
-        });
+        return res.status(403).json({ message: "Unauthorized" });
       }
     }
 
-    // Validate file types
     if (req.files && hackathon.allowedFileTypes) {
       for (const [field, files] of Object.entries(req.files)) {
         const allowed = hackathon.allowedFileTypes?.[field] || [];
-
         for (const file of files) {
           const ext = getFileExtension(file.originalname);
           if (allowed.length && !allowed.includes(ext)) {
@@ -385,30 +379,40 @@ export const updateSubmission = async (req, res) => {
       }
     }
 
-    // Upload new files (complete overwrite)
-    const docs =
-      req.files?.docs?.length > 0
-        ? await uploadFiles(req.files.docs, "raw", hackathon._id)
-        : [];
+    let docs = JSON.parse(req.body.existingDocs || "[]");
+    let images = JSON.parse(req.body.existingImages || "[]");
+    let videos = JSON.parse(req.body.existingVideos || "[]");
 
-    const images =
-      req.files?.images?.length > 0
-        ? await uploadFiles(req.files.images, "image", hackathon._id)
-        : [];
+    if (req.files?.docs?.length > 0) {
+      const newDocs = await uploadFiles(req.files.docs, "raw", hackathon._id);
+      docs = [...docs, ...newDocs];
+    }
 
-    const videos =
-      req.files?.videos?.length > 0
-        ? await uploadFiles(req.files.videos, "video", hackathon._id)
-        : [];
+    if (req.files?.images?.length > 0) {
+      const newImages = await uploadFiles(
+        req.files.images,
+        "image",
+        hackathon._id
+      );
+      images = [...images, ...newImages];
+    }
+
+    if (req.files?.videos?.length > 0) {
+      const newVideos = await uploadFiles(
+        req.files.videos,
+        "video",
+        hackathon._id
+      );
+      videos = [...videos, ...newVideos];
+    }
 
     let repoUrls = [];
     try {
       repoUrls = JSON.parse(repoUrl || "[]");
     } catch {
-      repoUrls = [repoUrl];
+      repoUrls = repoUrl ? [repoUrl] : [];
     }
 
-    // COMPLETE OVERWRITE
     submission.repoUrl = repoUrls;
     submission.docs = docs;
     submission.images = images;
@@ -421,7 +425,6 @@ export const updateSubmission = async (req, res) => {
       message: "Submission updated successfully",
       submission,
     });
-
   } catch (error) {
     console.error("Error updating submission:", error);
     return res.status(500).json({ message: "Server error" });

@@ -14,7 +14,7 @@ import { sendMail } from "../emailService/brevoEmail.js";
 // Get all hackathons created by a specific admin
 export const getAllHackathons = async (req, res) => {
   try {
-    const { adminId } = req.body;
+    const adminId = req.admin._id;
 
     if (!adminId) {
       return res.status(400).json({
@@ -53,7 +53,8 @@ export const getAllHackathons = async (req, res) => {
 // Get detailed information for a single hackathon created by an admin
 export const getMyHackathon = async (req, res) => {
   try {
-    const { adminId, hackathonId } = req.body;
+    const { hackathonId } = req.body;
+    const adminId = req.admin._id;
 
     // 1. Fetch the main hackathon document
     const hackathon = await hackathonModel.findOne({
@@ -204,20 +205,6 @@ export const createPendingHackathon = async (req, res) => {
       });
     }
 
-    if (!data.adminId) {
-      return res.status(400).json({
-        success: false,
-        message: "Admin ID is required",
-      });
-    }
-
-    if (!mongoose.Types.ObjectId.isValid(data.adminId)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid Admin ID",
-      });
-    }
-
     // ================= DATE VALIDATION =================
     const dateFields = [
       "startDate",
@@ -236,9 +223,7 @@ export const createPendingHackathon = async (req, res) => {
       }
     });
 
-    // ================= FIELD TRANSFORM =================
-    data.createdBy = data.adminId;
-    delete data.adminId;
+    data.createdBy = req.admin._id;
 
     if (imageUrl) {
       data.image = imageUrl;
@@ -331,7 +316,8 @@ export const createPendingHackathon = async (req, res) => {
 // Approve a pending hackathon (controller-only)
 export const approveHackathon = async (req, res) => {
   try {
-    const { pendingHackathonId, adminId } = req.body;
+    const { pendingHackathonId } = req.body;
+    const adminId = req.admin._id;
 
     const admin = await Admin.findById(adminId);
     if (!admin || !admin.controller) {
@@ -495,7 +481,8 @@ export const approveHackathon = async (req, res) => {
 // Reject a pending hackathon (controller-only)
 export const rejectHackathon = async (req, res) => {
   try {
-    const { pendingHackathonId, adminId, rejectionReason } = req.body;
+    const { pendingHackathonId, rejectionReason } = req.body;
+    const adminId = req.admin._id;
 
     const admin = await Admin.findById(adminId);
     if (!admin || !admin.controller) {
@@ -532,7 +519,8 @@ export const rejectHackathon = async (req, res) => {
 
     const hackathonTitle = pending.title;
     const createdBy = pending.createdBy;
-    const reason = rejectionReason || "Please review guidelines and update your submission.";
+    const reason =
+      rejectionReason || "Please review guidelines and update your submission.";
 
     setImmediate(async () => {
       try {
@@ -576,7 +564,7 @@ export const rejectHackathon = async (req, res) => {
 // Display all pending hackathons
 export const displayPendingHackathon = async (req, res) => {
   try {
-    const { adminId } = req.params;
+    const adminId = req.admin._id;
 
     if (!adminId) {
       return res.status(400).json({
@@ -621,7 +609,9 @@ export const displayPendingHackathon = async (req, res) => {
 export const updateHackathonPoint = async (req, res) => {
   const session = await mongoose.startSession();
   try {
-    const { adminId, submissionId, points } = req.body;
+    const { submissionId, points } = req.body;
+    const adminId = req.admin._id;
+
     if (!adminId) {
       return res
         .status(401)
@@ -774,7 +764,8 @@ export const getAdminDetails = async (req, res) => {
 export const editHackathon = async (req, res) => {
   try {
     // ── 1. Validate IDs ──────────────────────────────────────────────────────
-    const { hackathonId, adminId } = req.body;
+    const { hackathonId } = req.body;
+    const adminId = req.admin._id;
 
     if (!hackathonId || !mongoose.Types.ObjectId.isValid(hackathonId)) {
       return res
@@ -794,10 +785,15 @@ export const editHackathon = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Hackathon not found." });
     }
-    if (hackathon.createdBy.toString() !== adminId.toString()) {
+
+    const isCreator = hackathon.createdBy.toString() === adminId.toString();
+
+    const isController = req.admin?.controller === true;
+
+    if (!isCreator && !isController) {
       return res.status(403).json({
         success: false,
-        message: "You are not the creator of this hackathon.",
+        message: "You are not authorized to edit this hackathon.",
       });
     }
 
@@ -986,7 +982,8 @@ export const editHackathon = async (req, res) => {
 
 export const deleteHackathon = async (req, res) => {
   try {
-    const { hackathonId, adminId } = req.body;
+    const { hackathonId } = req.body;
+    const adminId = req.admin._id;
 
     // ── Validate IDs ─────────────────────────────────────
     if (!hackathonId || !mongoose.Types.ObjectId.isValid(hackathonId)) {

@@ -9,6 +9,7 @@ import {
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { createPortal } from "react-dom";
+import { API } from "../backendApis/api";
 
 const isVideo = (url) => /\.(mp4|webm|ogg)$/i.test(url);
 
@@ -36,7 +37,7 @@ const Gallery = () => {
   const currentFile = images[lightboxIndex];
 
   useEffect(() => {
-    axios
+    API
       .get(
         `${
           import.meta.env.VITE_API_BASE_URL
@@ -45,7 +46,7 @@ const Gallery = () => {
       .then((r) => {
         if (r.data.success) setImages(r.data.gallery || []);
       })
-      .catch(console.error)
+      .catch()
       .finally(() => setLoading(false));
   }, [hackathonId]);
 

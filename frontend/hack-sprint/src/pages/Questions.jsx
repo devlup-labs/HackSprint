@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { getDashboard } from "../backendApis/api";
 import { useNavigate } from "react-router-dom";
+import { API } from "../backendApis/api";
 
 const mono = "font-[family-name:'JetBrains_Mono',monospace]";
 const syne = "font-[family-name:'Syne',sans-serif]";
@@ -91,7 +92,7 @@ const Questions = () => {
   useEffect(() => {
     getDashboard()
       .then((r) => setUserId(r.data.userData._id))
-      .catch(console.error);
+      .catch();
   }, []);
 
   useEffect(() => {
@@ -156,7 +157,7 @@ const Questions = () => {
     (async () => {
       try {
         setIsLoading(true);
-        const r = await axios.get(
+        const r = await API.get(
           `${import.meta.env.VITE_API_BASE_URL}/api/dailyquiz/today`
         );
         if (r.data?.dailyQuiz?.questions?.length > 0) {
@@ -223,7 +224,7 @@ const Questions = () => {
       setSelectedAnswer(null);
     } else {
       try {
-        await axios.post(
+        await API.post(
           `${import.meta.env.VITE_API_BASE_URL}/api/user/finishquiz`,
           { userId, quizId }
         );
@@ -248,7 +249,7 @@ const Questions = () => {
       const url = correct
         ? "/api/user/correctanswer"
         : "/api/user/incorrectanswer";
-      await axios.post(`${import.meta.env.VITE_API_BASE_URL}${url}`, {
+      await API.post(`${import.meta.env.VITE_API_BASE_URL}${url}`, {
         questionId: questions[currentQ].id,
         userId,
       });
@@ -269,7 +270,7 @@ const Questions = () => {
 
   const handleFinish = async () => {
     try {
-      await axios.post(
+      await API.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/user/finishquiz`,
         { userId, quizId }
       );

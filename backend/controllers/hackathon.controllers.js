@@ -129,85 +129,6 @@ export const getHackathonById = async (req, res) => {
   }
 };
 
-// --- CREATE HACKATHON ---
-// Expects multer.fields([{ name: "image", maxCount: 1 }, { name: "gallery", maxCount: 10 }])
-export const createHackathon = async (req, res) => {
-  const tempFiles = []; // track all temp files for cleanup on error
-
-  try {
-    // ── 1. Upload banner image ───────────────────────────────────────────────
-    let imageUrl = "";
-
-    const bannerFile = req.files?.image?.[0];
-    if (bannerFile) {
-      tempFiles.push(bannerFile.path);
-      const { url } = await uploadFileToS3(bannerFile, "hackathons/images");
-      imageUrl = url;
-    }
-
-    // ── 2. Upload gallery images ─────────────────────────────────────────────
-    const galleryFiles = req.files?.gallery || [];
-    const galleryImages = [];
-
-    for (const file of galleryFiles) {
-      tempFiles.push(file.path);
-      const { url } = await uploadFileToS3(file, `hackathons/gallery`);
-      galleryImages.push(url); // Just store the URL string
-    }
-
-    // ── 3. Parse array fields ────────────────────────────────────────────────
-    const parsedBody = parseArrayFields(req.body);
-
-    // ── Handle refMaterial safely ─────────────────────────────
-    if (parsedBody.refMaterial !== undefined) {
-      if (Array.isArray(parsedBody.refMaterial)) {
-        parsedBody.refMaterial = parsedBody.refMaterial.filter(Boolean);
-      } else if (typeof parsedBody.refMaterial === "string") {
-        try {
-          const parsed = JSON.parse(parsedBody.refMaterial);
-
-          if (Array.isArray(parsed)) {
-            parsedBody.refMaterial = parsed;
-          } else {
-            parsedBody.refMaterial = [parsedBody.refMaterial];
-          }
-        } catch {
-          parsedBody.refMaterial = [parsedBody.refMaterial];
-        }
-      } else {
-        parsedBody.refMaterial = [];
-      }
-    }
-
-    // ── 4. Save to DB ────────────────────────────────────────────────────────
-    const hackathonData = new hackathonModel({
-      ...parsedBody,
-      image: imageUrl,
-      gallery: galleryImages,
-      createdBy: req.body.adminId,
-    });
-
-    await hackathonData.save();
-
-    res.status(201).json({
-      message: "Hackathon Added Successfully",
-      hackathon: hackathonData, // key must be "hackathon" so frontend gallery upload finds ._id
-    });
-  } catch (err) {
-    // Clean up any temp files that didn't get deleted yet
-    tempFiles.forEach((filePath) => {
-      if (fs.existsSync(filePath)) {
-        try {
-          fs.unlinkSync(filePath);
-        } catch {}
-      }
-    });
-
-    console.error("Create hackathon error:", err);
-    res.status(400).json({ error: err.message });
-  }
-};
-
 // --- GET HACKATHON RESULTS ---
 export const getHackathonResults = async (req, res) => {
   try {
@@ -231,26 +152,34 @@ export const addGalleryImages = async (req, res) => {
   try {
     const { hackathonId } = req.params;
 
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ message: "No images provided" });
-    }
-
     const hackathon = await hackathonModel.findById(hackathonId);
+
     if (!hackathon) {
       return res.status(404).json({ message: "Hackathon not found" });
     }
 
-    // ✅ Limit gallery size
+    if (
+      !req.admin?.controller &&
+      hackathon.createdBy.toString() !== req.admin._id.toString()
+    ) {
+      return res.status(403).json({
+        message: "You are not allowed to modify this hackathon",
+      });
+    }
+
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: "No images provided" });
+    }
+
     if (hackathon.gallery.length + req.files.length > 30) {
       return res.status(400).json({
-        message: "Max 10 images allowed in gallery",
+        message: "Max 30 images allowed in gallery",
       });
     }
 
     const validTypes = ["image/jpeg", "image/png", "image/webp"];
 
     const uploadPromises = req.files.map(async (file) => {
-      // ✅ File validation
       if (!validTypes.includes(file.mimetype)) {
         throw new Error(`Invalid file type: ${file.originalname}`);
       }
@@ -260,7 +189,6 @@ export const addGalleryImages = async (req, res) => {
         `hackathons/${hackathonId}/gallery`
       );
 
-      // ✅ Delete temp file
       try {
         fs.unlinkSync(file.path);
       } catch (e) {
@@ -292,11 +220,20 @@ export const addGalleryImages = async (req, res) => {
 export const deleteGalleryImage = async (req, res) => {
   try {
     const { hackathonId } = req.params;
-    const { imageUrl } = req.body; // ✅ changed
+    const { imageUrl } = req.body;
 
     const hackathon = await hackathonModel.findById(hackathonId);
     if (!hackathon) {
       return res.status(404).json({ message: "Hackathon not found" });
+    }
+
+    if (
+      !req.admin?.controller &&
+      hackathon.createdBy.toString() !== req.admin._id.toString()
+    ) {
+      return res.status(403).json({
+        message: "You are not allowed to modify this hackathon",
+      });
     }
 
     const imageIndex = hackathon.gallery.indexOf(imageUrl);
@@ -358,7 +295,7 @@ export const getHackathonGallery = async (req, res) => {
 export const toggleHackathonWishlist = async (req, res) => {
   try {
     const { hackathonId } = req.body;
-    const userId = req.userId || req.body.userId; // Try req.userId first
+    const userId = req.user._id; // Try req.userId first
 
     if (!hackathonId)
       return res
@@ -410,7 +347,7 @@ export const toggleHackathonWishlist = async (req, res) => {
 // --- GET USER WISHLIST ---
 export const getUserHackathonWishlist = async (req, res) => {
   try {
-    const userId = req.userId || req.body?.userId; // Try req.userId first
+    const userId = req.user._id; // Try req.userId first
 
     if (!userId) {
       return res.status(401).json({
@@ -448,7 +385,7 @@ export const getUserHackathonWishlist = async (req, res) => {
 export const checkHackathonLiked = async (req, res) => {
   try {
     const { hackathonId } = req.params;
-    const userId = req.userId || req.body?.userId; // Try req.userId first, fallback to req.body.userId
+    const userId = req.user._id; // Try req.userId first, fallback to req.body.userId
 
     if (!userId) {
       return res.status(401).json({

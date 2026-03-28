@@ -20,7 +20,7 @@ const userAuth = async (req, res, next) => {
     const decoded = jwt.verify(jsonToken, process.env.SECRET_KEY);
 
     if (decoded.email) {
-      req.email = decoded.email
+      req.email = decoded.email;
       next();
     } else {
       return res.status(401).json({
@@ -36,7 +36,6 @@ const userAuth = async (req, res, next) => {
   }
 };
 
-
 const verifyAuth = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   const verifyToken = authHeader && authHeader.split(" ")[1]; // Format: Bearer <token>
@@ -51,20 +50,29 @@ const verifyAuth = async (req, res, next) => {
   try {
     const decoded = jwt.verify(verifyToken, process.env.SECRET_KEY);
 
-    if (decoded._id) {
-      // For GET requests, req.body might be undefined, so set it on req.user instead
-      req.user = decoded;
-      req.userId = decoded._id;
-      // Also set on req.body for backward compatibility with POST requests
-      if (!req.body) req.body = {};
-      req.body.userId = decoded._id;
-      next();
-    } else {
+    // if (decoded._id) {
+    //   // For GET requests, req.body might be undefined, so set it on req.user instead
+    //   req.user = decoded;
+    //   req.userId = decoded._id;
+    //   // Also set on req.body for backward compatibility with POST requests
+    //   if (!req.body) req.body = {};
+    //   req.body.userId = decoded._id;
+    //   next();
+    // } else {
+    //   return res.status(401).json({
+    //     message: "Not Authorized! Signup Again",
+    //     success: false,
+    //   });
+    // }
+    if (!decoded._id) {
       return res.status(401).json({
         message: "Not Authorized! Signup Again",
         success: false,
       });
     }
+
+    req.user = decoded;
+    next();
   } catch (err) {
     return res.status(401).json({
       message: err.message || "Token invalid",
@@ -73,5 +81,4 @@ const verifyAuth = async (req, res, next) => {
   }
 };
 
-
-export { verifyAuth, userAuth }
+export { verifyAuth, userAuth };

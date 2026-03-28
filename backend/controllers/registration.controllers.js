@@ -10,7 +10,8 @@ import { all } from "axios"
 export const registerParicipants = async (req, res) => {
     try {
         const { hackathonId } = req.params;
-        const { userId, name, contactNumber, college , gender , currentYearOfStudy, email, currentLocation, yearsOfExperience, workEmailAddress, teamId } = req.body;
+        const { name, contactNumber, college , gender , currentYearOfStudy, email, currentLocation, yearsOfExperience, workEmailAddress, teamId } = req.body;
+        const userId = req.user._id;
 
         const alreadyRegistered = await RegisteredParticipantsModel.findOne({
             user: userId,
@@ -62,7 +63,8 @@ export const registerParicipants = async (req, res) => {
 
 export const isregistered = async (req, res) => {
     try {
-        const { hackathonId, userId } = req.params;
+        const { hackathonId } = req.params;
+        const userId = req.user._id;
 
         const hackathonObjectId = new mongoose.Types.ObjectId(hackathonId);
         const userObjectId = new mongoose.Types.ObjectId(userId);
@@ -80,6 +82,7 @@ export const isregistered = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
+
 export const registerTeam = async (req, res) => {
   try {
     const { hackathonId } = req.params;
@@ -90,7 +93,7 @@ export const registerTeam = async (req, res) => {
       yearsOfExperience,
       leadEmail,
       leadName,
-      teamMembers // 👈 now receiving comma-separated name,email,name,email,...
+      teamMembers 
     } = req.body;
 
     // ✅ Step 0: check leader exists

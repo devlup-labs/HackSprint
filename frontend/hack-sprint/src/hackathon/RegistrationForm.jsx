@@ -12,6 +12,7 @@ import {
   Copy,
   Check,
 } from "lucide-react";
+import { API } from "../backendApis/api";
 
 const inp = [
   "font-[family-name:'JetBrains_Mono',monospace]",
@@ -242,7 +243,7 @@ export const RegistrationForm = ({ onSubmit = () => {} }) => {
     setLoading(true);
     try {
       if (type === "individual") {
-        const r = await axios.post(
+        const r = await API.post(
           `${import.meta.env.VITE_API_BASE_URL}/api/register/${hackathonId}`,
           {
             userId: userData?._id,
@@ -260,7 +261,7 @@ export const RegistrationForm = ({ onSubmit = () => {} }) => {
         onSubmit(indForm);
         navigate(`/hackathon/${hackathonId}`);
       } else if (type === "team-create") {
-        const r = await axios.post(
+        const r = await API.post(
           `${import.meta.env.VITE_API_BASE_URL}/api/team/create`,
           {
             name: teamForm.teamName,
@@ -294,7 +295,7 @@ export const RegistrationForm = ({ onSubmit = () => {} }) => {
           const m = joinForm.link.match(/\/join\/([^\/\?]+)/);
           if (m) code = m[1];
         }
-        const r = await axios.post(
+        const r = await API.post(
           `${import.meta.env.VITE_API_BASE_URL}/api/team/join`,
           { userId: userData?._id, code, hackathon: hackathonId }
         );

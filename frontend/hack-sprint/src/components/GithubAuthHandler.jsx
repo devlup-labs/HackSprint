@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useContext } from "react";
 import { AppContent } from "../context/AppContext";
+import { API } from "../backendApis/api";
 
 export default function GithubAuthHandler() {
   const location = useLocation();
@@ -17,7 +18,7 @@ export default function GithubAuthHandler() {
       return;
     }
     // Exchange code for token
-    axios
+    API
       .get(`${backendUrl}/api/account/auth/callback/github?code=${code}`)
       .then((res) => {
         const { token, email, name } = res.data;

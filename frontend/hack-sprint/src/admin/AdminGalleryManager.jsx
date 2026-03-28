@@ -12,6 +12,7 @@ import {
   Play,
 } from "lucide-react";
 import { createPortal } from "react-dom";
+import { API as axiosAPI } from "../backendApis/api.js";
 
 const FontStyle = () => (
   <style>{`
@@ -32,8 +33,6 @@ const FontStyle = () => (
 );
 
 const isVideo = (url) => /\.(mp4|webm|ogg)$/i.test(url);
-const getToken = () =>
-  localStorage.getItem("adminToken") || localStorage.getItem("token");
 const API = (id, path = "") =>
   `${import.meta.env.VITE_API_BASE_URL}/api/hackathons/${id}/gallery${path}`;
 
@@ -246,12 +245,12 @@ const AdminGalleryManager = ({ hackathonId }) => {
 
   useEffect(() => {
     let cancelled = false;
-    axios
+    axiosAPI
       .get(API(hackathonId))
       .then(({ data }) => {
         if (!cancelled && data.success) setGallery(data.gallery || []);
       })
-      .catch(console.error)
+      .catch(console.log("Error"))
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
@@ -280,10 +279,10 @@ const AdminGalleryManager = ({ hackathonId }) => {
     files.forEach((f) => formData.append("image", f));
     setUploading(true);
     try {
-      const { data } = await axios.post(API(hackathonId), formData, {
+      const { data } = await axiosAPI.post(API(hackathonId), formData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${getToken()}`,
+          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
         },
       });
       toast.success(`${files.length} image(s) uploaded!`);
@@ -299,9 +298,11 @@ const AdminGalleryManager = ({ hackathonId }) => {
   const handleDelete = async (imageUrl) => {
     if (!window.confirm("Delete this image?")) return;
     try {
-      const { data } = await axios.delete(API(hackathonId), {
+      const { data } = await axiosAPI.delete(API(hackathonId), {
         data: { imageUrl },
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+        },
       });
       setGallery(data.gallery);
       if (lightboxIndex !== null && lightboxIndex >= data.gallery.length)

@@ -10,6 +10,7 @@ import {
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
+import { API } from "../backendApis/api";
 
 export const SocialShare = () => {
   const [copied, setCopied] = useState(false);
@@ -28,7 +29,7 @@ export const SocialShare = () => {
         return;
       }
       try {
-        const res = await axios.get(
+        const res = await API.get(
           `${
             import.meta.env.VITE_API_BASE_URL
           }/api/hackathons/wishlist/check/${id}`,
@@ -36,7 +37,7 @@ export const SocialShare = () => {
         );
         setLiked(res.data.liked);
       } catch (err) {
-        console.error(err);
+        // console.error(err);
       } finally {
         setIsCheckingLike(false);
       }
@@ -55,16 +56,13 @@ export const SocialShare = () => {
       return;
     }
     try {
-      const res = await axios.post(
+      const res = await API.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/hackathons/wishlist/toggle`,
         { hackathonId: id },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (res.data.success) {
         setLiked(res.data.liked);
-        toast.success(
-          res.data.liked ? "Added to wishlist! ❤️" : "Removed from wishlist"
-        );
       }
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to update wishlist");
@@ -77,7 +75,7 @@ export const SocialShare = () => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error(err);
+      // console.error(err);
     }
   };
 
@@ -90,7 +88,7 @@ export const SocialShare = () => {
           url: currentUrl,
         });
       } catch (err) {
-        console.error(err);
+        // console.error(err);
       }
     } else {
       handleCopyLink();

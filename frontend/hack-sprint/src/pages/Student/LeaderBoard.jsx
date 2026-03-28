@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Trophy, Crown, User } from "lucide-react";
 import axios from "axios";
 import "../Styles/LeaderBoard.css"
+import { API } from "../../backendApis/api";
 
 const PLACE_META = {
   1: {
@@ -127,7 +128,7 @@ const Leaderboard = () => {
   const [hasData, setHasData] = useState(false);
 
   useEffect(() => {
-    axios
+    API
       .get(`${import.meta.env.VITE_API_BASE_URL}/api/user/leaderBoard`)
       .then((res) => {
         const data = [...(res.data.leaderboard || [])].sort(
@@ -137,7 +138,7 @@ const Leaderboard = () => {
         setHasData(data.length > 0);
       })
       .catch((err) => {
-        console.error(err);
+        // console.error(err);
         setHasData(false);
       })
       .finally(() => setLoading(false));

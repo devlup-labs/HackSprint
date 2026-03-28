@@ -13,6 +13,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { getDashboard } from "../backendApis/api";
 import SubmissionForm from "./SubmissionForm";
+import { API } from "../backendApis/api";
 
 const FontStyle = () => (
   <style>{`@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@700;800&display=swap');`}</style>
@@ -72,78 +73,93 @@ export const HeroSection = ({
     const fetchTeamData = async (teamId, currentUserId) => {
       try {
         if (!teamId) return;
-        const res = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/team/${teamId}`
-        );
-        if (!res.ok) throw new Error("Failed to fetch team");
-        const data = await res.json();
-        const team = data.team;
+  
+        const res = await API.get(`/api/team/${teamId}`);
+        const team = res.data.team;
+  
         setTeamData(team);
-        if (
-          team?.hackathon?._id &&
-          String(team.hackathon._id) === String(hackathonId)
-        )
-          setIsTeamMember(
-            team.members?.some(
-              (m) => String(m._id) === String(currentUserId)
-            ) || false
-          );
-        else setIsTeamMember(false);
+  
+        setIsTeamMember(
+          team.members?.some(
+            (m) => String(m._id) === String(currentUserId)
+          ) || false
+        );
+  
       } catch (err) {
-        console.error("Team fetch error:", err.message);
         setIsTeamMember(false);
       }
     };
-
+  
     const fetchUserData = async () => {
       setLoading(true);
       try {
         const res = await getDashboard();
         const u = res.data.userData;
+  
         setUserData(u);
         setIsVerified(u?.isVerified || false);
+  
         const registered = Array.isArray(u.registeredHackathons)
           ? u.registeredHackathons.some(
               (o) => String(o?._id) === String(hackathonId)
             )
           : false;
+  
         setRegistrationInfo(registered);
+  
         const leader = u.leaderOfHackathons?.some(
           (o) => String(o?._id) === String(hackathonId)
         );
+  
         setIsLeader(!!leader);
         setLeaderButton(!!leader);
-        if (u?.team) await fetchTeamData(u.team, u._id);
-        else setIsTeamMember(false);
+  
+        // ✅ CORRECT TEAM FETCH
+        const teamEntry = u?.teams?.find(
+          (t) => String(t.hackathon) === String(hackathonId)
+        );
+  
+        if (teamEntry?.team) {
+          await fetchTeamData(teamEntry.team, u._id);
+        } else {
+          setIsTeamMember(false);
+          setTeamData(null); // 🔥 important
+        }
+  
       } catch (err) {
-        console.error(err.message);
         setUserData(null);
         setIsVerified(false);
         setRegistrationInfo(false);
         setIsLeader(false);
         setIsTeamMember(false);
+        setTeamData(null);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchTeamData();
+  
     fetchUserData();
-    renderActionButton();
-  }, [hackathonId, isLeader, registrationInfo]);
-
+  
+  }, [hackathonId]);
+  
   useEffect(() => {
-    if (teamData?.code) setLeaderValue(teamData.code);
-    else setLeaderValue(localStorage.getItem("teamDetails_code"));
+    if (teamData?.code) {
+      setLeaderValue(teamData.code);
+    } else {
+      setLeaderValue("");
+    }
   }, [teamData]);
 
   const handleRegister = () => {
     if (isVerified) navigate(`/hackathon/RegistrationForm/${hackathonId}`);
     else navigate("/account/login");
   };
+
   const handleLeader = () => {
+    if (!leaderValue) return;
     navigate(`/hackathon/${hackathonId}/team/${leaderValue}`);
   };
+
   const handleSubmit = () => {
     setShowSubmissionModal(true);
   };

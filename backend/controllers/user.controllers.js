@@ -12,8 +12,10 @@ export const saveGitHubLink = async (req, res) => {
       });
     }
 
+    const userId = req.user._id;
+
     // Verify user is authenticated
-    if (!req.user || !req.user.id) {
+    if (!userId) {
       return res.status(401).json({
         message: "User not authenticated"
       });
@@ -172,7 +174,8 @@ export const saveGitHubLink = async (req, res) => {
 
 export const updateGitHubLink = async (req, res) => {
   try {
-    const user = await UserModel.findById(req.user.id);
+    const userId = req.user._id;
+    const user = await UserModel.findById(userId);
 
     if (!user || !user.gitHubAccessToken) {
       return res.status(400).json({
@@ -263,7 +266,7 @@ export const updateGitHubLink = async (req, res) => {
 export const removeGitHubLink = async (req, res) => {
   try {
     const updatedUser = await UserModel.findByIdAndUpdate(
-      req.user.id,
+      req.user._id,
       {
         $unset: {
           gitHubAccessToken: 1,
@@ -308,7 +311,8 @@ export const removeGitHubLink = async (req, res) => {
 
 export const checkAndUpdateGitHubStatus = async (req, res) => {
   try {
-    const user = await UserModel.findById(req.user.id);
+    const userId = req.user._id;
+    const user = await UserModel.findById(userId);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -356,7 +360,8 @@ export const checkAndUpdateGitHubStatus = async (req, res) => {
 
 export const increaseStreak = async (req, res) => {
   try {
-    const { userId, questionId } = req.body;
+    const { questionId } = req.body;
+    const userId = req.user._id;
 
     if (!userId || !questionId) {
       return res.status(400).json({ message: "userId or questionId is required" });
@@ -386,7 +391,8 @@ export const increaseStreak = async (req, res) => {
 
 export const resetStreak = async (req, res) => {
   try {
-    const { userId, questionId } = req.body;
+    const { questionId } = req.body;
+    const userId = req.user._id;
 
     if (!userId) {
       return res.status(400).json({ message: "userId is required" });
@@ -418,7 +424,8 @@ export const resetStreak = async (req, res) => {
 
 export const devQuestionsAnsweredData = async (req, res) => {
   try {
-    const { userId, quizId } = req.body;
+    const { quizId } = req.body;
+    const userId = req.user._id;
     if (!userId || !quizId) {
       return res.status(404).json({ message: "user or quiz id not found" });
     }
@@ -462,7 +469,8 @@ export const devQuestionsAnsweredData = async (req, res) => {
 
 export const addEducation = async (req, res) => {
   try {
-    const { userId, institute, passOutYear, department, location } = req.body;
+    const { institute, passOutYear, department, location } = req.body;
+    const userId = req.user._id;
 
     if (!userId || !institute || !passOutYear || !department || !location) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -487,7 +495,8 @@ export const addEducation = async (req, res) => {
 
 export const editEducation = async (req, res) => {
   try {
-    const { userId, eduId, institute, passOutYear, department, location } = req.body;
+    const { eduId, institute, passOutYear, department, location } = req.body;
+    const userId = req.user._id;
 
     if (!userId || !eduId) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -519,7 +528,8 @@ export const editEducation = async (req, res) => {
 
 export const deleteEducation = async (req, res) => {
   try {
-    const { userId, eduId } = req.body;
+    const { eduId } = req.body;
+    const userId = req.user._id;
 
     if (!userId || !eduId) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -544,7 +554,8 @@ export const deleteEducation = async (req, res) => {
 
 export const addConnectedApp = async (req, res) => {
   try {
-    const { userId, appName, appURL } = req.body;
+    const { appName, appURL } = req.body;
+    const userId = req.user._id;
 
     if (!userId || !appName || !appURL) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -569,7 +580,8 @@ export const addConnectedApp = async (req, res) => {
 
 export const editConnectedApp = async (req, res) => {
   try {
-    const { userId, appId, appName, appURL } = req.body;
+    const { appId, appName, appURL } = req.body;
+    const userId = req.user._id;
 
     if (!userId || !appId) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -599,7 +611,8 @@ export const editConnectedApp = async (req, res) => {
 
 export const deleteConnectedApp = async (req, res) => {
   try {
-    const { userId, appId } = req.body;
+    const { appId } = req.body;
+    const userId = req.user._id;
 
     if (!userId || !appId) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -662,7 +675,8 @@ export const displayLeaderBoard = async (req, res) => {
 
 export const addLanguage = async (req, res) => {
   try {
-    const { userId, language } = req.body;
+    const { language } = req.body;
+    const userId = req.user._id;
 
     if (!userId || !language) {
       return res.status(400).json({ message: "User ID and language are required" });
@@ -692,7 +706,8 @@ export const addLanguage = async (req, res) => {
 
 export const removeLanguage = async (req, res) => {
   try {
-    const { userId, language } = req.body;
+    const { language } = req.body;
+    const userId = req.user._id;
 
     if (!userId || !language) return res.status(400).json({ message: "User ID and language are required" });
 
@@ -714,7 +729,8 @@ export const removeLanguage = async (req, res) => {
 
 export const addSkill = async (req, res) => {
   try {
-    const { userId, skill } = req.body;
+    const { skill } = req.body;
+    const userId = req.user._id;
 
     if (!userId || !skill) {
       return res.status(400).json({ message: "User ID and skill are required" });
@@ -745,7 +761,8 @@ export const addSkill = async (req, res) => {
 
 export const deleteSkill = async (req, res) => {
   try {
-    const { userId, skill } = req.body;
+    const { skill } = req.body;
+    const userId = req.user._id;
 
     if (!userId || !skill) {
       return res.status(400).json({ message: "User ID and skill are required" });

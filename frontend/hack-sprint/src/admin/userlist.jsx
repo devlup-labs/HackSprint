@@ -14,6 +14,7 @@ import { getAdminDetails, getAdminHackathonDetail } from "../backendApis/api";
 import axios from "axios";
 import AdminGalleryManager from "./AdminGalleryManager";
 import "./Userlist.css"
+import { API } from "../backendApis/api";
 
 /* ── Background ── */
 const GridBackground = () => <div className="hu-bg" />;
@@ -95,7 +96,7 @@ const HackathonUsersPage = () => {
   useEffect(() => {
     const fetchResult = async () => {
       try {
-        const response = await axios(
+        const response = await API(
           `${import.meta.env.VITE_API_BASE_URL}/api/submit/hackathon/${slug}`
         );
         setResult(response.data);
@@ -112,7 +113,7 @@ const HackathonUsersPage = () => {
         const response = await getAdminDetails();
         setAdminData(response.data.admin);
       } catch (error) {
-        console.error("Auth error, redirecting...", error);
+        // console.error("Auth error, redirecting...", error);
         navigate("/adminlogin");
       }
     };
@@ -132,7 +133,7 @@ const HackathonUsersPage = () => {
         setIndividualParticipants(participantsWithoutTeam);
         setTeams(teams);
       } catch (error) {
-        console.error("Failed to fetch hackathon details:", error);
+        // console.error("Failed to fetch hackathon details:", error);
       } finally {
         setLoading(false);
       }

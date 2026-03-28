@@ -1573,6 +1573,7 @@ const AdminProfile = () => {
       try {
         const res = await getAdminDetails();
         setAdminData(res.data.admin);
+        // console.log("Admin details:", res.data.admin);
       } catch {
         navigate("/adminlogin");
       } finally {
@@ -1588,7 +1589,7 @@ const AdminProfile = () => {
       try {
         setHackathonsLoading(true);
         const adminId = adminData._id ?? adminData.id;
-        const res = await getAdminHackathons(adminId);
+        const res = await getAdminHackathons();
         const now = new Date(),
           live = [],
           expired = [];

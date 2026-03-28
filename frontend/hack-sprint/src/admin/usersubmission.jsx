@@ -168,7 +168,7 @@ const UserSubmissionDetailPage = () => {
             }
           }
         } catch (error) {
-          console.error("Failed to fetch submission details:", error);
+          // console.error("Failed to fetch submission details:", error);
         } finally {
           setLoading(false);
         }

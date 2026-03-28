@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AppContent } from "../context/AppContext";
 import axios from "axios";
+import { API } from "../backendApis/api";
 
 export default function VerifyEmail() {
   const location = useLocation();
@@ -20,7 +21,7 @@ export default function VerifyEmail() {
       return;
     }
 
-    axios
+    API
       .get(`${backendUrl}/api/account/verify-email?token=${token}`)
       .then((res) => {
         setStatus("success");

@@ -149,7 +149,7 @@ function AdminLogin() {
         <GoogleAuthWrapper />
 
         <p className="footer-note">
-          SHACKSPRINT &nbsp;·&nbsp; <span>ENCRYPTED</span> &nbsp;·&nbsp;  {new Date().getFullYear()}
+          HACKSPRINT &nbsp;·&nbsp; <span>ENCRYPTED</span> &nbsp;·&nbsp;  {new Date().getFullYear()}
         </p>
       </div>
     </div>

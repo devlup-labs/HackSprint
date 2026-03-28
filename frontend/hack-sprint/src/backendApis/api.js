@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = axios.create({
+export const API = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
@@ -20,6 +20,7 @@ API.interceptors.request.use((req) => {
 
   return req;
 });
+
 
 export const addConnectedApp = (data) => {
   API.post("/api/user/addConnectedApps", data);
@@ -100,8 +101,7 @@ export const getAdminDetails = () => API.get("/api/admin/adminDetails");
  * Fetches all hackathons created by a specific admin.
  * @param {string} adminId - The ID of the admin.
  */
-export const getAdminHackathons = (adminId) =>
-  API.post("/api/admin/my-hackathons", { adminId });
+export const getAdminHackathons = () => API.get("/api/admin/my-hackathons");
 
 /**
  * Fetches the details of a single hackathon for its creator admin.
@@ -121,8 +121,8 @@ export const createHackathon = (formData) =>
  * Fetches all hackathons pending approval.
  */
 // export const getPendingHackathons = () => API.get('/api/admin/pendingHackathon');
-export const getPendingHackathons = (adminId) =>
-  API.get(`/api/admin/pendingHackathon/${adminId}`);
+export const getPendingHackathons = () =>
+  API.get(`/api/admin/pendingHackathon`);
 
 /**
  * Approves a pending hackathon.

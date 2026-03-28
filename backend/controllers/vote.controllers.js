@@ -7,7 +7,7 @@ import hackathonModel from "../models/hackathon.models.js";
 export const toggleVote = async (req, res) => {
   try {
     const { submissionId, hackathonId } = req.body;
-    const userId = req.body.userId; // This will come from the userAuth middleware
+    const userId = req.user._id; // This will come from the userAuth middleware
 
     if (!submissionId || !hackathonId) {
       return res.status(400).json({
@@ -138,7 +138,7 @@ export const getHackathonVotes = async (req, res) => {
 export const getUserVotes = async (req, res) => {
   try {
     const { hackathonId } = req.params;
-    const userId = req.body.userId; // From userAuth middleware
+    const userId = req.user._id; // From userAuth middleware
 
     if (!hackathonId) {
       return res.status(400).json({
