@@ -22,65 +22,6 @@ const sendMessageToChatbot = async (message) => {
   return res.json();
 };
 
-export const parseResponse = (text) => {
-  try {
-    if (!text || typeof text !== "string") {
-      throw new Error("Invalid input");
-    }
-
-    const clean = text.replace(/\*\*/g, "").trim();
-    const sectionRegex = (name) =>
-      new RegExp(
-        `${name}:?\\s*\\n?([\\s\\S]*?)(?=\\n\\s*[A-Za-z][^\\n]*:|$)`,
-        "i"
-      );
-
-    const extractList = (block, type = "number") => {
-      if (!block) return [];
-
-      return block
-        .split("\n")
-        .map((l) =>
-          l
-            .replace(/^\s*\d+[.)]\s*/, "")
-            .replace(/^\s*[-*•]\s*/, "")
-            .trim()
-        )
-        .filter(Boolean);
-    };
-
-    const titleMatch = clean.match(/Title:\s*(.+)/i);
-
-    const stepsMatch = clean.match(sectionRegex("Steps"));
-    const notesMatch = clean.match(sectionRegex("Important Notes"));
-    const actionsMatch = clean.match(sectionRegex("Next Actions"));
-
-    const result = {
-      type: "structured",
-      title: titleMatch?.[1]?.trim() || null,
-      steps: extractList(stepsMatch?.[1]),
-      notes: extractList(notesMatch?.[1]),
-      actions: extractList(actionsMatch?.[1]),
-    };
-
-    if (
-      !result.title &&
-      !result.steps.length &&
-      !result.notes.length &&
-      !result.actions.length
-    ) {
-      return { type: "plain", text: clean };
-    }
-
-    return result;
-  } catch {
-    return {
-      type: "plain",
-      text:
-        typeof text === "string" ? text.trim() : "Could not parse response.",
-    };
-  }
-};
 
 const formatTime = (date) =>
   date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -97,57 +38,7 @@ const TypingDots = () => (
   </div>
 );
 
-const StructuredMessage = ({ parsed, onActionClick }) => {
-  const { title, steps, notes, actions, raw } = parsed;
-
-  return (
-    <div className="flex flex-col gap-2.5 text-[0.67rem] leading-relaxed">
-      {/* Title */}
-      {title && (
-        <p
-          className={`${syne} font-extrabold text-[#5fff60] text-[0.72rem] tracking-tight leading-snug`}
-        >
-          {title}
-        </p>
-      )}
-
-      {/* Divider */}
-      {title &&
-        (steps.length > 0 || notes.length > 0 || actions.length > 0) && (
-          <div className="w-full h-px bg-[rgba(95,255,96,0.1)]" />
-        )}
-
-      {/* Steps */}
-      {steps.length > 0 && (
-        <div className="flex flex-col gap-1">
-          <ol className="flex flex-col gap-1.5 pl-1">
-            {steps.map((step, i) => (
-              <li key={i} className="flex items-start gap-2">
-                <span className="flex-shrink-0 w-4 h-4 rounded-[2px] bg-[rgba(95,255,96,0.1)] border border-[rgba(95,255,96,0.2)] text-[#5fff60] text-[0.55rem] flex items-center justify-center font-bold mt-0.5">
-                  {i + 1}
-                </span>
-                <span className="text-[rgba(232,255,232,0.85)] whitespace-pre-line">
-                  {step}
-                </span>
-              </li>
-            ))}
-          </ol>
-        </div>
-      )}
-
-      {/* Fallback: always show raw text if no sections parsed */}
-      {!title && !steps.length && !notes.length && !actions.length && (
-        <p className="text-[rgba(232,255,232,0.85)] whitespace-pre-line">
-          {raw}
-        </p>
-      )}
-    </div>
-  );
-};
-
-const BotBubble = ({ msg, onActionClick }) => {
-  const parsed = parseResponse(msg.text);
-
+const BotBubble = ({ msg }) => {
   return (
     <div className="msg-in flex items-end gap-2 flex-row">
       <div className="w-6 h-6 rounded-full bg-[rgba(95,255,96,0.1)] border border-[rgba(95,255,96,0.22)] flex items-center justify-center flex-shrink-0 mb-4">
@@ -155,13 +46,9 @@ const BotBubble = ({ msg, onActionClick }) => {
       </div>
       <div className="flex flex-col gap-0.5 items-start max-w-[85%]">
         <div className="bg-[rgba(95,255,96,0.06)] border border-[rgba(95,255,96,0.14)] rounded-[3px] rounded-tl-none px-3 py-2.5">
-          {parsed.type === "structured" ? (
-            <StructuredMessage parsed={parsed} onActionClick={onActionClick} />
-          ) : (
-            <p className="text-[0.68rem] text-[rgba(232,255,232,0.85)] leading-relaxed whitespace-pre-line">
-              {parsed.text}
-            </p>
-          )}
+          <p className="text-[0.68rem] text-[rgba(232,255,232,0.85)] leading-relaxed whitespace-pre-line">
+            {msg.text}
+          </p>
         </div>
         <span className="text-[0.47rem] tracking-[0.06em] text-[rgba(95,255,96,0.25)] px-0.5">
           {formatTime(msg.time)}

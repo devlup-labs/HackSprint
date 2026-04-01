@@ -37,7 +37,6 @@ const teamSchema = new mongoose.Schema({
       ref: "users",
     },
   ],
-
   hackathon: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "hackathons",
@@ -53,7 +52,7 @@ const teamSchema = new mongoose.Schema({
   },
   maxTeamSize: {
     type: Number,
-    default: 4,
+    default: 5,
   },
 });
 
