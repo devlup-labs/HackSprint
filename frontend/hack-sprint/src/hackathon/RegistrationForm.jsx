@@ -373,12 +373,12 @@ export const RegistrationForm = ({ onSubmit = () => {} }) => {
 
           {/* Individual / Team tabs */}
           <div className="flex gap-2 mb-7">
-            <TabBtn
+            {/* <TabBtn
               active={formType === "individual"}
               onClick={() => setFormType("individual")}
             >
               <User size={12} /> Individual
-            </TabBtn>
+            </TabBtn> */}
             <TabBtn
               active={formType === "team"}
               onClick={() => setFormType("team")}
@@ -388,7 +388,7 @@ export const RegistrationForm = ({ onSubmit = () => {} }) => {
           </div>
 
           {/* ── INDIVIDUAL ── */}
-          {formType === "individual" && (
+          {/* {formType === "individual" && (
             <form onSubmit={(e) => handleSubmit(e, "individual")}>
               <div className="grid sm:grid-cols-2 gap-x-6">
                 <Field label="Full Name" required>
@@ -502,7 +502,7 @@ export const RegistrationForm = ({ onSubmit = () => {} }) => {
                 </PrimaryBtn>
               </div>
             </form>
-          )}
+          )} */}
 
           {/* ── TEAM ── */}
           {formType === "team" && (

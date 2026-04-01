@@ -69,9 +69,9 @@ export const userData = async (req, res) => {
           model: "hackathons"
         }
       })
-      .populate("submittedHackathons")  // ✅ ADD THIS
-      .populate("registeredHackathons") // (optional but recommended)
-      .populate("leaderOfHackathons");  // (optional)
+      .populate("submittedHackathons") 
+      .populate("registeredHackathons") 
+      .populate("leaderOfHackathons"); 
 
     if (!userData) {
       return res.status(404).json({

@@ -1,25 +1,59 @@
-import express from 'express'
-import { Router } from 'express'
-import { checkAndUpdateGitHubStatus, saveGitHubLink, resetStreak, increaseStreak, devQuestionsAnsweredData, addConnectedApp, deleteConnectedApp, editConnectedApp, displayLeaderBoard, addEducation, editEducation, deleteEducation, addLanguage, removeLanguage, addSkill, deleteSkill } from '../controllers/user.controllers.js';
-import { userAuth, verifyAuth } from '../middlewares/userAuth.js';
+import express from "express";
+import { Router } from "express";
+import {
+  checkAndUpdateGitHubStatus,
+  saveGitHubLink,
+  resetStreak,
+  increaseStreak,
+  devQuestionsAnsweredData,
+  addConnectedApp,
+  deleteConnectedApp,
+  editConnectedApp,
+  displayLeaderBoard,
+  addEducation,
+  editEducation,
+  deleteEducation,
+  addLanguage,
+  removeLanguage,
+  addSkill,
+  deleteSkill,
+} from "../controllers/user.controllers.js";
+import { userAuth, verifyAuth } from "../middlewares/userAuth.js";
+import rateLimit from "express-rate-limit";
 
 const userRoutes = Router();
 
-userRoutes.put("/save-gitHubLink", verifyAuth, saveGitHubLink);
-userRoutes.get("/submission/github-status", verifyAuth, checkAndUpdateGitHubStatus);
-userRoutes.post("/correctanswer", increaseStreak);
-userRoutes.post("/incorrectanswer", resetStreak);
-userRoutes.post("/finishquiz", devQuestionsAnsweredData);
-userRoutes.post("/addEducation", verifyAuth, addEducation);
-userRoutes.put("/editEducation", verifyAuth, editEducation);
-userRoutes.delete("/deleteEducation", verifyAuth, deleteEducation);
-userRoutes.post("/addConnectedApps", verifyAuth, addConnectedApp);
-userRoutes.put("/editConnectedApps", verifyAuth, editConnectedApp);
-userRoutes.delete("/deleteConnectedApps", verifyAuth, deleteConnectedApp);
-userRoutes.get("/leaderBoard", displayLeaderBoard);
-userRoutes.post("/addLanguages", verifyAuth, addLanguage);
-userRoutes.delete("/deleteLanguages", verifyAuth, removeLanguage);
-userRoutes.post("/addSkills", verifyAuth, addSkill);
-userRoutes.delete("/deleteSkills", verifyAuth, deleteSkill);
+export const rateLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 500,
+  message: "Too many requests, please try again later.",
+});
+
+userRoutes.put("/save-gitHubLink", verifyAuth, rateLimiter, saveGitHubLink);
+userRoutes.get(
+  "/submission/github-status",
+  verifyAuth,
+  rateLimiter,
+  checkAndUpdateGitHubStatus
+);
+userRoutes.post("/correctanswer", rateLimiter, increaseStreak);
+userRoutes.post("/incorrectanswer", rateLimiter, resetStreak);
+userRoutes.post("/finishquiz", rateLimiter, devQuestionsAnsweredData);
+userRoutes.post("/addEducation", verifyAuth, rateLimiter, addEducation);
+userRoutes.put("/editEducation", verifyAuth, rateLimiter, editEducation);
+userRoutes.delete("/deleteEducation", verifyAuth, rateLimiter, deleteEducation);
+userRoutes.post("/addConnectedApps", verifyAuth, rateLimiter, addConnectedApp);
+userRoutes.put("/editConnectedApps", verifyAuth, rateLimiter, editConnectedApp);
+userRoutes.delete(
+  "/deleteConnectedApps",
+  verifyAuth,
+  rateLimiter,
+  deleteConnectedApp
+);
+userRoutes.get("/leaderBoard", rateLimiter, displayLeaderBoard);
+userRoutes.post("/addLanguages", verifyAuth, rateLimiter, addLanguage);
+userRoutes.delete("/deleteLanguages", verifyAuth, rateLimiter, removeLanguage);
+userRoutes.post("/addSkills", verifyAuth, rateLimiter, addSkill);
+userRoutes.delete("/deleteSkills", verifyAuth, rateLimiter, deleteSkill);
 
 export default userRoutes;

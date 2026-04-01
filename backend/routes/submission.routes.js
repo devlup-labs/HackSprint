@@ -1,5 +1,11 @@
 import express from "express";
-import { submitHackathonSolution, getSubmissionStatus, getSubmissionById, getSubmissionsByHackathon, updateSubmission } from "../controllers/submission.controllers.js";
+import {
+  submitHackathonSolution,
+  getSubmissionStatus,
+  getSubmissionById,
+  getSubmissionsByHackathon,
+  updateSubmission,
+} from "../controllers/submission.controllers.js";
 import upload from "../middlewares/multer.js";
 import rateLimit from "express-rate-limit";
 import { verifyAuth } from "../middlewares/userAuth.js";
@@ -8,7 +14,7 @@ const router = express.Router();
 
 const submitLimiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 5,
+  max: 10,
   message: {
     message: "Too many submissions. Please try again later.",
   },
@@ -16,7 +22,14 @@ const submitLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-router.post( "/",
+const getLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 700,
+  message: "Too many requests, please try again later.",
+});
+
+router.post(
+  "/",
   verifyAuth,
   submitLimiter,
   upload.fields([
@@ -37,8 +50,8 @@ router.put(
   ]),
   updateSubmission
 );
-router.get("/status", verifyAuth, getSubmissionStatus);
-router.get("/getSubmissionById/:id", getSubmissionById);
-router.get("/hackathon/:hackathonId", getSubmissionsByHackathon);
+router.get("/status", verifyAuth, getLimiter, getSubmissionStatus);
+router.get("/getSubmissionById/:id", getLimiter, getSubmissionById);
+router.get("/hackathon/:hackathonId", getLimiter, getSubmissionsByHackathon);
 
 export default router;
