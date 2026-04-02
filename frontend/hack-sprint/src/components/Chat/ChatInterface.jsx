@@ -6,7 +6,17 @@ import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
 
 const SOCKET_URL = import.meta.env.VITE_API_BASE_URL.replace("/api", "");
-let socket = null;
+let socket;
+
+const getSocket = () => {
+  if (!socket) {
+    socket = io(SOCKET_URL, {
+      transports: ["websocket", "polling"],
+      reconnection: true,
+    });
+  }
+  return socket;
+};
 
 const getDateLabel = (date) => {
   const d = new Date(date);
@@ -51,22 +61,32 @@ const ChatInterface = ({ hackathonId }) => {
   const [activeTab] = useState("group");
   const [currentUser, setCurrentUser] = useState(null);
   const [socketConnected, setSocketConnected] = useState(false);
-
+  const socket = getSocket();
   const containerRef = useRef(null);
 
-  /* ── socket init ── */
   useEffect(() => {
-    if (!socket) {
-      socket = io(SOCKET_URL, {
-        transports: ["websocket", "polling"],
-        reconnection: true,
-        reconnectionDelay: 1000,
-        reconnectionAttempts: 5,
-      });
-      socket.on("connect", () => setSocketConnected(true));
-      socket.on("disconnect", () => setSocketConnected(false));
-      socket.on("connect_error", () => setSocketConnected(false));
+    if (!socket.connected) {
+      socket.connect();
     }
+    function handleConnect() {
+      console.log("Connected");
+      setSocketConnected(true);
+    }
+
+    function handleDisconnect() {
+      console.log("Disconnected");
+      setSocketConnected(false);
+    }
+
+    socket.off("connect");
+    socket.off("disconnect");
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
+
+    return () => {
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
+    };
   }, []);
 
   useEffect(() => {
@@ -82,7 +102,8 @@ const ChatInterface = ({ hackathonId }) => {
   }, []);
 
   useEffect(() => {
-    if (!currentChatId || !socket || !socketConnected) return;
+    if (!currentChatId || !socket) return;
+    if (!socket.connected) socket.connect();
     socket.emit("join_room", currentChatId);
 
     (async () => {
@@ -112,7 +133,7 @@ const ChatInterface = ({ hackathonId }) => {
       socket.emit("leave_room", currentChatId);
       socket.off("receive_message", onMsg);
     };
-  }, [currentChatId, socketConnected]);
+  }, [currentChatId]);
 
   useEffect(() => {
     if (containerRef.current)
@@ -157,19 +178,19 @@ const ChatInterface = ({ hackathonId }) => {
             </div>
             <div
               className={`flex items-center gap-1.5 text-[0.55rem] tracking-[0.1em] uppercase ${
-                socketConnected
+                socket && socket.connected
                   ? "text-[rgba(95,255,96,0.55)]"
                   : "text-[rgba(255,96,96,0.55)]"
               }`}
             >
               <span
                 className={`w-1.5 h-1.5 rounded-full ${
-                  socketConnected
+                  socket && socket.connected
                     ? "bg-[#5fff60] animate-pulse"
                     : "bg-[#ff6060]"
                 }`}
               />
-              {socketConnected ? "Connected" : "Disconnected"}
+              {socket && socket.connected ? "Connected" : "Disconnected"}
             </div>
           </div>
 

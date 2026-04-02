@@ -15,13 +15,23 @@ const teamRoutes = express.Router();
 const getLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: 400,
-  message: "Too many requests, please try again later.",
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      message: "Too many requests, please try again later.",
+    });
+  },
 });
 
 const strictLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
-  message: "Too many attempts, Please try again later.",
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      message: "Too many requests, please try again later.",
+    });
+  },
 });
 
 teamRoutes.post("/create", verifyAuth, getLimiter, createTeam);
