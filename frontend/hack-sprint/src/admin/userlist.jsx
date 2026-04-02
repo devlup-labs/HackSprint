@@ -11,15 +11,12 @@ import {
   X,
 } from "lucide-react";
 import { getAdminDetails, getAdminHackathonDetail } from "../backendApis/api";
-import axios from "axios";
 import AdminGalleryManager from "./AdminGalleryManager";
-import "./Userlist.css"
+import "./Userlist.css";
 import { API } from "../backendApis/api";
 
-/* ── Background ── */
 const GridBackground = () => <div className="hu-bg" />;
 
-/* ── Filter buttons ── */
 const FilterButtons = ({ value, onChange }) => (
   <div className="hu-filters">
     {["all", "submitted", "not_submitted"].map((type) => (
@@ -36,7 +33,6 @@ const FilterButtons = ({ value, onChange }) => (
   </div>
 );
 
-/* ── Empty state ── */
 const EmptyState = ({ message }) => (
   <div className="hu-empty">
     <Users size={40} />
@@ -44,7 +40,6 @@ const EmptyState = ({ message }) => (
   </div>
 );
 
-/* ── Submission badge ── */
 const SubmissionBadge = ({ submitted }) =>
   submitted ? (
     <span className="hu-badge hu-badge--submitted">
@@ -56,7 +51,6 @@ const SubmissionBadge = ({ submitted }) =>
     </span>
   );
 
-/* ── Main page ── */
 const HackathonUsersPage = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -69,23 +63,41 @@ const HackathonUsersPage = () => {
   const [result, setResult] = useState(null);
   const [showScoreboard, setShowScoreboard] = useState(false);
   const [activeTab, setActiveTab] = useState("participants");
+
   const [teamFilter, setTeamFilter] = useState("all");
   const [participantFilter, setParticipantFilter] = useState("all");
+  const [teamSearch, setTeamSearch] = useState("");
+  const [participantSearch, setParticipantSearch] = useState("");
 
   const hasTeamSubmitted = (team) => !!team.submission;
   const hasUserSubmitted = (participant) => !!participant.submission;
 
   const filteredTeams = teams.filter((team) => {
     const submitted = hasTeamSubmitted(team);
-    if (teamFilter === "submitted") return submitted;
-    if (teamFilter === "not_submitted") return !submitted;
+    if (teamFilter === "submitted" && !submitted) return false;
+    if (teamFilter === "not_submitted" && submitted) return false;
+    if (teamSearch.trim()) {
+      const q = teamSearch.toLowerCase();
+      const nameMatch = team.name?.toLowerCase().includes(q);
+      const leaderMatch = team.leader?.name?.toLowerCase().includes(q);
+      const memberMatch = team.members?.some((m) =>
+        m.name?.toLowerCase().includes(q)
+      );
+      if (!nameMatch && !leaderMatch && !memberMatch) return false;
+    }
     return true;
   });
 
   const filteredParticipants = individualParticipants.filter((p) => {
     const submitted = hasUserSubmitted(p);
-    if (participantFilter === "submitted") return submitted;
-    if (participantFilter === "not_submitted") return !submitted;
+    if (participantFilter === "submitted" && !submitted) return false;
+    if (participantFilter === "not_submitted" && submitted) return false;
+    if (participantSearch.trim()) {
+      const q = participantSearch.toLowerCase();
+      const nameMatch = p.user?.name?.toLowerCase().includes(q);
+      const emailMatch = p.user?.email?.toLowerCase().includes(q);
+      if (!nameMatch && !emailMatch) return false;
+    }
     return true;
   });
 
@@ -112,8 +124,7 @@ const HackathonUsersPage = () => {
       try {
         const response = await getAdminDetails();
         setAdminData(response.data.admin);
-      } catch (error) {
-        // console.error("Auth error, redirecting...", error);
+      } catch {
         navigate("/adminlogin");
       }
     };
@@ -132,8 +143,8 @@ const HackathonUsersPage = () => {
         setHackathon(hackathon);
         setIndividualParticipants(participantsWithoutTeam);
         setTeams(teams);
-      } catch (error) {
-        // console.error("Failed to fetch hackathon details:", error);
+      } catch {
+        /* silent */
       } finally {
         setLoading(false);
       }
@@ -161,7 +172,6 @@ const HackathonUsersPage = () => {
     );
   }
 
-  /* scoreboard rank helpers */
   const rankClass = (idx) => {
     if (idx === 0) return { row: "hu-score-row--1", rank: "hu-score-rank--1" };
     if (idx === 1) return { row: "hu-score-row--2", rank: "hu-score-rank--2" };
@@ -182,15 +192,13 @@ const HackathonUsersPage = () => {
           padding: "clamp(1.25rem, 4vw, 2.5rem)",
         }}
       >
-        {/* ── Header ── */}
         <header style={{ marginBottom: "1.75rem" }}>
           <Link to="/admin" className="hu-back">
             <ArrowLeft size={13} /> Back to Dashboard
           </Link>
-          
+
           <h1 className="hu-page-title">{hackathon.title}</h1>
 
-          {/* Tabs */}
           <div className="hu-tabs">
             <button
               onClick={() => setActiveTab("participants")}
@@ -222,28 +230,32 @@ const HackathonUsersPage = () => {
           )}
         </header>
 
-        {/* ── Main content ── */}
         <main
           style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}
         >
           {activeTab === "participants" ? (
             <>
-              {/* Teams */}
               <div className="hu-card">
                 <div className="hu-section-title">
                   <Shield size={16} />
                   Teams
-                  <span
-                    style={{
-                      fontSize: "0.65rem",
-                      color: "var(--text-muted)",
-                      fontWeight: 400,
-                    }}
-                  >
-                    ({teams.length})
+                  <span className="hu-section-count">
+                    ({filteredTeams.length}
+                    {teamSearch.trim() || teamFilter !== "all"
+                      ? ` of ${teams.length}`
+                      : ""}
+                    )
                   </span>
                 </div>
+
+                <input
+                  className="hu-search"
+                  placeholder="Search by team name or member…"
+                  value={teamSearch}
+                  onChange={(e) => setTeamSearch(e.target.value)}
+                />
                 <FilterButtons value={teamFilter} onChange={setTeamFilter} />
+
                 <div className="hu-table-wrap">
                   <div className="hu-table-scroll">
                     <table className="hu-table">
@@ -303,31 +315,42 @@ const HackathonUsersPage = () => {
                       </tbody>
                     </table>
                     {filteredTeams.length === 0 && (
-                      <EmptyState message="No teams match this filter." />
+                      <EmptyState
+                        message={
+                          teamSearch.trim()
+                            ? `No teams match "${teamSearch}".`
+                            : "No teams match this filter."
+                        }
+                      />
                     )}
                   </div>
                 </div>
               </div>
 
-              {/* Individual Participants */}
               <div className="hu-card">
                 <div className="hu-section-title">
                   <Users size={16} />
                   Individual Participants
-                  <span
-                    style={{
-                      fontSize: "0.65rem",
-                      color: "var(--text-muted)",
-                      fontWeight: 400,
-                    }}
-                  >
-                    ({individualParticipants.length})
+                  <span className="hu-section-count">
+                    ({filteredParticipants.length}
+                    {participantSearch.trim() || participantFilter !== "all"
+                      ? ` of ${individualParticipants.length}`
+                      : ""}
+                    )
                   </span>
                 </div>
+
+                <input
+                  className="hu-search"
+                  placeholder="Search by name or email…"
+                  value={participantSearch}
+                  onChange={(e) => setParticipantSearch(e.target.value)}
+                />
                 <FilterButtons
                   value={participantFilter}
                   onChange={setParticipantFilter}
                 />
+
                 <div className="hu-table-wrap">
                   <div className="hu-table-scroll">
                     <table className="hu-table">
@@ -367,7 +390,13 @@ const HackathonUsersPage = () => {
                       </tbody>
                     </table>
                     {filteredParticipants.length === 0 && (
-                      <EmptyState message="No participants match this filter." />
+                      <EmptyState
+                        message={
+                          participantSearch.trim()
+                            ? `No participants match "${participantSearch}".`
+                            : "No participants match this filter."
+                        }
+                      />
                     )}
                   </div>
                 </div>
@@ -381,7 +410,6 @@ const HackathonUsersPage = () => {
         </main>
       </div>
 
-      {/* ── Scoreboard Modal ── */}
       {showScoreboard && (
         <div
           className="hu-modal-overlay"

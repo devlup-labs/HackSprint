@@ -296,6 +296,8 @@ const EditModal = ({ hackathon, adminData, onClose, onSaved }) => {
     projectSubmission: [...(hackathon.projectSubmission || [])],
     FAQs: [...(hackathon.FAQs || [])],
     rewards: [...(hackathon.rewards || [])],
+    showVoting: hackathon.showVoting || false,
+    showResult: hackathon.showResult || false,
   });
   const [bannerFile, setBannerFile] = useState(null);
   const [bannerPreview, setBannerPreview] = useState(hackathon.image || "");
@@ -396,6 +398,8 @@ const EditModal = ({ hackathon, adminData, onClose, onSaved }) => {
         "projectSubmission",
         "refMaterial",
       ].forEach((f) => fd.append(f, JSON.stringify(form[f])));
+      fd.append("showVoting", form.showVoting);
+      fd.append("showResult", form.showResult);
       fd.append("FAQs", JSON.stringify(form.FAQs));
       fd.append(
         "rewards",
@@ -489,15 +493,50 @@ const EditModal = ({ hackathon, adminData, onClose, onSaved }) => {
               />
             </div>
             <div>
-              <label className="ad-label">Short Description *</label>
-              <textarea
-                value={form.description}
-                onChange={(e) => set("description", e.target.value)}
-                rows={3}
-                placeholder="Short description"
-                className="ad-input"
-                style={{ resize: "none" }}
-              />
+              <label className="ad-label">Visibility</label>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.4rem",
+                }}
+              >
+                <label className="toggle-row" htmlFor="show-voting">
+                  <div>
+                    <div className="toggle-title">Show voting</div>
+                    <div className="toggle-desc">
+                      Let participants vote on submissions
+                    </div>
+                  </div>
+                  <div className="switch">
+                    <input
+                      type="checkbox"
+                      id="show-voting"
+                      checked={form.showVoting}
+                      onChange={(e) => set("showVoting", e.target.checked)}
+                    />
+                    <span className="slider" />
+                  </div>
+                </label>
+
+                <label className="toggle-row" htmlFor="show-result">
+                  <div>
+                    <div className="toggle-title">Show result</div>
+                    <div className="toggle-desc">
+                      Display winner &amp; final rankings
+                    </div>
+                  </div>
+                  <div className="switch">
+                    <input
+                      type="checkbox"
+                      id="show-result"
+                      checked={form.showResult}
+                      onChange={(e) => set("showResult", e.target.checked)}
+                    />
+                    <span className="slider amber" />
+                  </div>
+                </label>
+              </div>
             </div>
             <div>
               <label className="ad-label">Detailed Overview</label>

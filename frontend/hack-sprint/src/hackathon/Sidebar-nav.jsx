@@ -13,21 +13,32 @@ import {
   Images,
 } from "lucide-react";
 
-export const SidebarNav = ({ activeSection, onSectionChange }) => {
-  const sections = [
+export const SidebarNav = ({
+  activeSection,
+  onSectionChange,
+  showVoting,
+  showResult,
+}) => {
+  const allSections = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
+    { id: "about", label: "About", icon: Info },
     { id: "prizes", label: "Prizes", icon: Award },
     { id: "submission-guide", label: "Submission", icon: NotebookPen },
     { id: "judging", label: "Judging", icon: Scale },
-    { id: "results", label: "Results", icon: Award },
-    { id: "upvote", label: "Voting", icon: ThumbsUp },
+    { id: "results", label: "Results", icon: Award, requiresResult: true },
+    { id: "upvote", label: "Voting", icon: ThumbsUp, requiresResult: true },
     { id: "gallery", label: "Gallery", icon: Images },
     { id: "rules", label: "Rules", icon: FileText },
     { id: "faqs", label: "FAQs", icon: CircleHelp },
-    { id: "about", label: "About", icon: Info },
     { id: "refMaterial", label: "Reference", icon: FileText },
     { id: "discussion", label: "Discussion", icon: MessagesSquare },
   ];
+
+  const sections = allSections.filter((s) => {
+    if (s.requiresVoting && !showVoting) return false;
+    if (s.requiresResult && !showResult) return false;
+    return true;
+  });
 
   return (
     <>

@@ -113,6 +113,14 @@ const hackathonSchema = new mongoose.Schema(
         required: true,
       },
     ],
+    showVoting: {
+      type: Boolean,
+      default: true,
+    },
+    showResult: {
+      type: Boolean,
+      default: true,
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Admin",
