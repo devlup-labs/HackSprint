@@ -101,12 +101,12 @@ const Navbar = ({ navigate, userType }) => {
             </>
           )}
           {userType === "student" && (
-            <NavBtn onClick={() => navigate("/studenthome")}>
+            <NavBtn onClick={() => navigate("/dashboard")}>
               My Dashboard <ArrowRight size={11} />
             </NavBtn>
           )}
           {userType === "admin" && (
-            <NavBtn onClick={() => navigate("/adminhome")}>
+            <NavBtn onClick={() => navigate("/admin")}>
               Admin Panel <ArrowRight size={11} />
             </NavBtn>
           )}
@@ -665,7 +665,7 @@ const Home = () => {
             <button
               onClick={() =>
                 navigate(
-                  userType === "student" ? "/studenthome" : "/account/login"
+                  userType === "student" ? "/dashboard" : "/account/login"
                 )
               }
               className="font-jb inline-flex items-center gap-[0.5rem] text-[0.68rem] tracking-[0.12em] uppercase px-8 py-[0.85rem] rounded-[3px] border cursor-pointer transition-all duration-200 bg-[#5fff60] border-[#5fff60] text-[#050905] font-bold hover:bg-[#7fff80] hover:shadow-[0_0_28px_rgba(95,255,96,0.35)]"

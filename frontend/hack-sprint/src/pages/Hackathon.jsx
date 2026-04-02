@@ -102,6 +102,8 @@ export default function HackathonDetails() {
           <SidebarNav
             activeSection={activeSection}
             onSectionChange={setActiveSection}
+            showVoting={hackathon.showVoting}
+            showResult={hackathon.showResult}
           />
 
           <ContentSection activeSection={activeSection} hackathon={hackathon} />

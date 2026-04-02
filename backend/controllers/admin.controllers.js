@@ -763,7 +763,6 @@ export const getAdminDetails = async (req, res) => {
 
 export const editHackathon = async (req, res) => {
   try {
-    // ── 1. Validate IDs ──────────────────────────────────────────────────────
     const { hackathonId } = req.body;
     const adminId = req.admin._id;
 
@@ -778,7 +777,6 @@ export const editHackathon = async (req, res) => {
         .json({ success: false, message: "Valid adminId is required." });
     }
 
-    // ── 2. Find hackathon and verify ownership ───────────────────────────────
     const hackathon = await hackathonModel.findById(hackathonId);
     if (!hackathon) {
       return res
@@ -797,10 +795,16 @@ export const editHackathon = async (req, res) => {
       });
     }
 
-    // ── 3. Parse incoming data ───────────────────────────────────────────────
     const data = { ...req.body };
 
-    // Safe-parse any JSON-stringified fields
+    if (data.showVoting !== undefined) {
+      data.showVoting = data.showVoting === "true" || data.showVoting === true;
+    }
+
+    if (data.showResult !== undefined) {
+      data.showResult = data.showResult === "true" || data.showResult === true;
+    }
+
     Object.keys(data).forEach((key) => {
       if (typeof data[key] === "string") {
         const v = data[key].trim();
@@ -824,7 +828,7 @@ export const editHackathon = async (req, res) => {
         data.refMaterial = [];
       }
     }
-    // Remove fields that must never be overwritten via this route
+
     const PROTECTED = [
       "hackathonId",
       "adminId",
@@ -838,7 +842,6 @@ export const editHackathon = async (req, res) => {
     ];
     PROTECTED.forEach((f) => delete data[f]);
 
-    // Safe-parse any JSON-stringified fields (arrays / objects from FormData)
     Object.keys(data).forEach((key) => {
       if (typeof data[key] === "string") {
         const v = data[key].trim();
@@ -857,7 +860,6 @@ export const editHackathon = async (req, res) => {
       }
     });
 
-    // ── 4. Date validation ───────────────────────────────────────────────────
     const DATE_FIELDS = [
       "startDate",
       "endDate",
@@ -877,7 +879,6 @@ export const editHackathon = async (req, res) => {
       }
     }
 
-    // ── 5. Sanitise arrays ───────────────────────────────────────────────────
     if (Array.isArray(data.rewards)) {
       data.rewards = data.rewards.filter(
         (r) => r && r.description && r.amount > 0
@@ -886,15 +887,12 @@ export const editHackathon = async (req, res) => {
     if (Array.isArray(data.FAQs)) {
       data.FAQs = data.FAQs.filter((f) => f && f.question && f.answer);
     }
-    // allowedFileTypes — don't override schema defaults if it's not a valid object
     if (data.allowedFileTypes && typeof data.allowedFileTypes !== "object") {
       delete data.allowedFileTypes;
     }
 
-    // ── 6. Handle image replacement ──────────────────────────────────────────
     if (req.file) {
       try {
-        // Upload new image to S3
         const timestamp = Date.now();
         const randomStr = Math.random().toString(36).substring(2, 9);
         const key = `hackathons/images/${timestamp}-${randomStr}-${req.file.originalname}`;
@@ -911,7 +909,6 @@ export const editHackathon = async (req, res) => {
           process.env.AWS_REGION || "ap-southeast-2"
         }.amazonaws.com/${key}`;
 
-        // Delete old image from S3 if it exists and was stored on our bucket
         if (
           hackathon.image &&
           hackathon.image.includes(process.env.AWS_S3_BUCKET_NAME)
@@ -927,7 +924,6 @@ export const editHackathon = async (req, res) => {
               );
             }
           } catch (delErr) {
-            // Non-fatal — log but continue
             console.warn(
               "editHackathon: could not delete old S3 image:",
               delErr.message
@@ -935,7 +931,6 @@ export const editHackathon = async (req, res) => {
           }
         }
 
-        // Clean up temp file
         try {
           fs.unlinkSync(req.file.path);
         } catch {
@@ -950,7 +945,6 @@ export const editHackathon = async (req, res) => {
       }
     }
 
-    // ── 7. Recompute `status` if dates changed ───────────────────────────────
     if (data.startDate || data.submissionEndDate) {
       const start = data.startDate
         ? new Date(data.startDate)
@@ -962,7 +956,6 @@ export const editHackathon = async (req, res) => {
       data.status = !!(start && subEnd && start <= now && subEnd >= now);
     }
 
-    // ── 8. Apply update ──────────────────────────────────────────────────────
     const updated = await hackathonModel.findByIdAndUpdate(
       hackathonId,
       { $set: data },
@@ -985,7 +978,6 @@ export const deleteHackathon = async (req, res) => {
     const { hackathonId } = req.body;
     const adminId = req.admin._id;
 
-    // ── Validate IDs ─────────────────────────────────────
     if (!hackathonId || !mongoose.Types.ObjectId.isValid(hackathonId)) {
       return res.status(400).json({
         success: false,
@@ -1000,7 +992,6 @@ export const deleteHackathon = async (req, res) => {
       });
     }
 
-    // ── Fetch admin ─────────────────────────────────────
     const admin = await Admin.findById(adminId);
     if (!admin) {
       return res.status(404).json({
@@ -1009,7 +1000,6 @@ export const deleteHackathon = async (req, res) => {
       });
     }
 
-    // ── Fetch hackathon ─────────────────────────────────
     const hackathon = await hackathonModel.findById(hackathonId);
     if (!hackathon) {
       return res.status(404).json({
@@ -1018,7 +1008,6 @@ export const deleteHackathon = async (req, res) => {
       });
     }
 
-    // ── Authorization logic 🔥 ──────────────────────────
     const isCreator = hackathon.createdBy.toString() === adminId.toString();
 
     if (!admin.controller && !isCreator) {
@@ -1028,7 +1017,6 @@ export const deleteHackathon = async (req, res) => {
       });
     }
 
-    // ── Delete banner image from S3 (if exists) ─────────
     if (hackathon.image?.includes(process.env.AWS_S3_BUCKET_NAME)) {
       try {
         const key = hackathon.image.split(".amazonaws.com/")[1];
@@ -1045,7 +1033,6 @@ export const deleteHackathon = async (req, res) => {
       }
     }
 
-    // ── Delete gallery images (optional but good) ───────
     if (Array.isArray(hackathon.gallery)) {
       for (const url of hackathon.gallery) {
         try {
@@ -1064,7 +1051,6 @@ export const deleteHackathon = async (req, res) => {
       }
     }
 
-    // ── Delete hackathon ───────────────────────────────
     await hackathonModel.findByIdAndDelete(hackathonId);
 
     return res.status(200).json({
