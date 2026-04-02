@@ -15,17 +15,23 @@ const router = express.Router();
 const submitLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 10,
-  message: {
-    message: "Too many submissions. Please try again later.",
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      message: "Too many requests, please try again later.",
+    });
+  }
 });
 
 const getLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: 700,
-  message: "Too many requests, please try again later.",
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      message: "Too many requests, please try again later.",
+    });
+  },
 });
 
 router.post(

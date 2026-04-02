@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "react-toastify";
 
 export const API = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -21,6 +22,30 @@ API.interceptors.request.use((req) => {
   return req;
 });
 
+let lastToastTime = 0;
+
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response) {
+      const status = error.response.status;
+      const message = error.response.data?.message || "Something went wrong";
+
+      if (status === 429) {
+        const now = Date.now();
+
+        if (now - lastToastTime > 5000) {
+          toast.error(message);
+          lastToastTime = now;
+        }
+      }
+    } else {
+      toast.error("Network error.");
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 export const addConnectedApp = (data) => {
   API.post("/api/user/addConnectedApps", data);

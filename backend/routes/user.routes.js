@@ -26,7 +26,12 @@ const userRoutes = Router();
 export const rateLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: 500,
-  message: "Too many requests, please try again later.",
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      message: "Too many requests, please try again later.",
+    });
+  },
 });
 
 userRoutes.put("/save-gitHubLink", verifyAuth, rateLimiter, saveGitHubLink);

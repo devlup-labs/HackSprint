@@ -26,25 +26,45 @@ const router = express.Router();
 const adminLoginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
-  message: "Too many login attempts. Try again later.",
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      message: "Too many requests, please try again later.",
+    });
+  },
 });
 
 const googleLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 500,
-  message: "Too many Google login attempts. Try again later.",
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      message: "Too many requests, please try again later.",
+    });
+  },
 });
 
 const getLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: 700,
-  message: "Too many requests, please try again later.",
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      message: "Too many requests, please try again later.",
+    });
+  },
 });
 
 const strictLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
-  message: "Too many attempts, Please try again later.",
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      message: "Too many requests, please try again later.",
+    });
+  },
 });
 
 // router.get("/", adminAuth, getalladmin);
