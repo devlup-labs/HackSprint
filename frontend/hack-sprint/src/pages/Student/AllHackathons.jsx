@@ -300,9 +300,9 @@ const HackathonCard = ({ hackathon }) => {
                 {hackathon.title}
               </h3>
               <div className="flex flex-wrap gap-1.5">
-                <span className="font-jb text-[0.55rem] tracking-[0.08em] uppercase px-2 py-[3px] rounded-[2px] bg-[rgba(95,255,96,0.07)] border border-[rgba(95,255,96,0.18)] text-[rgba(95,255,96,0.65)]">
+                {/* <span className="font-jb text-[0.55rem] tracking-[0.08em] uppercase px-2 py-[3px] rounded-[2px] bg-[rgba(95,255,96,0.07)] border border-[rgba(95,255,96,0.18)] text-[rgba(95,255,96,0.65)]">
                   {hackathon.difficulty}
-                </span>
+                </span> */}
                 {(hackathon.category || []).map((cat, i) => (
                   <span
                     key={i}

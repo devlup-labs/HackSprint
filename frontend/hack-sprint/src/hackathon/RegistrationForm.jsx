@@ -559,7 +559,7 @@ export const RegistrationForm = ({ onSubmit = () => {} }) => {
                         readOnly={!!userData?.email}
                       />
                     </Field>
-                    <Field label="Contact Number" required>
+                    {/* <Field label="Contact Number" required>
                       <input
                         type="tel"
                         name="contactNumber"
@@ -568,8 +568,8 @@ export const RegistrationForm = ({ onSubmit = () => {} }) => {
                         className={inp}
                         required
                       />
-                    </Field>
-                    <Field label="Gender" required>
+                    </Field> */}
+                    {/* <Field label="Gender" required>
                       <select
                         name="gender"
                         value={teamForm.gender}
@@ -586,8 +586,8 @@ export const RegistrationForm = ({ onSubmit = () => {} }) => {
                           </option>
                         ))}
                       </select>
-                    </Field>
-                    <Field label="City" required>
+                    </Field> */}
+                    {/* <Field label="City" required>
                       <input
                         type="text"
                         name="city"
@@ -596,8 +596,8 @@ export const RegistrationForm = ({ onSubmit = () => {} }) => {
                         className={inp}
                         required
                       />
-                    </Field>
-                    <Field label="State" required>
+                    </Field> */}
+                    {/* <Field label="State" required>
                       <input
                         type="text"
                         name="state"
@@ -606,8 +606,8 @@ export const RegistrationForm = ({ onSubmit = () => {} }) => {
                         className={inp}
                         required
                       />
-                    </Field>
-                    <Field label="Years of Experience" required>
+                    </Field> */}
+                    {/* <Field label="Years of Experience" required>
                       <select
                         name="experience"
                         value={teamForm.experience}
@@ -624,8 +624,8 @@ export const RegistrationForm = ({ onSubmit = () => {} }) => {
                           </option>
                         ))}
                       </select>
-                    </Field>
-                    <Field label="Work Email (Optional)">
+                    </Field> */}
+                    {/* <Field label="Work Email (Optional)">
                       <input
                         type="email"
                         name="workEmail"
@@ -633,7 +633,7 @@ export const RegistrationForm = ({ onSubmit = () => {} }) => {
                         onChange={(e) => chg(e, setTeamForm)}
                         className={inp}
                       />
-                    </Field>
+                    </Field> */}
                   </div>
                   <div className="mt-6 flex justify-center sm:justify-end">
                     <PrimaryBtn type="submit" disabled={loading}>

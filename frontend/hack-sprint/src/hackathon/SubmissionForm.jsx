@@ -328,11 +328,11 @@ const SubmissionForm = ({ isOpen, onClose }) => {
             </button>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-5">
             <StatCard icon={Code}     label="Prize Pool"    value={`₹${totalPrize.toLocaleString("en-IN")}`} />
             <StatCard icon={Clock}    label="Days Left"     value={`${daysLeft} Days`} />
             <StatCard icon={Users}    label="Participants"  value={hackathon.numParticipants || 0} />
-            <StatCard icon={Calendar} label="Difficulty"    value={hackathon.difficulty} />
+            {/* <StatCard icon={Calendar} label="Difficulty"    value={hackathon.difficulty} /> */}
           </div>
 
           <p className={`${mono} text-[0.68rem] text-[rgba(180,220,180,0.6)] leading-relaxed mb-5`}>
