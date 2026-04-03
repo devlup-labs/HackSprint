@@ -213,7 +213,7 @@ export const ContentSection = ({ activeSection, hackathon }) => {
               </div>
             </Card>
 
-            <div className="grid sm:grid-cols-2 gap-4">
+            {/* <div className="grid sm:grid-cols-2 gap-4">
               <Card>
                 <SubHead icon={Code}>Difficulty</SubHead>
                 <Tag>{hackathon.difficulty}</Tag>
@@ -228,16 +228,16 @@ export const ContentSection = ({ activeSection, hackathon }) => {
                   ))}
                 </div>
               </Card>
-            </div>
+            </div> */}
 
-            <Card>
+            {/* <Card>
               <SubHead>Recommended Tech Stack</SubHead>
               <div className="flex flex-wrap gap-1.5">
                 {hackathon.techStackUsed?.map((tech, i) => (
                   <Tag key={i}>{tech}</Tag>
                 ))}
               </div>
-            </Card>
+            </Card> */}
           </div>
         );
 
