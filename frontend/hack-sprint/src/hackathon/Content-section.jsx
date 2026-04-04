@@ -200,8 +200,8 @@ export const ContentSection = ({ activeSection, hackathon }) => {
                 {[
                   ["Registration Opens", hackathon.startDate],
                   ["Registration Closes", hackathon.endDate],
-                  ["Submission Opens", hackathon.submissionStartDate],
-                  ["Submission Deadline", hackathon.submissionEndDate],
+                  ["Abstract Submission Opens", hackathon.submissionStartDate],
+                  ["Abstract Submission Deadline", hackathon.submissionEndDate],
                 ].map(([label, date], i, arr) => (
                   <TimelineRow
                     key={label}
