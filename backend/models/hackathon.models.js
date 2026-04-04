@@ -121,6 +121,12 @@ const hackathonSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    contact: [
+      {
+        title: { type: String, required: true },
+        value: { type: String, required: true }
+      },
+    ],
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Admin",

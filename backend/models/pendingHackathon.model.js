@@ -24,6 +24,12 @@ const pendingHackathonSchema = new mongoose.Schema(
         ref: "Admin",
       },
     },
+    contact: [
+      {
+        title: { type: String, required: true },
+        value: { type: String, required: true }
+      },
+    ],
     refMaterial: {
       type: [String],
     },

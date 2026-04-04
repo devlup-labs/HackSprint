@@ -1,15 +1,38 @@
-import express from 'express'
-import { googleLogin, githubLogin, login, resetPassword, sendResetLink, signup, verifyEmail } from '../controllers/auth.controller.js'
-import { loginValidation, signupValidation } from "../middlewares/authValidation.js"
+import express from "express";
+import {
+  googleLogin,
+  githubLogin,
+  login,
+  resetPassword,
+  sendResetLink,
+  signup,
+  verifyEmail,
+} from "../controllers/auth.controller.js";
+import {
+  loginValidation,
+  signupValidation,
+} from "../middlewares/authValidation.js";
+import rateLimit from "express-rate-limit";
 
-const router = express.Router()
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 30,
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      message: "Too many requests, please try again later.",
+    });
+  },
+});
 
-// router.post("/signup", signupValidation, signup)
-router.get("/verify-email", verifyEmail)
-router.post("/send-reset-link", sendResetLink);
-router.post("/reset-password", resetPassword);
-// router.post("/login", loginValidation, login)
-router.get("/google", googleLogin)
-router.get("/auth/callback/github", githubLogin)
+const router = express.Router();
 
-export default router
+router.post("/signup", limiter, signup);
+router.get("/verify-email", limiter, verifyEmail);
+router.post("/send-reset-link", limiter, sendResetLink);
+router.post("/reset-password", limiter, resetPassword);
+router.post("/login", limiter, login);
+router.get("/google", limiter, googleLogin);
+router.get("/auth/callback/github", limiter, githubLogin);
+
+export default router;

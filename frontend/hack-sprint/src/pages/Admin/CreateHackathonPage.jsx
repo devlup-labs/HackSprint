@@ -730,6 +730,74 @@ const DynamicRewardInput = ({ values, onUpdate }) => {
   );
 };
 
+const DynamicContactInput = ({ values, onUpdate }) => {
+  const [title, setTitle] = useState("");
+  const [value, setValue] = useState("");
+
+  const handleAdd = () => {
+    if (title.trim() && value.trim()) {
+      onUpdate([...values, { title: title.trim(), value: value.trim() }]);
+      setTitle("");
+      setValue("");
+    }
+  };
+
+  return (
+    <div>
+      <label className="ch-label">Contact Information</label>
+
+      {values.length > 0 && (
+        <div className="flex flex-col gap-2 mb-3">
+          {values.map((item, index) => (
+            <div key={index} className="ch-list-item">
+              <div style={{ flex: 1 }}>
+                <p className="text-[0.75rem] text-white font-semibold">
+                  {item.title}
+                </p>
+                <p className="text-[0.7rem] text-[rgba(95,255,96,0.5)] break-all">
+                  {item.value}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => onUpdate(values.filter((_, i) => i !== index))}
+                className="ch-list-item-remove"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="ch-divider" />
+
+      <div className="flex flex-col gap-2 mt-3">
+        <input
+          type="text"
+          placeholder="Title (e.g. Email, Phone, Discord)"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="ch-input"
+        />
+
+        <input
+          type="text"
+          placeholder="Value (e.g. abc@gmail.com / link / number)"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          className="ch-input"
+        />
+
+        <button type="button" onClick={handleAdd} className="ch-btn-add-full">
+          <Plus size={13} /> Add Contact
+        </button>
+      </div>
+    </div>
+  );
+};
+
 /* ================= HELPERS ================= */
 const toISOString = (datetimeLocalValue) => {
   if (!datetimeLocalValue) return null;
@@ -786,6 +854,7 @@ const CreateHackathonPage = () => {
     category: [],
     themes: [],
     problems: [],
+    contact: [],
     TandCforHackathon: [],
     evaluationCriteria: [],
     projectSubmission: [],
@@ -897,6 +966,7 @@ const CreateHackathonPage = () => {
           r && r.description && typeof r.amount === "number" && r.amount > 0
       );
       fd.append("rewards", JSON.stringify(validRewards));
+      fd.append("contact", JSON.stringify(formData.contact || []));
       const adminId = adminData._id ?? adminData.id ?? null;
       if (!adminId) {
         toast.error("Admin ID missing — please log out and log in again.");
@@ -1105,6 +1175,13 @@ const CreateHackathonPage = () => {
             <DynamicFaqInput
               values={formData.FAQs}
               onUpdate={(v) => setFormData((p) => ({ ...p, FAQs: v }))}
+            />
+          </Section>
+
+          <Section badge="06 / contact" title="Contact Information">
+            <DynamicContactInput
+              values={formData.contact}
+              onUpdate={(v) => setFormData((p) => ({ ...p, contact: v }))}
             />
           </Section>
 

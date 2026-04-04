@@ -1,96 +1,98 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-  <title>Admin Welcome — HackSprint</title>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
-  <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; padding: 0; background: #f0f2f8; font-family: 'Syne', sans-serif; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
-    table { border-collapse: collapse; mso-table-lspace: 0; mso-table-rspace: 0; }
-    img { border: 0; display: block; max-width: 100%; }
-    a { color: inherit; }
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="x-apple-disable-message-reformatting" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Admin Welcome - HackSprint</title>
+  <style type="text/css">
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: collapse; }
+    img { border: 0; display: block; max-width: 100%; -ms-interpolation-mode: bicubic; }
+    body { margin: 0 !important; padding: 0 !important; width: 100% !important; background: #f0f2f8; }
 
     @media only screen and (max-width: 620px) {
-      .wrapper { padding: 20px 12px !important; }
-      .outer { width: 100% !important; max-width: 100% !important; }
+      .wrapper    { padding: 20px 12px !important; }
+      .outer      { width: 100% !important; max-width: 100% !important; }
       .header-pad { padding: 26px 24px 22px !important; }
-      .hero-pad { padding: 36px 24px 32px !important; }
-      .body-pad { padding: 28px 24px 32px !important; }
-      .hero-h1 { font-size: 24px !important; }
-      .sub-text { font-size: 14px !important; }
-      .cta-btn { padding: 14px 32px !important; font-size: 14px !important; }
-      .tip-pad { padding: 18px 24px !important; }
+      .hero-pad   { padding: 36px 24px 32px !important; }
+      .body-pad   { padding: 28px 24px 32px !important; }
+      .hero-h1    { font-size: 22px !important; }
+      .sub-text   { font-size: 14px !important; }
+      .cta-btn    { padding: 14px 32px !important; font-size: 14px !important; }
+      .tip-pad    { padding: 18px 24px !important; }
       .footer-pad { padding: 24px 24px !important; }
-      .footer-links a { display: block !important; margin: 6px 0 !important; }
     }
 
     @media only screen and (max-width: 400px) {
-      .hero-h1 { font-size: 20px !important; }
+      .hero-h1 { font-size: 18px !important; }
     }
   </style>
 </head>
-<body style="margin:0; padding:0; background:#f0f2f8;">
+<body style="margin:0;padding:0;background:#f0f2f8;">
 
   <table class="wrapper" width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#f0f2f8" style="padding:40px 16px;">
     <tr>
       <td align="center">
+        <table class="outer" width="600" border="0" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
 
-        <table class="outer" width="600" border="0" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%;">
-
-          <!-- ── HEADER ── -->
+          <!-- HEADER -->
           <tr>
-            <td class="header-pad" style="background:#ffffff; border:1px solid #e4e6f0; border-radius:20px 20px 0 0; padding:30px 44px 26px; text-align:center;">
-              <div style="font-size:22px; font-weight:800; color:#1a1a2e; letter-spacing:-0.02em; font-family:'Syne',sans-serif; line-height:1.2;">
+            <td class="header-pad" style="background:#ffffff;border:1px solid #e4e6f0;border-radius:20px 20px 0 0;padding:30px 44px 26px;text-align:center;">
+              <p style="margin:0;font-size:22px;font-weight:bold;color:#1a1a2e;letter-spacing:-0.02em;font-family:Georgia,'Times New Roman',Times,serif;line-height:1.2;">
                 HackSprint
-              </div>
-              <div style="font-size:9px; color:#9ca3af; font-family:'Space Mono',monospace; letter-spacing:0.1em; text-transform:uppercase; margin-top:3px;">IIT Jodhpur · Control Center</div>
+              </p>
+              <p style="margin:4px 0 0 0;font-size:9px;color:#9ca3af;font-family:'Courier New',Courier,monospace;letter-spacing:0.1em;text-transform:uppercase;">
+                IIT Jodhpur . Control Center
+              </p>
             </td>
           </tr>
 
-          <!-- ── GRADIENT DIVIDER ── -->
+          <!-- DIVIDER -->
           <tr>
-            <td style="background:linear-gradient(90deg,#f97316 0%,#facc15 50%,#7c3aed 100%); height:3px; font-size:0; line-height:0;">&nbsp;</td>
+            <td style="background:#f97316;height:3px;font-size:0;line-height:0;">&nbsp;</td>
           </tr>
 
-          <!-- ── HERO ── -->
+          <!-- HERO -->
           <tr>
-            <td class="hero-pad" style="background:#ffffff; border-left:1px solid #e4e6f0; border-right:1px solid #e4e6f0; padding:44px 44px 36px; text-align:center;">
+            <td class="hero-pad" style="background:#ffffff;border-left:1px solid #e4e6f0;border-right:1px solid #e4e6f0;padding:44px 44px 36px;text-align:center;">
+              <!-- H1 -->
+              <p class="hero-h1" style="margin:0 0 14px 0;font-size:28px;font-weight:bold;color:#1a1a2e;line-height:1.2;letter-spacing:-0.03em;font-family:Georgia,'Times New Roman',Times,serif;">
+                Welcome,<br />
+                <span style="color:#f97316;">{{name}}</span>
+              </p>
 
-              <div style="display:inline-block; background:#fff7ed; border:1px solid #fed7aa; border-radius:100px; padding:5px 16px; margin-bottom:22px;">
-                <span style="font-family:'Space Mono',monospace; font-size:10px; color:#ea580c; text-transform:uppercase; letter-spacing:0.1em;">Admin Access Granted</span>
-              </div>
-
-              <h1 class="hero-h1" style="font-size:28px; font-weight:800; color:#1a1a2e; line-height:1.2; letter-spacing:-0.03em; margin:0 0 14px 0; font-family:'Syne',sans-serif;">
-                Welcome,<br>
-                <span style="background:linear-gradient(90deg,#f97316,#facc15); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; color:#f97316;">{{name}}</span>
-              </h1>
-
-              <p class="sub-text" style="color:#6b7280; font-size:14px; line-height:1.8; margin:0 auto 0 auto; font-family:'Syne',sans-serif; max-width:400px;">
-                You now have full control — create hackathons, manage participants, review submissions, and run the entire event lifecycle from one dashboard.
+              <!-- Subtext -->
+              <p class="sub-text" style="margin:0 auto;color:#6b7280;font-size:14px;line-height:1.8;font-family:Georgia,'Times New Roman',Times,serif;max-width:400px;">
+                You now have full control. Create hackathons, manage participants, review submissions, and run the entire event lifecycle from one dashboard.
               </p>
 
             </td>
           </tr>
 
-          <!-- ── ACTION CARDS ── -->
+          <!-- ACTION CARDS -->
           <tr>
-            <td class="body-pad" style="background:#fafbff; border-left:1px solid #e4e6f0; border-right:1px solid #e4e6f0; padding:28px 44px 32px;">
+            <td class="body-pad" style="background:#fafbff;border-left:1px solid #e4e6f0;border-right:1px solid #e4e6f0;padding:28px 44px 32px;">
 
               <!-- Card 1 -->
-              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background:#ffffff; border:1px solid #e4e6f0; border-left:3px solid #f97316; border-radius:12px; margin-bottom:10px;">
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background:#ffffff;border:1px solid #e4e6f0;border-left:3px solid #f97316;border-radius:12px;margin-bottom:10px;">
                 <tr>
                   <td style="padding:18px 20px;">
                     <table border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
                         <td width="46" valign="top">
-                          <div style="width:40px; height:40px; background:#fff7ed; border-radius:10px; text-align:center; line-height:40px; font-size:18px;">🚀</div>
+                          <table border="0" cellpadding="0" cellspacing="0" width="40">
+                            <tr>
+                              <td align="center" valign="middle" width="40" height="40" style="width:40px;height:40px;background:#fff7ed;border-radius:10px;font-size:18px;">
+                                &#128640;
+                              </td>
+                            </tr>
+                          </table>
                         </td>
                         <td style="padding-left:14px;" valign="top">
-                          <div style="font-weight:700; color:#1a1a2e; font-size:14px; margin-bottom:4px; font-family:'Syne',sans-serif;">Create a Hackathon</div>
-                          <div style="color:#6b7280; font-size:12.5px; line-height:1.6; font-family:'Syne',sans-serif;">Launch new events — set themes, deadlines, team sizes, prizes, and problem statements from the creator panel.</div>
+                          <p style="margin:0 0 4px 0;font-weight:bold;color:#1a1a2e;font-size:14px;font-family:Georgia,'Times New Roman',Times,serif;">Create a Hackathon</p>
+                          <p style="margin:0;color:#6b7280;font-size:12px;line-height:1.6;font-family:Georgia,'Times New Roman',Times,serif;">Launch new events. Set themes, deadlines, team sizes, prizes, and problem statements from the creator panel.</p>
                         </td>
                       </tr>
                     </table>
@@ -99,17 +101,23 @@
               </table>
 
               <!-- Card 2 -->
-              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background:#ffffff; border:1px solid #e4e6f0; border-left:3px solid #7c3aed; border-radius:12px; margin-bottom:10px;">
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background:#ffffff;border:1px solid #e4e6f0;border-left:3px solid #7c3aed;border-radius:12px;margin-bottom:10px;">
                 <tr>
                   <td style="padding:18px 20px;">
                     <table border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
                         <td width="46" valign="top">
-                          <div style="width:40px; height:40px; background:#f5f3ff; border-radius:10px; text-align:center; line-height:40px; font-size:18px;">👥</div>
+                          <table border="0" cellpadding="0" cellspacing="0" width="40">
+                            <tr>
+                              <td align="center" valign="middle" width="40" height="40" style="width:40px;height:40px;background:#f5f3ff;border-radius:10px;font-size:18px;">
+                                &#128101;
+                              </td>
+                            </tr>
+                          </table>
                         </td>
                         <td style="padding-left:14px;" valign="top">
-                          <div style="font-weight:700; color:#1a1a2e; font-size:14px; margin-bottom:4px; font-family:'Syne',sans-serif;">Monitor Participants</div>
-                          <div style="color:#6b7280; font-size:12.5px; line-height:1.6; font-family:'Syne',sans-serif;">Track registrations in real time. View team formations, individual profiles, skill tags, and engagement status.</div>
+                          <p style="margin:0 0 4px 0;font-weight:bold;color:#1a1a2e;font-size:14px;font-family:Georgia,'Times New Roman',Times,serif;">Monitor Participants</p>
+                          <p style="margin:0;color:#6b7280;font-size:12px;line-height:1.6;font-family:Georgia,'Times New Roman',Times,serif;">Track registrations in real time. View team formations, individual profiles, skill tags, and engagement status.</p>
                         </td>
                       </tr>
                     </table>
@@ -118,17 +126,23 @@
               </table>
 
               <!-- Card 3 -->
-              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background:#ffffff; border:1px solid #e4e6f0; border-left:3px solid #0ea5e9; border-radius:12px; margin-bottom:10px;">
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background:#ffffff;border:1px solid #e4e6f0;border-left:3px solid #0ea5e9;border-radius:12px;margin-bottom:10px;">
                 <tr>
                   <td style="padding:18px 20px;">
                     <table border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
                         <td width="46" valign="top">
-                          <div style="width:40px; height:40px; background:#f0f9ff; border-radius:10px; text-align:center; line-height:40px; font-size:18px;">📦</div>
+                          <table border="0" cellpadding="0" cellspacing="0" width="40">
+                            <tr>
+                              <td align="center" valign="middle" width="40" height="40" style="width:40px;height:40px;background:#f0f9ff;border-radius:10px;font-size:18px;">
+                                &#128230;
+                              </td>
+                            </tr>
+                          </table>
                         </td>
                         <td style="padding-left:14px;" valign="top">
-                          <div style="font-weight:700; color:#1a1a2e; font-size:14px; margin-bottom:4px; font-family:'Syne',sans-serif;">Review Submissions</div>
-                          <div style="color:#6b7280; font-size:12.5px; line-height:1.6; font-family:'Syne',sans-serif;">Browse project submissions with links and descriptions. Assign scores, leave feedback, and manage the judging pipeline.</div>
+                          <p style="margin:0 0 4px 0;font-weight:bold;color:#1a1a2e;font-size:14px;font-family:Georgia,'Times New Roman',Times,serif;">Review Submissions</p>
+                          <p style="margin:0;color:#6b7280;font-size:12px;line-height:1.6;font-family:Georgia,'Times New Roman',Times,serif;">Browse project submissions with links and descriptions. Assign scores, leave feedback, and manage the judging pipeline.</p>
                         </td>
                       </tr>
                     </table>
@@ -137,17 +151,23 @@
               </table>
 
               <!-- Card 4 -->
-              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background:#ffffff; border:1px solid #e4e6f0; border-left:3px solid #ec4899; border-radius:12px; margin-bottom:24px;">
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background:#ffffff;border:1px solid #e4e6f0;border-left:3px solid #ec4899;border-radius:12px;margin-bottom:24px;">
                 <tr>
                   <td style="padding:18px 20px;">
                     <table border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
                         <td width="46" valign="top">
-                          <div style="width:40px; height:40px; background:#fdf2f8; border-radius:10px; text-align:center; line-height:40px; font-size:18px;">📣</div>
+                          <table border="0" cellpadding="0" cellspacing="0" width="40">
+                            <tr>
+                              <td align="center" valign="middle" width="40" height="40" style="width:40px;height:40px;background:#fdf2f8;border-radius:10px;font-size:18px;">
+                                &#128227;
+                              </td>
+                            </tr>
+                          </table>
                         </td>
                         <td style="padding-left:14px;" valign="top">
-                          <div style="font-weight:700; color:#1a1a2e; font-size:14px; margin-bottom:4px; font-family:'Syne',sans-serif;">Send Announcements</div>
-                          <div style="color:#6b7280; font-size:12.5px; line-height:1.6; font-family:'Syne',sans-serif;">Broadcast updates, reminders, and result notifications directly to all participants via email and in-app alerts.</div>
+                          <p style="margin:0 0 4px 0;font-weight:bold;color:#1a1a2e;font-size:14px;font-family:Georgia,'Times New Roman',Times,serif;">Send Announcements</p>
+                          <p style="margin:0;color:#6b7280;font-size:12px;line-height:1.6;font-family:Georgia,'Times New Roman',Times,serif;">Broadcast updates, reminders, and result notifications directly to all participants via email and in-app alerts.</p>
                         </td>
                       </tr>
                     </table>
@@ -156,14 +176,14 @@
               </table>
 
               <!-- CTA -->
-              <table border="0" cellpadding="0" cellspacing="0" align="center" style="width:100%;">
+              <table border="0" cellpadding="0" cellspacing="0" align="center" width="100%">
                 <tr>
                   <td align="center">
                     <table border="0" cellpadding="0" cellspacing="0">
                       <tr>
-                        <td align="center" style="border-radius:100px; background:linear-gradient(135deg,#f97316,#facc15);">
+                        <td align="center" style="border-radius:100px;background:#f97316;">
                           <a class="cta-btn" href="https://hacksprint.devluplabs.tech/admin"
-                             style="display:inline-block; color:#ffffff; font-family:'Syne',sans-serif; font-weight:700; font-size:14px; padding:15px 42px; border-radius:100px; text-decoration:none; letter-spacing:0.01em; mso-padding-alt:0; white-space:nowrap;">
+                            style="display:inline-block;color:#ffffff;font-family:Georgia,'Times New Roman',Times,serif;font-weight:bold;font-size:14px;padding:15px 42px;border-radius:100px;text-decoration:none;letter-spacing:0.01em;white-space:nowrap;">
                             Open Admin Dashboard
                           </a>
                         </td>
@@ -176,13 +196,13 @@
             </td>
           </tr>
 
-          <!-- ── NOTICE STRIP ── -->
+          <!-- NOTICE STRIP -->
           <tr>
-            <td class="tip-pad" style="background:#fffbeb; border-left:1px solid #e4e6f0; border-right:1px solid #e4e6f0; border-top:1px solid #fde68a; padding:20px 44px;">
+            <td class="tip-pad" style="background:#fffbeb;border-left:1px solid #e4e6f0;border-right:1px solid #e4e6f0;border-top:1px solid #fde68a;padding:20px 44px;">
               <table width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td width="24" valign="top" style="font-size:15px; padding-top:1px;">⚠️</td>
-                  <td style="padding-left:10px; color:#92400e; font-size:13px; line-height:1.65; font-family:'Syne',sans-serif;">
+                  <td width="24" valign="top" style="font-size:15px;padding-top:1px;">&#9888;&#65039;</td>
+                  <td style="padding-left:10px;color:#92400e;font-size:13px;line-height:1.65;font-family:Georgia,'Times New Roman',Times,serif;">
                     <strong style="color:#b45309;">Admin Responsibility:</strong> Your account has elevated privileges. All actions are logged and tied to your admin ID. Please act responsibly.
                   </td>
                 </tr>
@@ -190,33 +210,36 @@
             </td>
           </tr>
 
-          <!-- ── FOOTER ── -->
+          <!-- FOOTER -->
           <tr>
-            <td class="footer-pad" style="background:#ffffff; border:1px solid #e4e6f0; border-top:none; border-radius:0 0 20px 20px; padding:26px 44px; text-align:center;">
+            <td class="footer-pad" style="background:#ffffff;border:1px solid #e4e6f0;border-top:none;border-radius:0 0 20px 20px;padding:26px 44px;text-align:center;">
 
-              <table class="footer-links" width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+              <!-- Social links -->
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
                 <tr>
                   <td align="center">
-                    <a href="https://hacksprint.devluplabs.tech" style="color:#9ca3af; text-decoration:none; font-size:10px; font-family:'Space Mono',monospace; text-transform:uppercase; letter-spacing:0.08em; margin:0 8px;">Website</a>
-                    <a href="https://www.instagram.com/hack.sprint" style="color:#9ca3af; text-decoration:none; font-size:10px; font-family:'Space Mono',monospace; text-transform:uppercase; letter-spacing:0.08em; margin:0 8px;">Instagram</a>
-                    <a href="https://github.com/devlup-labs/HackSprint" style="color:#9ca3af; text-decoration:none; font-size:10px; font-family:'Space Mono',monospace; text-transform:uppercase; letter-spacing:0.08em; margin:0 8px;">Github</a>
-                    <a href="https://www.linkedin.com/company/hacksprintiitj/" style="color:#9ca3af; text-decoration:none; font-size:10px; font-family:'Space Mono',monospace; text-transform:uppercase; letter-spacing:0.08em; margin:0 8px;">LinkedIn</a>
+                    <a href="https://hacksprint.devluplabs.tech" style="color:#9ca3af;text-decoration:none;font-size:10px;font-family:'Courier New',Courier,monospace;text-transform:uppercase;letter-spacing:0.08em;margin:0 8px;">Website</a>
+                    <a href="https://www.instagram.com/hack.sprint" style="color:#9ca3af;text-decoration:none;font-size:10px;font-family:'Courier New',Courier,monospace;text-transform:uppercase;letter-spacing:0.08em;margin:0 8px;">Instagram</a>
+                    <a href="https://github.com/devlup-labs/HackSprint" style="color:#9ca3af;text-decoration:none;font-size:10px;font-family:'Courier New',Courier,monospace;text-transform:uppercase;letter-spacing:0.08em;margin:0 8px;">Github</a>
+                    <a href="https://www.linkedin.com/company/hacksprintiitj/" style="color:#9ca3af;text-decoration:none;font-size:10px;font-family:'Courier New',Courier,monospace;text-transform:uppercase;letter-spacing:0.08em;margin:0 8px;">LinkedIn</a>
                   </td>
                 </tr>
               </table>
 
-              <div style="border-top:1px solid #f3f4f6; margin:0 0 16px 0; font-size:0;">&nbsp;</div>
+              <!-- Divider -->
+              <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+                <tr><td style="border-top:1px solid #f3f4f6;font-size:0;line-height:0;">&nbsp;</td></tr>
+              </table>
 
-              <div style="font-size:10px; color:#c4c9d8; font-family:'Space Mono',monospace; line-height:1.7;">
-                <strong style="color:#d1d5db;">HackSprint &middot; IIT Jodhpur &middot; Admin Panel</strong><br>
+              <p style="margin:0;font-size:10px;color:#c4c9d8;font-family:'Courier New',Courier,monospace;line-height:1.7;">
+                <strong style="color:#d1d5db;">HackSprint . IIT Jodhpur . Admin Panel</strong><br />
                 <span style="font-size:9px;">You're receiving this because you were granted admin access on HackSprint.</span>
-              </div>
+              </p>
 
             </td>
           </tr>
 
         </table>
-
       </td>
     </tr>
   </table>
