@@ -243,6 +243,7 @@ export const createPendingHackathon = async (req, res) => {
       "approvals",
       "rejectedBy",
       "rewards",
+      "contact",
     ];
 
     if (data.refMaterial !== undefined) {
@@ -275,6 +276,10 @@ export const createPendingHackathon = async (req, res) => {
     // ✅ Rewards cleanup
     if (Array.isArray(data.rewards)) {
       data.rewards = data.rewards.filter((r) => r && r.description && r.amount);
+    }
+
+    if (Array.isArray(data.contact)) {
+      data.contact = data.contact.filter((c) => c && c.title && c.value);
     }
 
     // ✅ Gallery cleanup
@@ -884,6 +889,11 @@ export const editHackathon = async (req, res) => {
         (r) => r && r.description && r.amount > 0
       );
     }
+
+    if (Array.isArray(data.contact)) {
+      data.contact = data.contact.filter((c) => c && c.title && c.value);
+    }
+
     if (Array.isArray(data.FAQs)) {
       data.FAQs = data.FAQs.filter((f) => f && f.question && f.answer);
     }

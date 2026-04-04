@@ -240,7 +240,6 @@ export const ContentSection = ({ activeSection, hackathon }) => {
             </Card> */}
           </div>
         );
-
       case "prizes": {
         const rewards =
           hackathon.rewards?.length > 0
@@ -292,7 +291,6 @@ export const ContentSection = ({ activeSection, hackathon }) => {
           </div>
         );
       }
-
       case "themes":
         return <ListSection title="Themes" content={hackathon.themes} />;
       case "submission-guide":
@@ -325,7 +323,6 @@ export const ContentSection = ({ activeSection, hackathon }) => {
             content={hackathon.refMaterial}
           />
         );
-
       case "faqs": {
         const faqs = hackathon.FAQs || [];
         return (
@@ -382,9 +379,63 @@ export const ContentSection = ({ activeSection, hackathon }) => {
           </div>
         );
       }
-
       case "discussion":
         return <ChatInterface hackathonId={hackathon._id} />;
+      case "contact":
+        return (
+          <div>
+            <SectionHead>Contact</SectionHead>
+
+            <Card>
+              {hackathon.contact?.length > 0 ? (
+                <div className="flex flex-col gap-3">
+                  {hackathon.contact.map((item, i) => {
+                    const value = item.value || "";
+                    const title = item.title || "";
+
+                    const isEmail = value.includes("@");
+                    const isLink = value.startsWith("http");
+
+                    return (
+                      <div
+                        key={i}
+                        className="flex items-center justify-between gap-3"
+                      >
+                        <p className="text-[0.6rem] text-[#5fff60] uppercase tracking-wider">
+                          {title}
+                        </p>
+
+                        {isEmail ? (
+                          <a
+                            href={`mailto:${value}`}
+                            className="font-[family-name:'JetBrains_Mono',monospace] text-[0.7rem] text-[#5fff60] hover:underline break-all"
+                          >
+                            {value}
+                          </a>
+                        ) : isLink ? (
+                          <a
+                            href={value}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-[family-name:'JetBrains_Mono',monospace] text-[0.7rem] text-[#5fff60] hover:underline break-all"
+                          >
+                            {value}
+                          </a>
+                        ) : (
+                          <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.7rem] text-[rgba(180,220,180,0.6)] break-all">
+                            {value}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <Empty label="contact" />
+              )}
+            </Card>
+          </div>
+        );
       case "upvote":
         return <Upvote />;
       case "gallery":
@@ -396,7 +447,6 @@ export const ContentSection = ({ activeSection, hackathon }) => {
         );
       case "results":
         return <ResultsSection hackathonId={hackathon._id} />;
-
       default:
         return (
           <div className="text-center py-12">

@@ -10,6 +10,7 @@ import {
   NotebookPen,
   Target as ThemeIcon,
   ThumbsUp,
+  Phone,
   Images,
 } from "lucide-react";
 
@@ -23,15 +24,16 @@ export const SidebarNav = ({
     { id: "overview", label: "Overview", icon: LayoutDashboard },
     { id: "about", label: "About", icon: Info },
     { id: "prizes", label: "Prizes", icon: Award },
+    { id: "rules", label: "Rules", icon: FileText },
     { id: "submission-guide", label: "Submission", icon: NotebookPen },
     { id: "judging", label: "Judging", icon: Scale },
-    { id: "results", label: "Results", icon: Award, requiresResult: true },
-    { id: "upvote", label: "Voting", icon: ThumbsUp, requiresResult: true },
-    { id: "gallery", label: "Gallery", icon: Images },
-    { id: "rules", label: "Rules", icon: FileText },
     { id: "faqs", label: "FAQs", icon: CircleHelp },
     { id: "refMaterial", label: "Reference", icon: FileText },
     { id: "discussion", label: "Discussion", icon: MessagesSquare },
+    { id: "results", label: "Results", icon: Award, requiresResult: true },
+    { id: "upvote", label: "Voting", icon: ThumbsUp, requiresResult: true },
+    { id: "gallery", label: "Gallery", icon: Images },
+    { id: "contact", label: "Contact", icon: Phone }
   ];
 
   const sections = allSections.filter((s) => {

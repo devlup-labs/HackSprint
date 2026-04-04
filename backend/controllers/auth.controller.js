@@ -7,8 +7,6 @@ import { sendMail } from "../emailService/brevoEmail.js";
 import dotenv from "dotenv";
 dotenv.config();
 
-const isIITJEmail = (email) => /^[A-Za-z0-9._%+-]+@(iitj\.ac\.in|alumni\.iitj\.ac\.in)$/i.test(email);
-
 /**
  * SIGNUP - creates user, sends verification email
  */
@@ -24,7 +22,7 @@ const signup = async (req, res) => {
       });
     }
 
-    console.log("bye...")
+    console.log("bye...");
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -79,7 +77,7 @@ const verifyEmail = async (req, res) => {
     }
 
     // Decode token
-    console.log("hello")
+    console.log("hello");
     console.log("Verifying token:", token);
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
     console.log("Decoded JWT:", decoded);
@@ -102,7 +100,7 @@ const verifyEmail = async (req, res) => {
     await sendMail({
       to: user.email,
       subject: "Welcome to HackSprint 🎉",
-      templateName: "welcome",
+      templateName: "userWelcome",
       data: {
         name: user.name,
         email: user.email,
@@ -110,7 +108,6 @@ const verifyEmail = async (req, res) => {
     });
 
     return res.redirect(`${process.env.FRONTEND_URL}/?verified=success`);
-
   } catch (err) {
     console.error("Verify error:", err);
     return res.redirect(`${process.env.FRONTEND_URL}/?verified=failed`);
@@ -122,13 +119,32 @@ const verifyEmail = async (req, res) => {
  */
 const sendResetLink = async (req, res) => {
   try {
-    const { email } = req.body;
+    let { email } = req.body;
+
+    email = email.toLowerCase().trim();
 
     const user = await UserModel.findOne({ email });
-    if (!user)
-      return res
-        .status(404)
-        .json({ message: "User not found", success: false });
+
+    if (!user) {
+      return res.status(400).json({
+        message: "User not registered. Please check and try again.",
+        success: false,
+      });
+    }
+
+    if (user.provider && user.provider !== "local") {
+      return res.status(400).json({
+        message: `This account uses ${user.provider} login. Please login using ${user.provider}.`,
+        success: false,
+      });
+    }
+
+    if (!user.password) {
+      return res.status(400).json({
+        message: "Password reset not available for this account.",
+        success: false,
+      });
+    }
 
     const resetToken = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
       expiresIn: "15m",
@@ -137,21 +153,27 @@ const sendResetLink = async (req, res) => {
     const resetUrl = `${process.env.FRONTEND_URL}/account/reset-password?token=${resetToken}`;
 
     await sendMail({
-      to: email,
+      to: user.email,
       subject: "Reset your password - HackSprint",
       templateName: "resetPassword",
-      data: { name: user.name, email: user.email, resetUrl: resetUrl },
+      data: {
+        name: user.name,
+        email: user.email,
+        resetUrl,
+      },
     });
 
-    res.json({
-      message: "Password reset link sent to your email",
+    return res.json({
+      message: "If an account exists, a reset link has been sent.",
       success: true,
     });
   } catch (err) {
     console.error("Reset link error:", err);
-    res
-      .status(500)
-      .json({ message: "Server error", error: err.message, success: false });
+    res.status(500).json({
+      message: "Server error",
+      error: err.message,
+      success: false,
+    });
   }
 };
 
@@ -200,22 +222,43 @@ const resetPassword = async (req, res) => {
  */
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    let { email, password } = req.body;
+
+    email = email.toLowerCase().trim();
+
     const user = await UserModel.findOne({ email });
 
     const errorMsg = "Authentication failed! Email or password is wrong";
 
-    if (!user)
-      return res.status(403).json({ message: errorMsg, success: false });
+    if (!user) {
+      return res.status(401).json({ message: errorMsg, success: false });
+    }
+
+    if (user.provider && user.provider !== "local") {
+      return res.status(400).json({
+        message: `This email is registered using ${user.provider}. Please login with ${user.provider}.`,
+        success: false,
+      });
+    }
+
+    if (!user.password) {
+      return res.status(400).json({
+        message: "Password login not available for this account",
+        success: false,
+      });
+    }
 
     const isPasswordEqual = await bcrypt.compare(password, user.password);
-    if (!isPasswordEqual)
-      return res.status(403).json({ message: errorMsg, success: false });
+
+    if (!isPasswordEqual) {
+      return res.status(401).json({ message: errorMsg, success: false });
+    }
 
     if (!user.isVerified) {
-      return res
-        .status(403)
-        .json({ message: "Please verify your email first", success: false });
+      return res.status(403).json({
+        message: "Please verify your email first",
+        success: false,
+      });
     }
 
     const jwtToken = jwt.sign(
@@ -239,7 +282,6 @@ const login = async (req, res) => {
     res.status(500).json({ message: "Internal server error", success: false });
   }
 };
-
 /**
  * GOOGLE LOGIN - no email verification required
  */
@@ -312,7 +354,9 @@ const githubLogin = async (req, res) => {
   try {
     const { code } = req.query;
     if (!code) {
-      return res.status(400).json({ message: "Code not provided", success: false });
+      return res
+        .status(400)
+        .json({ message: "Code not provided", success: false });
     }
 
     const params = new URLSearchParams();
@@ -334,7 +378,9 @@ const githubLogin = async (req, res) => {
 
     const accessToken = tokenRes.data.access_token;
     if (!accessToken) {
-      return res.status(400).json({ message: "Invalid GitHub code", success: false });
+      return res
+        .status(400)
+        .json({ message: "Invalid GitHub code", success: false });
     }
 
     // Get user info from GitHub
@@ -360,7 +406,9 @@ const githubLogin = async (req, res) => {
     }
 
     if (!email) {
-      return res.status(400).json({ message: "Email not available from GitHub", success: false });
+      return res
+        .status(400)
+        .json({ message: "Email not available from GitHub", success: false });
     }
 
     const name = userRes.data.name || userRes.data.login;
@@ -401,11 +449,13 @@ const githubLogin = async (req, res) => {
       success: true,
       token: jwtToken,
       email,
-      name: user.name
+      name: user.name,
     });
   } catch (err) {
     console.error("🔥 Error in githubLogin:", err);
-    return res.status(500).json({ message: "Internal server error", success: false });
+    return res
+      .status(500)
+      .json({ message: "Internal server error", success: false });
   }
 };
 
@@ -416,5 +466,5 @@ export {
   sendResetLink,
   resetPassword,
   googleLogin,
-  githubLogin
+  githubLogin,
 };

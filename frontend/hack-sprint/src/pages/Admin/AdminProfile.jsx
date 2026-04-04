@@ -296,6 +296,7 @@ const EditModal = ({ hackathon, adminData, onClose, onSaved }) => {
     projectSubmission: [...(hackathon.projectSubmission || [])],
     FAQs: [...(hackathon.FAQs || [])],
     rewards: [...(hackathon.rewards || [])],
+    contact: [...(hackathon.contact || [])],
     showVoting: hackathon.showVoting || false,
     showResult: hackathon.showResult || false,
   });
@@ -308,6 +309,10 @@ const EditModal = ({ hackathon, adminData, onClose, onSaved }) => {
   const [rewardInput, setRewardInput] = useState({
     description: "",
     amount: "",
+  });
+  const [contactInput, setContactInput] = useState({
+    title: "",
+    value: "",
   });
 
   const set = (field, val) => setForm((f) => ({ ...f, [field]: val }));
@@ -338,6 +343,19 @@ const EditModal = ({ hackathon, adminData, onClose, onSaved }) => {
       { description: rewardInput.description.trim(), amount: amt },
     ]);
     setRewardInput({ description: "", amount: "" });
+  };
+  const addContact = () => {
+    if (!contactInput.title.trim() || !contactInput.value.trim()) return;
+
+    set("contact", [
+      ...form.contact,
+      {
+        title: contactInput.title.trim(),
+        value: contactInput.value.trim(),
+      },
+    ]);
+
+    setContactInput({ title: "", value: "" });
   };
   const handleBanner = (file) => {
     if (!file) return;
@@ -401,6 +419,7 @@ const EditModal = ({ hackathon, adminData, onClose, onSaved }) => {
       fd.append("showVoting", form.showVoting);
       fd.append("showResult", form.showResult);
       fd.append("FAQs", JSON.stringify(form.FAQs));
+      fd.append("contact", JSON.stringify(form.contact || []));
       fd.append(
         "rewards",
         JSON.stringify(
@@ -875,6 +894,67 @@ const EditModal = ({ hackathon, adminData, onClose, onSaved }) => {
                 />
                 <button type="button" onClick={addFaq} className="ad-add-full">
                   <Plus size={12} /> Add FAQ
+                </button>
+              </div>
+            </div>
+          </EditSection>
+          <EditSection badge="06 / contact">
+            <div>
+              <label className="ad-label">Contact Information</label>
+
+              <div className="flex flex-col gap-1 mb-2">
+                {form.contact.map((c, i) => (
+                  <div key={i} className="ad-list-item">
+                    <div style={{ flex: 1 }}>
+                      <div className="ad-list-item-title">{c.title}</div>
+                      <div className="ad-list-item-sub break-all">
+                        {c.value}
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        set(
+                          "contact",
+                          form.contact.filter((_, j) => j !== i)
+                        )
+                      }
+                      className="ad-list-remove"
+                    >
+                      <X size={13} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="ad-divider" />
+
+              <div className="flex flex-col gap-2 mt-2">
+                <input
+                  value={contactInput.title}
+                  onChange={(e) =>
+                    setContactInput((p) => ({ ...p, title: e.target.value }))
+                  }
+                  placeholder="Title (Email, Phone, Discord...)"
+                  className="ad-input"
+                />
+
+                <input
+                  value={contactInput.value}
+                  onChange={(e) =>
+                    setContactInput((p) => ({ ...p, value: e.target.value }))
+                  }
+                  placeholder="Value"
+                  className="ad-input"
+                />
+
+                <button
+                  type="button"
+                  onClick={addContact}
+                  className="ad-add-full"
+                >
+                  <Plus size={12} /> Add Contact
                 </button>
               </div>
             </div>
