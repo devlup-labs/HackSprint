@@ -1,6 +1,7 @@
 import path from "path";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import SubmissionModel from "../models/submission.js";
+import Admin from "../models/admin.model.js";
 import hackathonModel from "../models/hackathon.models.js";
 import TeamModel from "../models/team.js";
 import UserModel from "../models/user.models.js";
@@ -75,11 +76,11 @@ export const submitHackathonSolution = async (req, res) => {
       repoUrls = [repoUrl];
     }
 
-    if (!Array.isArray(repoUrls) || repoUrls.length === 0 || !repoUrls[0]) {
-      return res.status(400).json({
-        message: "At least one repo URL is required",
-      });
-    }
+    // if (!Array.isArray(repoUrls) || repoUrls.length === 0 || !repoUrls[0]) {
+    //   return res.status(400).json({
+    //     message: "At least one repo URL is required",
+    //   });
+    // }
 
     const hackathon = await hackathonModel.findById(hackathonId);
 
@@ -291,28 +292,30 @@ export const getSubmissionById = async (req, res) => {
 export const getSubmissionsByHackathon = async (req, res) => {
   try {
     const { hackathonId } = req.params;
+    const adminId = req.admin._id;
 
-    if (!hackathonId) {
-      return res.status(400).json({ message: "hackathonId is required" });
-    }
-
+    const admin = await Admin.findById(adminId);
     const hackathon = await hackathonModel.findById(hackathonId);
     if (!hackathon) {
       return res.status(404).json({ message: "Hackathon not found" });
     }
 
+    const isCreator = hackathon.createdBy?.toString() === adminId.toString();
+    const isController = admin.controller === true;
+
+    if (!isCreator && !isController) {
+      const isPublic = hackathon.showVoting || hackathon.showResult;
+      if (!isPublic) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+    }
+
     const submissions = await SubmissionModel.find({ hackathon: hackathonId })
-      .populate({
-        path: "participant",
-        select: "name email",
-      })
+      .populate({ path: "participant", select: "name email" })
       .populate({
         path: "team",
         select: "name secretCode members leader",
-        populate: {
-          path: "members leader",
-          select: "name email",
-        },
+        populate: { path: "members leader", select: "name email" },
       })
       .sort({ hackathonPoints: -1, submittedAt: 1 });
 

@@ -236,15 +236,17 @@ const SubmissionForm = ({ isOpen, onClose }) => {
     }
 
     const valid = repoUrls.filter((u) => u.trim());
-    if (!valid.length) {
-      toast.error("Please provide at least one valid URL.");
-      return;
-    }
+    // if (!valid.length) {
+    //   toast.error("Please provide at least one valid URL.");
+    //   return;
+    // }
 
     setLoading(true);
     try {
       const fd = new FormData();
-      fd.append("repoUrl",        JSON.stringify(valid));
+      if (valid.length > 0) {
+        fd.append("repoUrl", JSON.stringify(valid));
+      }
       fd.append("hackathonId",    hackathonId);
       fd.append("userId",         userData._id);
       fd.append("existingDocs",   JSON.stringify(existingDocs));

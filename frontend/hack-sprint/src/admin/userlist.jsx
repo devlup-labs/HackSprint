@@ -108,16 +108,19 @@ const HackathonUsersPage = () => {
   useEffect(() => {
     const fetchResult = async () => {
       try {
-        const response = await API(
-          `${import.meta.env.VITE_API_BASE_URL}/api/submit/hackathon/${slug}`
-        );
+        const adminToken = localStorage.getItem("adminToken");
+        const response = await API.get(`/api/submit/hackathon/${slug}`, {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        });
         setResult(response.data);
-      } catch {
-        /* silent */
-      }
+      } catch {}
     };
     fetchResult();
   }, [slug]);
+
+  console.log("Fetched results:", result);
 
   useEffect(() => {
     const fetchAdminData = async () => {

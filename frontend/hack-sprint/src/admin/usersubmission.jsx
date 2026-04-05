@@ -316,10 +316,13 @@ const UserSubmissionDetailPage = () => {
                   ))}
                 {submission.docs?.length > 0 && (
                   <LinkRow
-                    href={submission.docs[0]}
+                    href={submission.docs[0].url}
                     icon={FileText}
                     title="Documentation"
-                    subtitle={submission.docs[0]}
+                    subtitle={
+                      submission.docs[0].original_filename ||
+                      submission.docs[0].url
+                    }
                   />
                 )}
                 {!submission.repoUrl?.length && !submission.docs?.length && (
@@ -340,18 +343,19 @@ const UserSubmissionDetailPage = () => {
                   <div className="mb-[1.25rem]">
                     <SubLabel icon={Image}>Images</SubLabel>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-[0.75rem]">
-                      {submission.images.map((imageUrl, index) => (
+                      {submission.images.map((img, index) => (
                         <a
                           key={index}
-                          href={imageUrl}
+                          href={img.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="block rounded-[3px] overflow-hidden border border-[rgba(95,255,96,0.1)] hover:border-[rgba(95,255,96,0.3)] transition-all"
                         >
                           <img
-                            src={imageUrl}
-                            alt={`Screenshot ${index + 1}`}
-                            className="w-full object-cover aspect-video hover:opacity-80 transition-opacity"
+                            src={img.url}
+                            alt={
+                              img.original_filename || `Screenshot ${index + 1}`
+                            }
+                            className="w-full object-cover aspect-video"
                           />
                         </a>
                       ))}
@@ -363,19 +367,16 @@ const UserSubmissionDetailPage = () => {
                   <div>
                     <SubLabel icon={Video}>Videos</SubLabel>
                     <div className="flex flex-col gap-[0.4rem]">
-                      {submission.videos.map((videoUrl, index) => (
+                      {submission.videos.map((video, index) => (
                         <a
                           key={index}
-                          href={videoUrl}
+                          href={video.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-jb flex items-center gap-[0.4rem] text-[0.65rem] text-[#5fff60] hover:underline break-all"
+                          className="..."
                         >
-                          <ExternalLink
-                            size={11}
-                            className="flex-shrink-0 opacity-60"
-                          />
-                          {videoUrl}
+                          <ExternalLink size={11} />
+                          {video.original_filename || video.url}
                         </a>
                       ))}
                     </div>

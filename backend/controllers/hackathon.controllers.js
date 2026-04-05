@@ -133,11 +133,24 @@ export const getHackathonById = async (req, res) => {
 export const getHackathonResults = async (req, res) => {
   try {
     const { id } = req.params;
+
+    const hackathon = await hackathonModel.findById(id);
+    if (!hackathon) {
+      return res.status(404).json({ message: "Hackathon not found" });
+    }
+
+    if (!hackathon.showResult) {
+      return res
+        .status(403)
+        .json({ message: "Results are not public for this hackathon." });
+    }
+
     const results = await SubmissionModel.find({ hackathon: id })
       .sort({ hackathonPoints: -1 })
       .limit(10)
       .populate("participant", "name avatar email")
       .populate("team", "name members");
+
     res.status(200).json(results);
   } catch (error) {
     res
