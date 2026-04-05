@@ -9,6 +9,7 @@ import {
 import upload from "../middlewares/multer.js";
 import rateLimit from "express-rate-limit";
 import { verifyAuth } from "../middlewares/userAuth.js";
+import { adminAuth } from "../middlewares/adminAuth.js";
 
 const router = express.Router();
 
@@ -57,7 +58,7 @@ router.put(
   updateSubmission
 );
 router.get("/status", verifyAuth, getLimiter, getSubmissionStatus);
-router.get("/getSubmissionById/:id", getLimiter, getSubmissionById);
-router.get("/hackathon/:hackathonId", getLimiter, getSubmissionsByHackathon);
+// router.get("/getSubmissionById/:id", , getLimiter, getSubmissionById);
+router.get("/hackathon/:hackathonId", adminAuth, getLimiter, getSubmissionsByHackathon);
 
 export default router;

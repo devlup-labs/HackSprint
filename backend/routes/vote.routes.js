@@ -6,6 +6,7 @@ import {
   getSubmissionVoteCount,
 } from "../controllers/vote.controllers.js";
 import { verifyAuth } from "../middlewares/userAuth.js";
+import { adminAuth } from "../middlewares/adminAuth.js";
 
 const router = express.Router();
 

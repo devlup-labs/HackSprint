@@ -90,47 +90,46 @@ export const getHackathonVotes = async (req, res) => {
   try {
     const { hackathonId } = req.params;
 
-    if (!hackathonId) {
-      return res.status(400).json({
-        message: "Hackathon ID is required",
-        success: false,
-      });
+    const hackathon = await hackathonModel.findById(hackathonId);
+    if (!hackathon) {
+      return res
+        .status(404)
+        .json({ message: "Hackathon not found", success: false });
     }
 
-    // Get all submissions for this hackathon with their vote counts
+    if (!hackathon.showVoting) {
+      return res
+        .status(403)
+        .json({
+          message: "Voting is not public for this hackathon.",
+          success: false,
+        });
+    }
+
     const submissions = await SubmissionModel.find({ hackathon: hackathonId })
       .populate("team", "name")
       .populate("participant", "name email")
       .lean();
 
-    // Get vote counts for each submission
     const submissionsWithVotes = await Promise.all(
       submissions.map(async (submission) => {
         const voteCount = await VoteModel.countDocuments({
           submission: submission._id,
         });
-
-        return {
-          ...submission,
-          voteCount,
-        };
+        return { ...submission, voteCount };
       })
     );
 
-    // Sort by vote count (descending)
     submissionsWithVotes.sort((a, b) => b.voteCount - a.voteCount);
 
-    return res.status(200).json({
-      success: true,
-      submissions: submissionsWithVotes,
-    });
+    return res
+      .status(200)
+      .json({ success: true, submissions: submissionsWithVotes });
   } catch (error) {
     console.error("Get hackathon votes error:", error);
-    return res.status(500).json({
-      message: "Internal server error",
-      success: false,
-      error: error.message,
-    });
+    return res
+      .status(500)
+      .json({ message: "Internal server error", success: false });
   }
 };
 
@@ -152,7 +151,9 @@ export const getUserVotes = async (req, res) => {
       hackathon: hackathonId,
     }).select("submission");
 
-    const votedSubmissionIds = userVotes.map((vote) => vote.submission.toString());
+    const votedSubmissionIds = userVotes.map((vote) =>
+      vote.submission.toString()
+    );
 
     return res.status(200).json({
       success: true,
