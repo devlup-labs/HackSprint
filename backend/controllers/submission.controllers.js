@@ -75,11 +75,11 @@ export const submitHackathonSolution = async (req, res) => {
       repoUrls = [repoUrl];
     }
 
-    if (!Array.isArray(repoUrls) || repoUrls.length === 0 || !repoUrls[0]) {
-      return res.status(400).json({
-        message: "At least one repo URL is required",
-      });
-    }
+    // if (!Array.isArray(repoUrls) || repoUrls.length === 0 || !repoUrls[0]) {
+    //   return res.status(400).json({
+    //     message: "At least one repo URL is required",
+    //   });
+    // }
 
     const hackathon = await hackathonModel.findById(hackathonId);
 
