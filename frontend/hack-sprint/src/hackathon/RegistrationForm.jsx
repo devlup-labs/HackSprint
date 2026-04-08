@@ -664,7 +664,7 @@ export const RegistrationForm = ({ onSubmit = () => {} }) => {
                         className={inp}
                       />
                     </Field>
-                    <div className="flex items-center gap-3 my-2 mb-5">
+                    {/* <div className="flex items-center gap-3 my-2 mb-5">
                       <div className="flex-1 h-px bg-[rgba(95,255,96,0.1)]" />
                       <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.55rem] tracking-[0.12em] uppercase text-[rgba(95,255,96,0.3)]">
                         or
@@ -680,7 +680,7 @@ export const RegistrationForm = ({ onSubmit = () => {} }) => {
                         onChange={(e) => chg(e, setJoinForm)}
                         className={inp}
                       />
-                    </Field>
+                    </Field> */}
                   </div>
                   <div className="mt-6 flex justify-center sm:justify-end">
                     <PrimaryBtn

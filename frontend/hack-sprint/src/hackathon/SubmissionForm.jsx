@@ -428,7 +428,7 @@ const SubmissionForm = ({ isOpen, onClose }) => {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
 
-            <div>
+            {/* <div>
               <FieldLabel required>Submission URL(s)</FieldLabel>
               <div className="flex flex-col gap-2">
                 {repoUrls.map((url, i) => (
@@ -480,7 +480,7 @@ const SubmissionForm = ({ isOpen, onClose }) => {
                   />
                 )
               }
-            />
+            /> */}
 
             <DropZone
               label={already && existingDocs.length > 0 ? "Upload Additional Document" : "Documentation (PDF)"}

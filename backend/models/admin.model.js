@@ -51,7 +51,8 @@ const adminSchema = new mongoose.Schema({
     },
     controller:{
         type : Boolean,
-        default : false
+        default : false,
+        immutable: true
     }
 }, { timestamps: true });
 

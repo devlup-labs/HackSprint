@@ -329,13 +329,13 @@ const TeamDetails = () => {
                       copiedItem={copiedItem}
                       onCopy={handleCopy}
                     />
-                    <CopyRow
+                    {/* <CopyRow
                       label="Invite Link"
                       value={teamData.secretLink}
                       copyKey="link"
                       copiedItem={copiedItem}
                       onCopy={handleCopy}
-                    />
+                    /> */}
                   </div>
                 </div>
               )}

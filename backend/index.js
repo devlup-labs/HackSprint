@@ -24,6 +24,20 @@ import chatRoutes from "./routes/chat.routes.js";
 import { runDailyQuizAutomation } from "./api/dailyQuizAutomation.js";
 
 const app = express();
+const corsOptions = {
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:3000",
+    "http://127.0.0.1:5173",
+    "https://hack-sprint-iitj.vercel.app",
+    "https://hacksprint.devluplabs.tech",
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
@@ -89,21 +103,21 @@ io.on("connection", (socket) => {
 dotenv.config();
 connectDB();
 
-const corsOptions = {
-  origin: [
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "http://localhost:3000",
-    "http://127.0.0.1:5173",
-    "https://hack-sprint-iitj.vercel.app",
-    "https://hacksprint.devluplabs.tech",
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-  credentials: true,
-  optionsSuccessStatus: 200,
-};
+// const corsOptions = {
+//   origin: [
+//     "http://localhost:5173",
+//     "http://localhost:5174",
+//     "http://localhost:3000",
+//     "http://127.0.0.1:5173",
+//     "https://hack-sprint-iitj.vercel.app",
+//     "https://hacksprint.devluplabs.tech",
+//   ],
+//   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+//   credentials: true,
+//   optionsSuccessStatus: 200,
+// };
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 app.use(compression());
 app.use(express.json());
 
