@@ -37,7 +37,6 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 200,
 };
-
 app.use(cors(corsOptions));
 const server = createServer(app);
 const io = new Server(server, {
