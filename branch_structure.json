@@ -1,0 +1,33 @@
+{
+  "default_branch": "main",
+  "branches": [
+    "authentication",
+    "bhawani-prajapat2006-patch-1",
+    "bhawani-prajapat2006-patch-2",
+    "feature/hackathon-detail-page",
+    "main",
+    "origin",
+    "rahul-1901-patch-1",
+    "testing"
+  ],
+  "parent": {
+    "authentication": "main",
+    "bhawani-prajapat2006-patch-1": "main",
+    "bhawani-prajapat2006-patch-2": "main",
+    "feature/hackathon-detail-page": "main",
+    "main": null,
+    "origin": "main",
+    "rahul-1901-patch-1": "main",
+    "testing": "main"
+  },
+  "order": [
+    "main",
+    "authentication",
+    "bhawani-prajapat2006-patch-1",
+    "bhawani-prajapat2006-patch-2",
+    "feature/hackathon-detail-page",
+    "origin",
+    "rahul-1901-patch-1",
+    "testing"
+  ]
+}
