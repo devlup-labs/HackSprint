@@ -56,11 +56,18 @@ export const getMyHackathon = async (req, res) => {
     const { hackathonId } = req.body;
     const adminId = req.admin._id;
 
-    // 1. Fetch the main hackathon document
-    const hackathon = await hackathonModel.findOne({
-      _id: hackathonId,
-      createdBy: adminId,
-    });
+    const admin = await Admin.findById(adminId);
+
+    let hackathon;
+
+    if (admin.controller) {
+      hackathon = await hackathonModel.findById(hackathonId);
+    } else {
+      hackathon = await hackathonModel.findOne({
+        _id: hackathonId,
+        createdBy: adminId,
+      });
+    }
 
     if (!hackathon) {
       return res
@@ -616,6 +623,7 @@ export const updateHackathonPoint = async (req, res) => {
   try {
     const { submissionId, points } = req.body;
     const adminId = req.admin._id;
+    const admin = await Admin.findById(adminId);
 
     if (!adminId) {
       return res
@@ -656,11 +664,13 @@ export const updateHackathonPoint = async (req, res) => {
       });
     }
 
-    if (hackathon.createdBy.toString() !== adminId.toString()) {
+    const isCreator = hackathon.createdBy.toString() === adminId.toString();
+    const isController = admin?.controller === true;
+
+    if (!isCreator && !isController) {
       return res.status(403).json({
         success: false,
-        message:
-          "You are not authorized to update points for submissions of this hackathon",
+        message: "You are not authorized to update points for this hackathon",
       });
     }
 
