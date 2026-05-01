@@ -2,7 +2,13 @@ import multer, { memoryStorage } from "multer";
 
 // Allowed mime types
 const MIME_TYPES = {
-  docs: ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
+  docs: [
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.ms-powerpoint",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  ],
   images: ["image/jpeg", "image/png", "image/jpg"],
   videos: ["video/mp4", "video/mpeg", "video/quicktime"],
 };
@@ -20,7 +26,12 @@ const fileFilter = (req, file, cb) => {
   }
 
   // ❌ Reject file
-  cb(new Error(`Invalid file type for field ${file.fieldname}: ${file.mimetype}`), false);
+  cb(
+    new Error(
+      `Invalid file type for field ${file.fieldname}: ${file.mimetype}`
+    ),
+    false
+  );
 };
 
 const storage = memoryStorage();

@@ -2,8 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { createPortal } from "react-dom";
 import {
-  X, Clock, Calendar, Users, Code,
-  FileVideo, FileText, Plus, ExternalLink,
+  X,
+  Clock,
+  Calendar,
+  Users,
+  Code,
+  FileVideo,
+  FileText,
+  Plus,
+  ExternalLink,
 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import { getDashboard } from "../backendApis/api";
@@ -17,17 +24,23 @@ const inp = `${mono} w-full bg-[rgba(18,22,18,0.7)] border border-[rgba(95,255,9
 const StatCard = ({ icon: Icon, label, value }) => (
   <div className="relative bg-[rgba(95,255,96,0.04)] border border-[rgba(95,255,96,0.12)] rounded-[3px] p-4">
     <Icon size={13} className="text-[rgba(95,255,96,0.55)] mb-2" />
-    <div className={`${mono} text-[0.52rem] tracking-[0.12em] uppercase text-[rgba(180,220,180,0.45)] mb-0.5`}>
+    <div
+      className={`${mono} text-[0.52rem] tracking-[0.12em] uppercase text-[rgba(180,220,180,0.45)] mb-0.5`}
+    >
       {label}
     </div>
-    <div className={`${syne} font-extrabold text-white text-sm tracking-tight break-words`}>
+    <div
+      className={`${syne} font-extrabold text-white text-sm tracking-tight break-words`}
+    >
       {value}
     </div>
   </div>
 );
 
 const FieldLabel = ({ children, required }) => (
-  <div className={`${mono} text-[0.55rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.5)] mb-1.5`}>
+  <div
+    className={`${mono} text-[0.55rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.5)] mb-1.5`}
+  >
     {children}
     {required && <span className="text-[#ff9090] ml-1">*</span>}
   </div>
@@ -55,16 +68,31 @@ const RemoveBtn = ({ onClick }) => (
   </button>
 );
 
-const DropZone = ({ label, icon: Icon, accept, file, onFileChange, onRemove, preview }) => (
+const DropZone = ({
+  label,
+  icon: Icon,
+  accept,
+  file,
+  onFileChange,
+  onRemove,
+  preview,
+}) => (
   <div>
     <FieldLabel>{label}</FieldLabel>
     <div className="relative">
       <label className="flex flex-col items-center justify-center w-full h-28 border border-dashed border-[rgba(95,255,96,0.2)] rounded-[3px] cursor-pointer hover:border-[rgba(95,255,96,0.38)] hover:bg-[rgba(95,255,96,0.03)] transition-all">
-        <input type="file" accept={accept} onChange={onFileChange} className="hidden" />
+        <input
+          type="file"
+          accept={accept}
+          onChange={onFileChange}
+          className="hidden"
+        />
         {file ? (
           <div className="flex flex-col items-center gap-1.5">
             {preview}
-            <span className={`${mono} text-[0.62rem] text-[rgba(180,220,180,0.6)] truncate max-w-[200px]`}>
+            <span
+              className={`${mono} text-[0.62rem] text-[rgba(180,220,180,0.6)] truncate max-w-[200px]`}
+            >
               {file.name}
             </span>
           </div>
@@ -90,7 +118,12 @@ const DropZone = ({ label, icon: Icon, accept, file, onFileChange, onRemove, pre
   </div>
 );
 
-const PrimaryBtn = ({ children, disabled, type = "submit", color = "green" }) => {
+const PrimaryBtn = ({
+  children,
+  disabled,
+  type = "submit",
+  color = "green",
+}) => {
   const c =
     color === "amber"
       ? "bg-[#ffb84d] border-[#ffb84d] hover:bg-[#ffc96e] hover:shadow-[0_0_18px_rgba(255,184,77,0.3)]"
@@ -109,22 +142,21 @@ const PrimaryBtn = ({ children, disabled, type = "submit", color = "green" }) =>
   );
 };
 
-
 const SubmissionForm = ({ isOpen, onClose }) => {
   const { id: hackathonId } = useParams();
 
-  const [repoUrls,       setRepoUrls]       = useState([""]);
-  const [loading,        setLoading]         = useState(false);
-  const [hackathon,      setHackathon]       = useState(null);
-  const [videoFile,      setVideoFile]       = useState(null);
-  const [pdfFile,        setPdfFile]         = useState(null);
+  const [repoUrls, setRepoUrls] = useState([""]);
+  const [loading, setLoading] = useState(false);
+  const [hackathon, setHackathon] = useState(null);
+  const [videoFile, setVideoFile] = useState(null);
+  const [pdfFile, setPdfFile] = useState(null);
   const [videoPreviewUrl, setVideoPreviewUrl] = useState(null);
   const [submissionStatus, setSubmissionStatus] = useState(null);
-  const [userData,       setUserData]        = useState(null);
-  const [isLeader,       setIsLeader]        = useState(false);
-  const [isTeamMember,   setIsTeamMember]    = useState(false);
-  const [teamId,         setTeamId]          = useState(null);
-  const [existingDocs,   setExistingDocs]   = useState([]);
+  const [userData, setUserData] = useState(null);
+  const [isLeader, setIsLeader] = useState(false);
+  const [isTeamMember, setIsTeamMember] = useState(false);
+  const [teamId, setTeamId] = useState(null);
+  const [existingDocs, setExistingDocs] = useState([]);
   const [existingVideos, setExistingVideos] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
 
@@ -150,7 +182,7 @@ const SubmissionForm = ({ isOpen, onClose }) => {
 
         if (currentTeamObj?.team) {
           setTeamId(currentTeamObj.team);
-          const tr   = await API.get(`/api/team/${currentTeamObj.team}`);
+          const tr = await API.get(`/api/team/${currentTeamObj.team}`);
           const team = tr.data.team;
           setIsLeader(String(team.leader) === String(u._id));
           setIsTeamMember(
@@ -158,7 +190,9 @@ const SubmissionForm = ({ isOpen, onClose }) => {
           );
         } else {
           setIsLeader(
-            u.leaderOfHackathons?.some((id) => String(id) === String(hackathonId)) || false
+            u.leaderOfHackathons?.some(
+              (id) => String(id) === String(hackathonId)
+            ) || false
           );
           setIsTeamMember(false);
           setTeamId(null);
@@ -185,8 +219,7 @@ const SubmissionForm = ({ isOpen, onClose }) => {
         });
         const res = await API.get(`/api/submit/status?${p}`);
         setSubmissionStatus(res.data);
-      } catch {
-      }
+      } catch {}
     })();
   }, [hackathonId, userData]);
 
@@ -197,10 +230,12 @@ const SubmissionForm = ({ isOpen, onClose }) => {
       // repo URLs
       const urls = Array.isArray(sub.repoUrl)
         ? sub.repoUrl
-        : sub.repoUrl ? [sub.repoUrl] : [];
+        : sub.repoUrl
+        ? [sub.repoUrl]
+        : [];
       setRepoUrls(urls.length ? urls : [""]);
       // existing files — shown with remove buttons
-      setExistingDocs(sub.docs     || []);
+      setExistingDocs(sub.docs || []);
       setExistingVideos(sub.videos || []);
       setExistingImages(sub.images || []);
     } else {
@@ -212,13 +247,18 @@ const SubmissionForm = ({ isOpen, onClose }) => {
   }, [submissionStatus, isOpen]);
 
   useEffect(
-    () => () => { if (videoPreviewUrl) URL.revokeObjectURL(videoPreviewUrl); },
+    () => () => {
+      if (videoPreviewUrl) URL.revokeObjectURL(videoPreviewUrl);
+    },
     [videoPreviewUrl]
   );
 
   const handleVideoChange = (e) => {
     const f = e.target.files[0];
-    if (f) { setVideoFile(f); setVideoPreviewUrl(URL.createObjectURL(f)); }
+    if (f) {
+      setVideoFile(f);
+      setVideoPreviewUrl(URL.createObjectURL(f));
+    }
   };
   const removeVideo = () => {
     if (videoPreviewUrl) URL.revokeObjectURL(videoPreviewUrl);
@@ -247,22 +287,24 @@ const SubmissionForm = ({ isOpen, onClose }) => {
       if (valid.length > 0) {
         fd.append("repoUrl", JSON.stringify(valid));
       }
-      fd.append("hackathonId",    hackathonId);
-      fd.append("userId",         userData._id);
-      fd.append("existingDocs",   JSON.stringify(existingDocs));
+      fd.append("hackathonId", hackathonId);
+      fd.append("userId", userData._id);
+      fd.append("existingDocs", JSON.stringify(existingDocs));
       fd.append("existingVideos", JSON.stringify(existingVideos));
       fd.append("existingImages", JSON.stringify(existingImages));
 
-      if (teamId)    fd.append("teamId", teamId);
+      if (teamId) fd.append("teamId", teamId);
       if (videoFile) fd.append("videos", videoFile);
-      if (pdfFile)   fd.append("docs",   pdfFile);
+      if (pdfFile) fd.append("docs", pdfFile);
 
       const isUpdating = submissionStatus?.submitted;
       const res = isUpdating
         ? await API.put(`/api/submit/${submissionStatus.submission._id}`, fd)
         : await API.post(`/api/submit`, fd);
 
-      toast.success(res.data.message || "Submission successful!", { autoClose: 1000 });
+      toast.success(res.data.message || "Submission successful!", {
+        autoClose: 1000,
+      });
       setTimeout(() => {
         setRepoUrls([""]);
         setVideoFile(null);
@@ -273,7 +315,9 @@ const SubmissionForm = ({ isOpen, onClose }) => {
       if (err.response?.status === 429)
         toast.error("Too many requests. Please try again later.");
       else
-        toast.error(err.response?.data?.message || err.message || "Submission failed.");
+        toast.error(
+          err.response?.data?.message || err.message || "Submission failed."
+        );
     } finally {
       setLoading(false);
     }
@@ -282,7 +326,7 @@ const SubmissionForm = ({ isOpen, onClose }) => {
   if (!isOpen || !hackathon || !userData) return null;
 
   const daysLeft = Math.ceil(
-    (new Date(hackathon.endDate) - new Date()) / 86400000
+    (new Date(hackathon.submissionEndDate) - new Date()) / 86400000
   );
   const totalPrize =
     hackathon.rewards?.length > 0
@@ -291,10 +335,11 @@ const SubmissionForm = ({ isOpen, onClose }) => {
         (hackathon.prizeMoney2 || 0) +
         (hackathon.prizeMoney3 || 0);
   const isDeadlineOver =
-    hackathon.submissionEndDate && new Date() > new Date(hackathon.submissionEndDate);
+    hackathon.submissionEndDate &&
+    new Date() > new Date(hackathon.submissionEndDate);
 
   const already = submissionStatus?.submitted;
-  const sub     = submissionStatus?.submission;
+  const sub = submissionStatus?.submission;
 
   return createPortal(
     <>
@@ -313,11 +358,15 @@ const SubmissionForm = ({ isOpen, onClose }) => {
 
           <div className="flex items-start justify-between gap-4 mb-5">
             <div className="min-w-0">
-              <h2 className={`${syne} font-extrabold text-white text-xl tracking-tight`}>
+              <h2
+                className={`${syne} font-extrabold text-white text-xl tracking-tight`}
+              >
                 {hackathon.title}
               </h2>
               {hackathon.subTitle && (
-                <p className={`${mono} text-[0.65rem] text-[rgba(180,220,180,0.55)] mt-0.5`}>
+                <p
+                  className={`${mono} text-[0.65rem] text-[rgba(180,220,180,0.55)] mt-0.5`}
+                >
                   {hackathon.subTitle}
                 </p>
               )}
@@ -331,49 +380,81 @@ const SubmissionForm = ({ isOpen, onClose }) => {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-5">
-            <StatCard icon={Code}     label="Prize Pool"    value={`₹${totalPrize.toLocaleString("en-IN")}`} />
-            <StatCard icon={Clock}    label="Days Left"     value={`${daysLeft} Days`} />
-            <StatCard icon={Users}    label="Participants"  value={hackathon.numParticipants || 0} />
+            <StatCard
+              icon={Code}
+              label="Prize Pool"
+              value={`₹${totalPrize.toLocaleString("en-IN")}`}
+            />
+            <StatCard
+              icon={Clock}
+              label="Days Left"
+              value={`${daysLeft} Days`}
+            />
+            <StatCard
+              icon={Users}
+              label="Participants"
+              value={hackathon.numParticipants || 0}
+            />
             {/* <StatCard icon={Calendar} label="Difficulty"    value={hackathon.difficulty} /> */}
           </div>
 
-          <p className={`${mono} text-[0.68rem] text-[rgba(180,220,180,0.6)] leading-relaxed mb-5`}>
+          <p
+            className={`${mono} text-[0.68rem] text-[rgba(180,220,180,0.6)] leading-relaxed mb-5`}
+          >
             {hackathon.description}
           </p>
 
           {already && (
             <div className="relative bg-[rgba(95,255,96,0.05)] border border-[rgba(95,255,96,0.2)] rounded-[3px] p-4 mb-5 flex flex-col gap-3">
               <span className="absolute top-[-1px] left-[-1px] w-2 h-2 border-t-2 border-l-2 border-[rgba(95,255,96,0.45)]" />
-              <p className={`${syne} font-extrabold text-[#5fff60] text-sm tracking-tight`}>
+              <p
+                className={`${syne} font-extrabold text-[#5fff60] text-sm tracking-tight`}
+              >
                 Already Submitted — you can update before deadline.
               </p>
               {Array.isArray(sub.repoUrl) && sub.repoUrl.length > 0 && (
                 <div>
-                  <div className={`${mono} text-[0.5rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.4)] mb-1.5`}>
+                  <div
+                    className={`${mono} text-[0.5rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.4)] mb-1.5`}
+                  >
                     URLs
                   </div>
                   <div className="flex flex-col gap-1">
-                    {sub.repoUrl.map((url, i) => <LinkRow key={i} href={url} label={url} />)}
+                    {sub.repoUrl.map((url, i) => (
+                      <LinkRow key={i} href={url} label={url} />
+                    ))}
                   </div>
                 </div>
               )}
 
               {existingDocs.length > 0 && (
                 <div>
-                  <div className={`${mono} text-[0.5rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.4)] mb-1.5`}>
+                  <div
+                    className={`${mono} text-[0.5rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.4)] mb-1.5`}
+                  >
                     Documents
                   </div>
                   <div className="flex flex-col gap-1.5">
                     {existingDocs.map((d) => (
-                      <div key={d._id} className="flex items-center justify-between gap-2">
-                        <LinkRow href={d.url} label={d.original_filename || "Document"} />
+                      <div
+                        key={d._id}
+                        className="flex items-center justify-between gap-2"
+                      >
+                        <LinkRow
+                          href={d.url}
+                          label={d.original_filename || "Document"}
+                        />
                         <div className="flex items-center gap-1.5">
-                          <span className={`${mono} text-[0.52rem] text-[rgba(180,220,180,0.3)]`}>
+                          <span
+                            className={`${mono} text-[0.52rem] text-[rgba(180,220,180,0.3)]`}
+                          >
                             ({(d.size / 1024).toFixed(1)} KB)
                           </span>
                           <RemoveBtn
                             onClick={() =>
-                              setExistingDocs((prev) => prev.filter((x) => x._id !== d._id))
+                              setExistingDocs((prev) =>
+                                prev.filter((x) => x._id !== d._id)
+                              )
                             }
                           />
                         </div>
@@ -385,16 +466,26 @@ const SubmissionForm = ({ isOpen, onClose }) => {
 
               {existingVideos.length > 0 && (
                 <div>
-                  <div className={`${mono} text-[0.5rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.4)] mb-1.5`}>
+                  <div
+                    className={`${mono} text-[0.5rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.4)] mb-1.5`}
+                  >
                     Videos
                   </div>
                   <div className="flex flex-col gap-1.5">
                     {existingVideos.map((v) => (
-                      <div key={v._id} className="flex items-center justify-between gap-2">
-                        <LinkRow href={v.url} label={v.original_filename || "Video"} />
+                      <div
+                        key={v._id}
+                        className="flex items-center justify-between gap-2"
+                      >
+                        <LinkRow
+                          href={v.url}
+                          label={v.original_filename || "Video"}
+                        />
                         <RemoveBtn
                           onClick={() =>
-                            setExistingVideos((prev) => prev.filter((x) => x._id !== v._id))
+                            setExistingVideos((prev) =>
+                              prev.filter((x) => x._id !== v._id)
+                            )
                           }
                         />
                       </div>
@@ -406,16 +497,26 @@ const SubmissionForm = ({ isOpen, onClose }) => {
               {/* Existing images with remove */}
               {existingImages.length > 0 && (
                 <div>
-                  <div className={`${mono} text-[0.5rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.4)] mb-1.5`}>
+                  <div
+                    className={`${mono} text-[0.5rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.4)] mb-1.5`}
+                  >
                     Images
                   </div>
                   <div className="flex flex-col gap-1.5">
                     {existingImages.map((img) => (
-                      <div key={img._id} className="flex items-center justify-between gap-2">
-                        <LinkRow href={img.url} label={img.original_filename || "Image"} />
+                      <div
+                        key={img._id}
+                        className="flex items-center justify-between gap-2"
+                      >
+                        <LinkRow
+                          href={img.url}
+                          label={img.original_filename || "Image"}
+                        />
                         <RemoveBtn
                           onClick={() =>
-                            setExistingImages((prev) => prev.filter((x) => x._id !== img._id))
+                            setExistingImages((prev) =>
+                              prev.filter((x) => x._id !== img._id)
+                            )
                           }
                         />
                       </div>
@@ -427,7 +528,6 @@ const SubmissionForm = ({ isOpen, onClose }) => {
           )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-
             {/* <div>
               <FieldLabel required>Submission URL(s)</FieldLabel>
               <div className="flex flex-col gap-2">
@@ -483,31 +583,50 @@ const SubmissionForm = ({ isOpen, onClose }) => {
             /> */}
 
             <DropZone
-              label={already && existingDocs.length > 0 ? "Upload Additional Document" : "Documentation (PDF)"}
+              label={
+                already && existingDocs.length > 0
+                  ? "Upload Additional Document"
+                  : "Documentation (PDF/PPT)"
+              }
               icon={FileText}
-              accept="application/pdf"
+              accept="application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation"
               file={pdfFile}
-              onFileChange={(e) => e.target.files[0] && setPdfFile(e.target.files[0])}
+              onFileChange={(e) =>
+                e.target.files[0] && setPdfFile(e.target.files[0])
+              }
               onRemove={removePdf}
-              preview={<FileText size={22} className="text-[rgba(95,255,96,0.5)]" />}
+              preview={
+                <FileText size={22} className="text-[rgba(95,255,96,0.5)]" />
+              }
             />
 
             {!isLeader && isTeamMember && (
-              <p className={`${mono} text-[0.6rem] text-[rgba(255,184,77,0.7)] tracking-[0.04em]`}>
+              <p
+                className={`${mono} text-[0.6rem] text-[rgba(255,184,77,0.7)] tracking-[0.04em]`}
+              >
                 ⚠ Only team leaders can submit.
               </p>
             )}
 
             {already ? (
               isDeadlineOver ? (
-                <PrimaryBtn disabled color="gray">Submission Closed</PrimaryBtn>
+                <PrimaryBtn disabled color="gray">
+                  Submission Closed
+                </PrimaryBtn>
               ) : (
-                <PrimaryBtn disabled={loading || (!isLeader && isTeamMember)} color="amber">
+                <PrimaryBtn
+                  disabled={loading || (!isLeader && isTeamMember)}
+                  color="amber"
+                >
                   {loading ? "Updating…" : "Update Submission"}
                 </PrimaryBtn>
               )
             ) : (
-              <PrimaryBtn disabled={loading || (!isLeader && isTeamMember) || isDeadlineOver}>
+              <PrimaryBtn
+                disabled={
+                  loading || (!isLeader && isTeamMember) || isDeadlineOver
+                }
+              >
                 {loading ? "Submitting…" : "Submit Project"}
               </PrimaryBtn>
             )}

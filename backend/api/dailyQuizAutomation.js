@@ -46,39 +46,39 @@ export const runDailyQuizAutomation = async () => {
 
     console.log("Quiz created");
 
-    const participants = await RegisteredParticipantsModel.find({
-      email: { $exists: true, $ne: null },
-    });
+    // const participants = await RegisteredParticipantsModel.find({
+    //   email: { $exists: true, $ne: null },
+    // });
 
-    const uniqueEmails = [
-      ...new Map(
-        participants.map((p) => [
-          p.email.toLowerCase(),
-          { email: p.email, name: p.name },
-        ])
-      ).values(),
-    ];
+    // const uniqueEmails = [
+    //   ...new Map(
+    //     participants.map((p) => [
+    //       p.email.toLowerCase(),
+    //       { email: p.email, name: p.name },
+    //     ])
+    //   ).values(),
+    // ];
 
-    const BATCH_SIZE = 50;
+    // const BATCH_SIZE = 50;
 
-    for (let i = 0; i < uniqueEmails.length; i += BATCH_SIZE) {
-      const batch = uniqueEmails.slice(i, i + BATCH_SIZE);
+    // for (let i = 0; i < uniqueEmails.length; i += BATCH_SIZE) {
+    //   const batch = uniqueEmails.slice(i, i + BATCH_SIZE);
 
-      await Promise.all(
-        batch.map((user) =>
-          sendMail({
-            to: user.email,
-            subject: "Daily Quiz is Live!",
-            templateName: "quizEmail",
-            data: {
-              name: user.name || "Participant",
-            },
-          })
-        )
-      );
+    //   await Promise.all(
+    //     batch.map((user) =>
+    //       sendMail({
+    //         to: user.email,
+    //         subject: "Daily Quiz is Live!",
+    //         templateName: "quizEmail",
+    //         data: {
+    //           name: user.name || "Participant",
+    //         },
+    //       })
+    //     )
+    //   );
 
-      await new Promise((res) => setTimeout(res, 500));
-    }
+    //   await new Promise((res) => setTimeout(res, 500));
+    // }
 
     console.log("Emails sent");
   } catch (err) {
