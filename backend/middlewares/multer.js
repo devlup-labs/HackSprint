@@ -1,4 +1,5 @@
 import multer, { memoryStorage } from "multer";
+import path from "path";
 
 // Allowed mime types
 const MIME_TYPES = {
@@ -13,19 +14,38 @@ const MIME_TYPES = {
   videos: ["video/mp4", "video/mpeg", "video/quicktime"],
 };
 
-// File filter
 const fileFilter = (req, file, cb) => {
-  if (MIME_TYPES.docs.includes(file.mimetype)) {
-    if (file.fieldname === "docs") return cb(null, true);
-  }
-  if (MIME_TYPES.images.includes(file.mimetype)) {
-    if (file.fieldname === "images") return cb(null, true);
-  }
-  if (MIME_TYPES.videos.includes(file.mimetype)) {
-    if (file.fieldname === "videos") return cb(null, true);
+  const ext = path.extname(file.originalname).toLowerCase();
+
+  if (file.fieldname === "docs") {
+    if (
+      MIME_TYPES.docs.includes(file.mimetype) ||
+      [".pdf", ".doc", ".docx", ".ppt", ".pptx"].includes(ext)
+    ) {
+      return cb(null, true);
+    }
   }
 
-  // ❌ Reject file
+  if (file.fieldname === "images") {
+    if (
+      MIME_TYPES.images.includes(file.mimetype) ||
+      [".jpg", ".jpeg", ".png"].includes(ext)
+    ) {
+      return cb(null, true);
+    }
+  }
+
+  if (file.fieldname === "videos") {
+    if (
+      MIME_TYPES.videos.includes(file.mimetype) ||
+      [".mp4", ".mpeg", ".mov"].includes(ext)
+    ) {
+      return cb(null, true);
+    }
+  }
+
+  console.log("Rejected:", file.fieldname, file.mimetype, file.originalname);
+
   cb(
     new Error(
       `Invalid file type for field ${file.fieldname}: ${file.mimetype}`
