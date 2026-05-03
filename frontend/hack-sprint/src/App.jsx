@@ -129,7 +129,7 @@ function App() {
         <HideAdminRoutes>
           <AdminNavbar />
         </HideAdminRoutes>
-        <ToastContainer position="top-right" autoClose={1200}/>
+        <ToastContainer position="top-right" autoClose={1200} />
         <Chatbot />
         <Routes>
           <Route path="/" element={<Home />} caseSensitive />

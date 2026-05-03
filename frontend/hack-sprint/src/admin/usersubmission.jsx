@@ -314,17 +314,16 @@ const UserSubmissionDetailPage = () => {
                       subtitle={url}
                     />
                   ))}
-                {submission.docs?.length > 0 && (
-                  <LinkRow
-                    href={submission.docs[0].url}
-                    icon={FileText}
-                    title="Documentation"
-                    subtitle={
-                      submission.docs[0].original_filename ||
-                      submission.docs[0].url
-                    }
-                  />
-                )}
+                {submission.docs?.length > 0 &&
+                  submission.docs.map((doc, index) => (
+                    <LinkRow
+                      key={index}
+                      href={doc.url}
+                      icon={FileText}
+                      title={`Documentation ${index + 1}`}
+                      subtitle={doc.original_filename || doc.url}
+                    />
+                  ))}
                 {!submission.repoUrl?.length && !submission.docs?.length && (
                   <p className="font-jb text-[0.65rem] text-[rgba(180,220,180,0.35)] italic">
                     No links provided.
