@@ -1,12 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 
-const STORAGE_KEY = "hacksprint_intro_seen_v1";
-
 // Boot-sequence lines — deliberately generic, no real site numbers (hackathon
 // counts, user counts, etc.) baked into decorative flavor text that would go
 // stale the moment those numbers change.
 const LINES = [
-  { text: "BOOTING HACKSPRINT_OS v2.7", tag: null },
+  { text: "BOOTING HACKSPRINT", tag: null },
   { text: "> mounting filesystem", tag: "[OK]" },
   { text: "> initializing neural handshake", tag: "[OK]" },
   { text: "> calibrating live bracket engine", tag: "[OK]" },
@@ -61,8 +59,7 @@ const useMatrixRain = (canvasRef, active) => {
 };
 
 export default function FirstVisitIntro() {
-  const [visible, setVisible] = useState(false);
-  const [checked, setChecked] = useState(false);
+  const [visible, setVisible] = useState(true);
   const [lineIndex, setLineIndex] = useState(0);
   const [typedLines, setTypedLines] = useState([]);
   const [phase, setPhase] = useState("boot"); // boot -> granted -> welcome -> opening -> done
@@ -71,28 +68,12 @@ export default function FirstVisitIntro() {
 
   useMatrixRain(canvasRef, visible && phase !== "opening");
 
-  useEffect(() => {
-    let seen = false;
-    try {
-      seen = localStorage.getItem(STORAGE_KEY) === "true";
-    } catch {
-      seen = false;
-    }
-    setVisible(!seen);
-    setChecked(true);
-  }, []);
-
   // The gate-open reveal: content fades fast, then two panels physically
   // slide apart off-screen — the actual homepage has been rendering behind
   // this the whole time, so opening the gate is all that's left to do.
   const finish = () => {
     timeouts.current.forEach(clearTimeout);
     setPhase("opening");
-    try {
-      localStorage.setItem(STORAGE_KEY, "true");
-    } catch {
-      // private-browsing or storage disabled — worst case it replays once more
-    }
     timeouts.current.push(setTimeout(() => setVisible(false), GATE_MS + 150));
   };
 
@@ -146,7 +127,7 @@ export default function FirstVisitIntro() {
 
   useEffect(() => () => timeouts.current.forEach(clearTimeout), []);
 
-  if (!checked || !visible) return null;
+  if (!visible) return null;
 
   const opening = phase === "opening";
 
