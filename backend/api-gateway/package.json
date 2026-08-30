@@ -4,8 +4,8 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon src/index.js",
-    "start": "node src/index.js"
+    "dev": "node init && nodemon src/index.js",
+    "start": "node init && node src/index.js"
   },
   "keywords": [],
   "author": "",

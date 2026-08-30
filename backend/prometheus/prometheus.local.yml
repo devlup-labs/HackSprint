@@ -1,0 +1,38 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets:
+          - localhost:9090
+
+  - job_name: "api-gateway"
+    static_configs:
+      - targets:
+          - host.docker.internal:5000
+
+  - job_name: "auth-service"
+    static_configs:
+      - targets:
+          - host.docker.internal:5001
+
+  - job_name: "hackathon-service"
+    static_configs:
+      - targets:
+          - host.docker.internal:5002
+
+  - job_name: "media-service"
+    static_configs:
+      - targets:
+          - host.docker.internal:5003
+
+  - job_name: "notification-service"
+    static_configs:
+      - targets:
+          - host.docker.internal:5004
+
+  - job_name: "chatbot-service"
+    static_configs:
+      - targets:
+          - host.docker.internal:5005
