@@ -16,8 +16,9 @@ function App() {
         containerStyle={{ zIndex: 100000 }}
         toastOptions={{ style: { zIndex: 100000 } }}
       />
-      {/* Renders once ever per browser (localStorage-gated) — every other
-          loading state in the app (page loaders, spinners) is untouched. */}
+      {/* Plays on every load — Skip Intro lets anyone past it immediately.
+          Every other loading state in the app (page loaders, spinners) is
+          untouched. */}
       <FirstVisitIntro />
       <AppRoutes />
       <Chatbot />
