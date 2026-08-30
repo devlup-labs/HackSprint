@@ -96,6 +96,8 @@ services:
       - ./grafana/.env.docker
     environment:
       - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=https://rahul1901.prometeo.in/grafana/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
     ports:
       - "127.0.0.1:3001:3000"
     depends_on:
