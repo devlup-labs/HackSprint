@@ -21,7 +21,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
           timeout: 60s
-          command_timeout: 20m
+          command_timeout: 45m
           debug: true
           script: |
             whoami
@@ -71,7 +71,9 @@ jobs:
             # Build first, then replace containers in place. Without a full
             # `down`, the copies of a scaled service are swapped one by one, so
             # nginx always has a healthy copy to send traffic to.
-            docker compose -f docker-compose.prod.yml build
+            # Two images at a time: building all seven in parallel overwhelms a
+            # small instance (this is what timed out the first v3 deploy).
+            COMPOSE_PARALLEL_LIMIT=2 docker compose -f docker-compose.prod.yml build
 
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
