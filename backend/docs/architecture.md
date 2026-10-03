@@ -175,7 +175,7 @@ This protects against a crashed or restarting process and gives near-zero-downti
 
 **Images.** Each service builds from its own Dockerfile (`node:22-alpine`, `npm ci --omit=dev`). `.dockerignore` excludes `.env*`, so no environment file — including `.env.docker` — is baked into an image; configuration reaches containers at runtime through Compose `env_file`.
 
-**Observability.** Prometheus scrapes each service's `/metrics`; Grafana visualizes them. Both are bound to the host's loopback interface only (see [`observability.md`](./observability.md)).
+**Observability.** Prometheus scrapes each service's `/metrics`; Grafana visualizes them. Prometheus is bound to the host's loopback interface and reached by SSH tunnel; Grafana is served at `/grafana/` behind its own login (see [`observability.md`](./observability.md)).
 
 ---
 

@@ -127,7 +127,7 @@ Prometheus handles metrics scraping across the platform. Each instrumented servi
 
 The scrape jobs are `api-gateway`, `user-service`, `admin-service`, `hackathon-service`, `media-service`, `notification-service` and `chatbot-service`. The two replicated services use DNS service discovery (`dns_sd_configs`, record type `A`) rather than a static target, so Prometheus gets one target per running copy and metrics from both are collected instead of whichever copy a name happened to resolve to. `prometheus.local.yml` is the variant for running Prometheus in a container against services running directly on the host.
 
-Prometheus has no authentication of its own, so it is never exposed on the public domain or through Nginx. In `docker-compose.prod.yml` it's published as `127.0.0.1:9090:9090` — bound to the EC2 host's loopback interface only. That means the port exists on the instance but is unreachable from the internet regardless of security group rules; the only way to reach it is by SSH-tunneling into the instance (Section 9.1) as whoever holds SSH access to the box.
+Prometheus has no authentication of its own, so it is never exposed on the public domain or through Nginx (Grafana is, behind its own login — see Section 9). In `docker-compose.prod.yml` it's published as `127.0.0.1:9090:9090` — bound to the EC2 host's loopback interface only. That means the port exists on the instance but is unreachable from the internet regardless of security group rules; the only way to reach it is by SSH-tunneling into the instance (Section 9.1) as whoever holds SSH access to the box.
 
 ---
 
@@ -137,17 +137,19 @@ Grafana provides visualization on top of the metrics Prometheus collects, presen
 
 Admin credentials come from `grafana/.env.docker` (`GF_SECURITY_ADMIN_USER` / `GF_SECURITY_ADMIN_PASSWORD`), provisioned from the `GRAFANA_ENV` GitHub secret the same way the five application services get their own `.env.docker` files (Section 7) — this replaces Grafana's `admin`/`admin` default. `GF_USERS_ALLOW_SIGN_UP=false` is set directly in Compose to disable open self-registration.
 
-Like Prometheus, Grafana is published as `127.0.0.1:3001:3000` — loopback-only, not reachable from the internet. Grafana does have its own login, but keeping it off the public internet entirely means that login isn't the only thing standing between the dashboard and the internet.
+Grafana is published on the host's loopback (`127.0.0.1:3001:3000`) and is **also served publicly through Nginx at `https://<domain>/grafana/`** (`GF_SERVER_ROOT_URL` and `GF_SERVER_SERVE_FROM_SUB_PATH` are set so it works under that path, and Nginx forwards the websocket Grafana uses for live updates). The only thing in front of it is Grafana's own login, so the admin password in `GRAFANA_ENV` must be strong, and sign-up stays disabled. Prometheus, which has no authentication, is not exposed this way.
 
 ### 9.1 Accessing Prometheus / Grafana
 
-Both are reached the same way: SSH-tunnel into the EC2 instance, then browse to the forwarded port on your own machine.
+**Grafana:** browse to `https://<domain>/grafana/` and sign in with the credentials from `GRAFANA_ENV`.
+
+**Prometheus** is reached by SSH tunnel only: forward the port, then open it on your own machine.
 
 ```bash
-ssh -L 9090:localhost:9090 -L 3001:localhost:3001 <ec2-user>@<EC2_HOST>
+ssh -L 9090:localhost:9090 <ec2-user>@<EC2_HOST>
 ```
 
-Then open `http://localhost:9090` for Prometheus and `http://localhost:3001` for Grafana. This only works for someone who already holds SSH access to the instance — there is no other route in.
+Then open `http://localhost:9090` (Status → Targets lists every scraped service and copy). This only works for someone who already holds SSH access to the instance — there is no other route in.
 
 ---
 
