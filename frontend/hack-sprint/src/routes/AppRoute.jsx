@@ -22,7 +22,6 @@ import { OnSpotBracketPage } from "../hackathon/OnSpotBracketPage.jsx";
 import { RegistrationForm } from "../hackathon/RegistrationForm.jsx";
 import TeamDetails from "../pages/TeamDetails.jsx";
 import ForgotPassword from "../pages/Student/forgotPassword.jsx";
-import PublicProfile from "../pages/Student/PublicProfile.jsx";
 
 import Studenthome from "../pages/Student/Studenthome.jsx";
 
@@ -37,9 +36,9 @@ import AdminSubmissionDetail from "../pages/Admin/AdminSubmissionDetail.jsx";
 import ParticipantPoliciesPage from "../pages/Participation.jsx";
 import OrganizerPlaybookPage from "../pages/Organiser.jsx";
 import TermsPage from "../pages/Terms.jsx";
-import PrivacyPolicyPage from "../pages/PrivacyPolicy.jsx";
+import ContactPage from "../pages/Contact.jsx";
+import FeedbackPage from "../pages/Feedback.jsx";
 import CreateHackathonPage from "../pages/Admin/CreateHackathonPage.jsx";
-import ArchitecturePage from "../pages/Architecture.jsx";
 
 function AppRoutes() {
   return (
@@ -56,10 +55,9 @@ function AppRoutes() {
         />
         <Route path="/organizer-ruleBook" element={<OrganizerPlaybookPage />} />
         <Route path="/terms-and-condition" element={<TermsPage />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-        <Route path="/architecture" element={<ArchitecturePage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/feedback" element={<FeedbackPage />} />
         <Route path="/adminhome" element={<Adminhome />} />
-        <Route path="/u/:userName" element={<PublicProfile />} />
       </Route>
 
       <Route element={<GuestRoute />}>

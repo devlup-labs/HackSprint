@@ -23,7 +23,14 @@ export const validateSubmissionData = (submissionData, submissionForm) => {
       throw new BadRequestError(`${field.label} is required`);
     }
 
-    if (value === undefined || value === null) {
+    // An optional field left blank (empty text/URL, or no files) is simply
+    // "not provided" — it must not be type-checked as if it had content.
+    if (
+      value === undefined ||
+      value === null ||
+      (typeof value === "string" && value.trim() === "") ||
+      (Array.isArray(value) && value.length === 0)
+    ) {
       continue;
     }
 

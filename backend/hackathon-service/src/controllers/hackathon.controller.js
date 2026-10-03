@@ -133,7 +133,7 @@ export const submitForApproval = async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      message: "Hackathon submitted for approval",
+      message: "Event submitted for approval",
       hackathon,
     });
   } catch (error) {
@@ -181,7 +181,7 @@ export const approveHackathon = async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      message: "Hackathon approved",
+      message: "Event approved",
       hackathon,
     });
   } catch (error) {
@@ -199,7 +199,7 @@ export const rejectHackathon = async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      message: "Hackathon rejected",
+      message: "Event rejected",
       hackathon,
     });
   } catch (error) {

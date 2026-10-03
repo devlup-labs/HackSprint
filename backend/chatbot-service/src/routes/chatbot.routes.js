@@ -1,6 +1,6 @@
 import express from "express";
 import rateLimit from "express-rate-limit";
-import { chat } from "../controllers/chatbot.controller.js";
+import { chat, chatStream } from "../controllers/chatbot.controller.js";
 
 const router = express.Router();
 
@@ -20,5 +20,6 @@ const chatLimiter = rateLimit({
 });
 
 router.post("/chat", chatLimiter, chat);
+router.post("/chat/stream", chatLimiter, chatStream);
 
 export default router;

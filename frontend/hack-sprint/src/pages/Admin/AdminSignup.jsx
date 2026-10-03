@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import AdminGoogleLogin from "../../components/auth/AdminGoogleAuth";
 
+import "../Styles/AllHackathons.css";
 const GoogleAuthWrapper = () => (
   <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
     <AdminGoogleLogin />
@@ -17,7 +18,7 @@ function AdminSignup() {
 
         .admin-login-root {
           min-height: 100vh;
-          background: #0a0a0a;
+          background: var(--hk-bg);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -31,8 +32,8 @@ function AdminSignup() {
           position: absolute;
           inset: 0;
           background-image:
-            linear-gradient(rgba(95,255,96,0.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(95,255,96,0.04) 1px, transparent 1px);
+            linear-gradient(rgba(var(--hk-accent-rgb),0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(var(--hk-accent-rgb),0.04) 1px, transparent 1px);
           background-size: 40px 40px;
           pointer-events: none;
         }
@@ -42,7 +43,7 @@ function AdminSignup() {
           position: absolute;
           width: 500px;
           height: 500px;
-          background: radial-gradient(circle, rgba(95,255,96,0.07) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(var(--hk-accent-rgb),0.07) 0%, transparent 70%);
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
@@ -56,11 +57,11 @@ function AdminSignup() {
           max-width: 400px;
           margin: 1rem;
           padding: 2.5rem 2rem;
-          border: 1px solid rgba(95,255,96,0.18);
+          border: 1px solid rgba(var(--hk-accent-rgb),0.18);
           border-radius: 4px;
-          background: rgba(10,10,10,0.92);
+          background: rgba(var(--hk-card-bg),0.92);
           backdrop-filter: blur(12px);
-          box-shadow: 0 0 40px rgba(95,255,96,0.08), inset 0 0 40px rgba(0,0,0,0.4);
+          box-shadow: 0 0 40px rgba(var(--hk-accent-rgb),0.08), inset 0 0 40px rgba(var(--hk-accent-rgb),0.03);
         }
 
         .card::before, .card::after {
@@ -68,7 +69,7 @@ function AdminSignup() {
           position: absolute;
           width: 12px;
           height: 12px;
-          border-color: #5fff60;
+          border-color: var(--hk-accent-solid);
           border-style: solid;
         }
         .card::before {
@@ -85,8 +86,8 @@ function AdminSignup() {
           font-size: 0.6rem;
           letter-spacing: 0.2em;
           text-transform: uppercase;
-          color: #5fff60;
-          border: 1px solid rgba(95,255,96,0.3);
+          color: var(--hk-accent-solid);
+          border: 1px solid rgba(var(--hk-accent-rgb),0.3);
           padding: 0.2rem 0.6rem;
           border-radius: 2px;
           margin-bottom: 1.5rem;
@@ -96,19 +97,19 @@ function AdminSignup() {
           font-family: 'Syne', sans-serif;
           font-size: 2rem;
           font-weight: 800;
-          color: #fff;
+          color: var(--hk-text);
           line-height: 1.1;
           margin-bottom: 0.4rem;
           letter-spacing: -0.02em;
         }
 
         .title span {
-          color: #5fff60;
+          color: var(--hk-accent-solid);
         }
 
         .subtitle {
           font-size: 0.7rem;
-          color: rgba(255,255,255,0.35);
+          color: rgba(var(--hk-text-rgb),calc(0.6 + var(--hk-fade-boost)));
           letter-spacing: 0.05em;
           margin-bottom: 2rem;
           line-height: 1.6;
@@ -116,25 +117,25 @@ function AdminSignup() {
 
         .divider {
           height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(95,255,96,0.2), transparent);
+          background: linear-gradient(90deg, transparent, rgba(var(--hk-accent-rgb),0.2), transparent);
           margin-bottom: 2rem;
         }
 
         .footer-note {
           margin-top: 1.8rem;
           font-size: 0.62rem;
-          color: rgba(255,255,255,0.2);
+          color: rgba(var(--hk-text-rgb),calc(0.45 + var(--hk-fade-boost)));
           text-align: center;
           letter-spacing: 0.08em;
         }
 
         .footer-note a {
-          color: rgba(95,255,96,0.6);
+          color: rgba(var(--hk-accent-rgb),calc(0.6 + var(--hk-fade-boost)));
           text-decoration: underline;
           text-underline-offset: 2px;
         }
         .footer-note a:hover {
-          color: #5fff60;
+          color: var(--hk-accent-solid);
         }
       `}</style>
 

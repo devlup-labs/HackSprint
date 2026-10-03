@@ -8,7 +8,7 @@ import { SocialShare } from "./SocialShare";
 import SEO from "../components/SEO.jsx";
 
 const GridBackground = () => (
-  <div className="absolute inset-0 pointer-events-none bg-[rgba(8,10,8,0.92)] backdrop-blur-xl" />
+  <div className="absolute inset-0 pointer-events-none bg-[rgba(var(--hk-bg-rgb),0.92)] backdrop-blur-xl" />
 );
 
 const useIsDesktop = () => {
@@ -37,7 +37,7 @@ export const OnSpotEventPage = ({ hackathon }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[rgba(8,10,8,0.92)] backdrop-blur-xl relative text-white">
+    <div className="min-h-screen bg-[rgba(var(--hk-bg-rgb),0.92)] backdrop-blur-xl relative text-[var(--hk-text)]">
       <SEO
         title={hackathon.title}
         description={hackathon.subTitle || `${hackathon.title} — a live on-spot event on HackSprint.`}
@@ -63,7 +63,7 @@ export const OnSpotEventPage = ({ hackathon }) => {
           extraAction={
             <button
               onClick={handleEnterEvent}
-              className="font-[family-name:'JetBrains_Mono',monospace] w-full sm:w-auto inline-flex items-center justify-center gap-2 text-xs tracking-[0.1em] uppercase px-5 py-2.5 rounded-[3px] border cursor-pointer transition-all duration-150 bg-[rgba(95,255,96,0.1)] border-[rgba(95,255,96,0.4)] text-[#5fff60] hover:bg-[rgba(95,255,96,0.18)] hover:shadow-[0_0_20px_rgba(95,255,96,0.15)]"
+              className="font-[family-name:'JetBrains_Mono',monospace] w-full sm:w-auto inline-flex items-center justify-center gap-2 text-xs tracking-[0.1em] uppercase px-5 py-2.5 rounded-[3px] border cursor-pointer transition-all duration-150 bg-[rgba(var(--hk-accent-rgb),0.1)] border-[rgba(var(--hk-card-border-rgb),0.64)] dark:border-[rgba(var(--hk-card-border-rgb),0.4)] text-[var(--hk-accent-solid)] hover:bg-[rgba(var(--hk-accent-rgb),0.18)] hover:shadow-[0_0_20px_rgba(var(--hk-accent-rgb),0.15)]"
             >
               <Swords size={14} />
               Enter

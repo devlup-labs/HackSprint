@@ -1,6 +1,19 @@
 import jwt from "jsonwebtoken";
+import { gatewayClaims } from "../utils/gatewayIdentity.js";
 
 export const verifyUploader = (req, res, next) => {
+  const trusted = gatewayClaims(req);
+  if (trusted?._id) {
+    req.user = trusted;
+    req.uploaderType = "user";
+    return next();
+  }
+  if (trusted?.id) {
+    req.admin = trusted;
+    req.uploaderType = "admin";
+    return next();
+  }
+
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {

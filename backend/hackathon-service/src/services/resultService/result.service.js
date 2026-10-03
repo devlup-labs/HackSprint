@@ -11,7 +11,7 @@ export class ResultService {
     const hackathon = await this.hackathonRepository.getById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     if (!hackathon.showResult) {

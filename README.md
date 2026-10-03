@@ -14,11 +14,11 @@
 
 ## 1. What This Is
 
-HackSprint is a hackathon-hosting platform with two sides: **students** browse and register for hackathons (solo or in a team formed via a shareable invite code), submit their project (GitHub repo, live demo, documents) within a fixed window, and see results on a public leaderboard. **Admins/organizers** create and configure hackathons (subject to platform-admin approval), assign judges, review submissions, and score them. Both sides get email, in-app, and browser push notifications for things like deadline reminders and team activity.
+HackSprint is a hackathon-hosting platform with two sides: **students** browse and register for hackathons (solo or in a team formed via a shareable invite code), submit their project (GitHub repo, live demo, documents) within a fixed window, and see results on a public leaderboard. **Admins/organizers** create and configure hackathons (subject to platform-admin approval), assign judges, review submissions, and score them. Both sides get email, in-app, and browser push notifications for things like deadline reminders and team activity. Beyond events, students have a **community layer** — a People directory with public profiles, connection requests and direct messages — and every visitor can reach the team through a **Contact** page and a **Feedback** form whose submissions land in a controller inbox on the admin dashboard. A built-in assistant (Byte, backed by Gemini) answers platform questions and streams its replies.
 
 Alongside that original submission-based format, HackSprint also supports **on-spot events** — in-person, bracket/tournament-style competitions (drone combat, robotics, similar physical competitions) with no project submission at all. Admins pair teams into matches round by round and enter scores live; standings update automatically and are always publicly visible, and teams get reminded (in-app, email, and push) as their scheduled match time approaches.
 
-It's deliberately built as a **distributed system** rather than a single monolith — five independently deployable backend services behind one API gateway, a separately deployed frontend, containerized with Docker, monitored with Prometheus/Grafana, and shipped via GitHub Actions. Part of the point of this project is the engineering exercise of building and operating that kind of system, not just the product on top of it.
+It's deliberately built as a **distributed system** rather than a single monolith — six independently deployable backend services behind one API gateway (which verifies tokens and rate-limits through Redis), a separately deployed frontend, containerized with Docker with the busiest components running as two copies behind Nginx, monitored with Prometheus/Grafana, and shipped via GitHub Actions. Part of the point of this project is the engineering exercise of building and operating that kind of system, not just the product on top of it.
 
 ---
 
@@ -27,33 +27,38 @@ It's deliberately built as a **distributed system** rather than a single monolit
 ```mermaid
 graph TD
     Browser["Browser"] -->|Vercel| Frontend["React SPA (Vite)"]
-    Frontend -->|"HTTPS, single origin"| Nginx["Nginx (TLS termination)"]
-    Nginx --> Gateway["API Gateway"]
+    Frontend -->|"HTTPS, single origin"| Nginx["Nginx (TLS termination, failover)"]
+    Nginx --> Gateway["API Gateway ×2"]
 
-    Gateway --> Auth["Auth Service"]
-    Gateway --> Hackathon["Hackathon Service"]
+    Gateway --> User["User Service"]
+    Gateway --> Admin["Admin Service"]
+    Gateway --> Hackathon["Hackathon Service ×2"]
     Gateway --> Media["Media Service"]
     Gateway --> Notification["Notification Service"]
     Gateway --> Chatbot["Chatbot Service"]
 
-    Auth --> Mongo[("MongoDB")]
+    User --> Mongo[("MongoDB")]
+    Admin --> Mongo
     Hackathon --> Mongo
     Media --> Mongo
     Notification --> Mongo
 
-    Auth --> Redis[("Redis")]
+    Gateway --> Redis[("Redis")]
+    User --> Redis
     Hackathon --> Redis
+    Notification --> Redis
 
     Media --> S3[("Amazon S3")]
 
     Chatbot --> Gemini[("Gemini API")]
 
-    Prometheus["Prometheus"] -.scrapes.-> Auth
+    Prometheus["Prometheus"] -.scrapes.-> Gateway
+    Prometheus -.scrapes.-> User
+    Prometheus -.scrapes.-> Admin
     Prometheus -.scrapes.-> Hackathon
     Prometheus -.scrapes.-> Media
     Prometheus -.scrapes.-> Notification
     Prometheus -.scrapes.-> Chatbot
-    Prometheus -.scrapes.-> Gateway
     Prometheus --> Grafana["Grafana"]
 ```
 
@@ -68,16 +73,18 @@ This is the 60-second version. The full architectural reasoning — why microser
 ```
 HackSprint
 ├── backend/
-│   ├── api-gateway/          Single public entry point — routing, CORS, rate limiting
-│   ├── auth-service/         Auth, Google OAuth, JWT + refresh tokens, profiles
+│   ├── api-gateway/          Single public entry point — routing, CORS, token check, Redis-backed rate limiting
+│   ├── user-service/         Student login (Google OAuth + One Tap), JWT + refresh tokens, profiles, people directory, connections, messages
+│   ├── admin-service/        Admin login, organiser verification, controller tools, contact + feedback inbox
 │   ├── hackathon-service/    Hackathons (submission-based + on-spot/bracket), registrations, teams, judging, discussions
 │   ├── media-service/        File uploads → Amazon S3
 │   ├── notification-service/ In-app notifications + transactional email + browser push (BullMQ)
 │   ├── chatbot-service/      FAQ chatbot (Google Gemini) — stateless, no database, no user data access
-│   ├── nginx/                Reverse proxy + HTTPS termination config
+│   ├── nginx/                Reverse proxy, HTTPS termination, failover between gateway copies
 │   ├── prometheus/           Scrape config
 │   ├── grafana/              Provisioned datasource + dashboard
-│   ├── docker-compose.prod.yml
+│   ├── docker-compose.yml        Development stack (one copy of each service)
+│   ├── docker-compose.prod.yml   Production stack (2 copies of gateway + hackathon-service, health checks)
 │   └── docs/                 Detailed architecture, services, API gateway, and CI/CD docs
 └── frontend/
     └── hack-sprint/          React + Vite SPA — see its own README for frontend-specific detail
@@ -91,14 +98,14 @@ HackSprint
 |---|---|
 | Frontend | React 19, Vite, Tailwind CSS, TanStack Query, Zustand, React Router |
 | Backend | Node.js + Express, one process per service |
-| Database | MongoDB (primary), Redis (caching) |
-| File Storage | Amazon S3 (IAM role–based access, no static credentials) |
-| Auth | Google OAuth + JWT access/refresh tokens (student and admin sessions are independent) |
+| Database | MongoDB (primary, shared instance), Redis (cache, rate-limit counters, job locks, queues) |
+| File Storage | Amazon S3 (the media service reads its AWS access key from its environment file) |
+| Auth | Google OAuth (popup code flow and One Tap) + JWT access/refresh tokens; student and admin sessions are independent; the gateway verifies tokens and forwards identity |
 | Async work | BullMQ/Redis (transactional email, browser push), `node-cron` (deadline + on-spot match reminders) |
-| AI | Google Gemini API — scoped to a stateless platform-FAQ chatbot, no access to user accounts/data |
-| Reverse proxy | Nginx (HTTPS via Let's Encrypt) |
+| AI | Google Gemini API — scoped to a stateless platform-FAQ chatbot (streamed replies, Markdown), no access to user accounts/data |
+| Reverse proxy | Nginx (HTTPS via Let's Encrypt, retries across gateway copies) |
 | Containerization | Docker + Docker Compose |
-| CI/CD | GitHub Actions (backend → EC2), Vercel (frontend) |
+| CI/CD | GitHub Actions (backend → EC2, in-place container replacement), Vercel (frontend) |
 | Observability | Prometheus + Grafana |
 
 ---
@@ -107,19 +114,41 @@ HackSprint
 
 **Backend** (from `backend/`):
 ```bash
-cp <service>/.env.example <service>/.env   # per service, see backend/docs/services.md
+cp <service>/.env.example <service>/.env          # per service, for running with npm run dev
+cp <service>/.env.example <service>/.env.docker   # per service, for docker compose
 docker compose up -d --build
 ```
-Each service needs its own env file (Mongo/Redis connection strings, JWT secret, Google OAuth credentials, S3 credentials for `media-service`, Brevo API key and VAPID (Web Push) keys for `notification-service`, etc.) — the exact requirements are enforced in each service's own startup validation, not duplicated here. See [`backend/docs/services.md`](backend/docs/services.md) for what each service owns.
+`docker compose` brings up MongoDB, Redis, the gateway and all six services (the gateway is published on port 5000). To run a service directly instead, `cd <service> && npm install && npm run dev`.
+
+| Service | Port |
+|---|---|
+| api-gateway | 5000 |
+| user-service | 5001 |
+| hackathon-service | 5002 |
+| media-service | 5003 |
+| notification-service | 5004 |
+| chatbot-service | 5005 |
+| admin-service | 5006 |
+
+Each service needs its own env file; the exact requirements are enforced by each service's startup validation, not duplicated here. A few values must **agree across services**:
+
+- `SECRET_KEY` — the JWT signing secret. Tokens issued by the user and admin services are verified by the gateway and by the other services.
+- `INTERNAL_SERVICE_SECRET` — service-to-service calls and the gateway's trusted identity headers.
+- `FRONTEND_URL` — the allowed CORS origin.
+
+The gateway also needs the address of every service (`USER_SERVICE_URL`, `ADMIN_SERVICE_URL`, `HACKATHON_SERVICE_URL`, `MEDIA_SERVICE_URL`, `NOTIFICATION_SERVICE_URL`, `CHATBOT_SERVICE_URL`) and, optionally, `REDIS_URL` for shared rate-limit counters. Other per-service needs: S3 credentials for `media-service`; a Brevo API key and VAPID keys for `notification-service`; `GEMINI_API_KEY` and `GEMINI_MODEL` for `chatbot-service`; Google OAuth client id and secret for `user-service` and `admin-service`. The Google client's "Authorized JavaScript origins" must include your frontend origin for One Tap to appear.
+
+See [`backend/docs/services.md`](backend/docs/services.md) for what each service owns and [`backend/docs/observability.md`](backend/docs/observability.md) for the Docker and deployment details.
 
 **Frontend** (from `frontend/hack-sprint/`):
 ```bash
 npm install
 npm run dev
 ```
-Requires `VITE_API_URL` pointing at your local gateway (`http://localhost:5000` by default) — see [`frontend/hack-sprint/README.md`](frontend/hack-sprint/README.md) and its `.env.example`.
+Requires `VITE_API_URL` pointing at your local gateway (`http://localhost:5000` by default) and `VITE_GOOGLE_CLIENT_ID` — see [`frontend/hack-sprint/README.md`](frontend/hack-sprint/README.md) and its `.env.example`.
 
 ---
+
 
 ## 6. Documentation
 
@@ -128,9 +157,10 @@ This README is the entry point. Everything below goes deeper on one specific par
 | Doc | Covers |
 |---|---|
 | [`backend/docs/architecture.md`](backend/docs/architecture.md) | Full system architecture, request flow, data layer, tradeoffs, planned work |
-| [`backend/docs/services.md`](backend/docs/services.md) | What each of the five services owns and is responsible for |
-| [`backend/docs/api-gateway.md`](backend/docs/api-gateway.md) | Gateway routing, middleware chain, current limitations |
-| [`backend/docs/observability.md`](backend/docs/observability.md) | Deployment, CI/CD pipeline, Prometheus/Grafana access |
+| [`backend/docs/architecture.excalidraw`](backend/docs/architecture.excalidraw) | The whole system as one editable diagram (open at excalidraw.com or in the VS Code Excalidraw extension) |
+| [`backend/docs/services.md`](backend/docs/services.md) | What each of the six services (plus the gateway) owns and is responsible for |
+| [`backend/docs/api-gateway.md`](backend/docs/api-gateway.md) | Gateway routing, identity forwarding, rate limiting, configuration |
+| [`backend/docs/observability.md`](backend/docs/observability.md) | Docker, replicas and health checks, CI/CD pipeline, Prometheus/Grafana access |
 | [`frontend/hack-sprint/README.md`](frontend/hack-sprint/README.md) | Frontend folder structure, routing, API client, state management, Docker |
 
 ---

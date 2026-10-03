@@ -41,7 +41,7 @@ export class SubmissionReviewService {
     );
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     const minScore = hackathon?.judgingConfig?.minScore ?? 0;

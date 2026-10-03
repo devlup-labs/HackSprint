@@ -19,6 +19,7 @@ import { MediaAPI } from "../../api/media.api.js";
 import RichTextEditor from "../../components/RichTextEditor.jsx";
 import { getFileMeta, formatBytes } from "../../utils/fileType.js";
 import "./HackathonForm.css";
+import "../Styles/AllHackathons.css";
 
 /* ─────────────────────────────────────────────────────────────────────────
    Shared primitives
@@ -733,7 +734,7 @@ export default function HackathonForm({ initialValues, onSubmit, submitLabel = "
     if (!form.description.trim()) return toast.error("Description is required.");
     if (form.phases.length === 0) return toast.error("At least one phase is required.");
     if (form.participationType === "TEAM" && Number(form.maxTeamSize) < 2)
-      return toast.error("Team hackathons need maxTeamSize of at least 2.");
+      return toast.error("Team events need maxTeamSize of at least 2.");
 
     setUploading(true);
     try {
@@ -787,7 +788,7 @@ export default function HackathonForm({ initialValues, onSubmit, submitLabel = "
   return (
     <form onSubmit={handleSubmit} className="hf-root">
       <Section badge="01 / basic information">
-        <Field label="Event Format" hint="Submission-based hackathons are judged from uploaded work. On-Spot events are live, in-person, bracket-style competitions (Team vs Team matches).">
+        <Field label="Event Format" hint="Submission-based events are judged from uploaded work. On-Spot events are live, in-person, bracket-style competitions (Team vs Team matches).">
           <div className="hf-radio-row">
             {[
               { value: "SUBMISSION", label: "Submission-Based", icon: FileText },
@@ -802,7 +803,7 @@ export default function HackathonForm({ initialValues, onSubmit, submitLabel = "
           </div>
         </Field>
         <Field label="Title" required>
-          <input className="hf-input" value={form.title} onChange={(e) => set("title", e.target.value)} placeholder="Hackathon title" />
+          <input className="hf-input" value={form.title} onChange={(e) => set("title", e.target.value)} placeholder="Event title" />
         </Field>
         <Field label="Subtitle">
           <input className="hf-input" value={form.subTitle} onChange={(e) => set("subTitle", e.target.value)} placeholder="Short tagline" />
@@ -813,7 +814,7 @@ export default function HackathonForm({ initialValues, onSubmit, submitLabel = "
         <Field label="Description" required>
           <textarea className="hf-input hf-textarea" rows={3} value={form.description} onChange={(e) => set("description", e.target.value)} placeholder="Short summary shown on listing cards" />
         </Field>
-        <Field label="Details Content" hint="Long-form content shown on the hackathon's Details tab.">
+        <Field label="Details Content" hint="Long-form content shown on the event's Details tab.">
           <RichTextEditor
             value={form.detailsContent}
             onChange={(html) => set("detailsContent", html)}

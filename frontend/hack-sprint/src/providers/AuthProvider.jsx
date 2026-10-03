@@ -14,6 +14,8 @@ export default function AuthProvider({ children }) {
       if (adminToken) {
         try {
           const res = await AdminAPI.getProfile();
+          // Leftover from before one-account-at-a-time: keep the organiser.
+          localStorage.removeItem("token");
           login(res.data.admin, "admin");
           return;
         } catch {
@@ -32,7 +34,7 @@ export default function AuthProvider({ children }) {
         const res = await ProfileAPI.getMyProfile();
         const profile = res.data.profile;
         login(profile, profile.role || "student");
-      } catch (err) {
+      } catch {
         localStorage.removeItem("token");
         logout();
       }

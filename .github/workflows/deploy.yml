@@ -36,8 +36,12 @@ jobs:
 
             cd backend
 
-            cat > auth-service/.env.docker << 'EOF'
+            cat > user-service/.env.docker << 'EOF'
             ${{ secrets.AUTH_ENV }}
+            EOF
+
+            cat > admin-service/.env.docker << 'EOF'
+            ${{ secrets.ADMIN_ENV }}
             EOF
 
             cat > hackathon-service/.env.docker << 'EOF'
@@ -64,8 +68,11 @@ jobs:
             ${{ secrets.GRAFANA_ENV }}
             EOF
 
-            docker compose -f docker-compose.prod.yml down
+            # Build first, then replace containers in place. Without a full
+            # `down`, the copies of a scaled service are swapped one by one, so
+            # nginx always has a healthy copy to send traffic to.
+            docker compose -f docker-compose.prod.yml build
 
-            docker compose -f docker-compose.prod.yml up -d --build
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
             docker image prune -af

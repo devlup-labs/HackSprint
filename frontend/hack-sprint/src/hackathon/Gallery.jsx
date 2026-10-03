@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { createPortal } from "react-dom";
 import { HackathonAPI } from "../api/hackathon.api.js";
+import "../pages/Styles/AllHackathons.css";
 
 const isVideo = (url) => /\.(mp4|webm|ogg)$/i.test(url);
 
@@ -19,7 +20,7 @@ const galleryCache = new Map();
 const NavBtn = ({ onClick, children, className = "" }) => (
   <button
     onClick={onClick}
-    className={`flex items-center justify-center w-9 h-9 rounded-[3px] border bg-[rgba(10,12,10,0.88)] border-[rgba(95,255,96,0.2)] text-[rgba(95,255,96,0.6)] hover:bg-[rgba(95,255,96,0.08)] hover:border-[rgba(95,255,96,0.42)] hover:text-[#5fff60] transition-all cursor-pointer ${className}`}
+    className={`flex items-center justify-center w-9 h-9 rounded-[3px] border bg-[rgba(var(--hk-card-bg),0.88)] border-[rgba(var(--hk-accent-rgb),0.2)] text-[rgba(var(--hk-accent-rgb),0.6)] hover:bg-[rgba(var(--hk-accent-rgb),0.08)] hover:border-[rgba(var(--hk-accent-rgb),0.42)] hover:text-[var(--hk-accent-solid)] transition-all cursor-pointer ${className}`}
   >
     {children}
   </button>
@@ -100,8 +101,8 @@ const Gallery = ({ hackathonId }) => {
   if (loading)
     return (
       <div className="flex items-center justify-center py-16 gap-3 font-[family-name:'JetBrains_Mono',monospace]">
-        <div className="w-7 h-7 rounded-full border-2 border-[rgba(95,255,96,0.15)] border-t-[#5fff60] animate-spin" />
-        <span className="text-[0.62rem] tracking-[0.1em] uppercase text-[rgba(95,255,96,0.35)]">
+        <div className="w-7 h-7 rounded-full border-2 border-[rgba(var(--hk-accent-rgb),0.15)] border-t-[var(--hk-accent-solid)] animate-spin" />
+        <span className="text-[0.62rem] tracking-[0.1em] uppercase text-[rgba(var(--hk-accent-rgb),0.7)] dark:text-[rgba(var(--hk-accent-rgb),0.35)]">
           Loading gallery…
         </span>
       </div>
@@ -110,14 +111,14 @@ const Gallery = ({ hackathonId }) => {
   if (images.length === 0)
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-3 font-[family-name:'JetBrains_Mono',monospace]">
-        <div className="relative w-12 h-12 rounded-[3px] bg-[rgba(95,255,96,0.05)] border border-[rgba(95,255,96,0.12)] flex items-center justify-center">
-          <span className="absolute top-[-1px] left-[-1px] w-2 h-2 border-t-2 border-l-2 border-[rgba(95,255,96,0.3)]" />
-          <ImageIcon size={20} className="text-[rgba(95,255,96,0.2)]" />
+        <div className="relative w-12 h-12 rounded-[3px] bg-[rgba(var(--hk-accent-rgb),0.05)] border border-[rgba(var(--hk-accent-rgb),0.12)] flex items-center justify-center">
+          <span className="absolute top-[-1px] left-[-1px] w-2 h-2 border-t-2 border-l-2 border-[rgba(var(--hk-accent-rgb),0.3)]" />
+          <ImageIcon size={20} className="text-[rgba(var(--hk-accent-rgb),0.6)] dark:text-[rgba(var(--hk-accent-rgb),0.2)]" />
         </div>
-        <p className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-sm tracking-tight">
+        <p className="font-[family-name:'Syne',sans-serif] font-extrabold text-[var(--hk-text)] text-sm tracking-tight">
           No gallery yet
         </p>
-        <p className="text-[0.6rem] text-[rgba(180,220,180,0.3)]">
+        <p className="text-[0.6rem] text-[rgba(var(--hk-text-rgb),0.6)] dark:text-[rgba(var(--hk-text-rgb),0.3)]">
           Check back later for event photos!
         </p>
       </div>
@@ -127,11 +128,11 @@ const Gallery = ({ hackathonId }) => {
     <>
       <div className="flex flex-col gap-5 font-[family-name:'JetBrains_Mono',monospace]">
         <div>
-          <h2 className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-2xl tracking-tight mb-1">
+          <h2 className="font-[family-name:'Syne',sans-serif] font-extrabold text-[var(--hk-text)] text-2xl tracking-tight mb-1">
             Glimpse from event
           </h2>
-          <p className="text-[0.62rem] text-[rgba(180,220,180,0.4)] tracking-[0.04em]">
-            Photos and videos from the hackathon
+          <p className="text-[0.62rem] text-[rgba(var(--hk-text-rgb),0.6)] dark:text-[rgba(var(--hk-text-rgb),0.4)] tracking-[0.04em]">
+            Photos and videos from the event
           </p>
         </div>
 
@@ -144,10 +145,10 @@ const Gallery = ({ hackathonId }) => {
                 <div
                   key={actualIdx}
                   onClick={() => openLightbox(actualIdx)}
-                  className="relative group overflow-hidden rounded-[4px] border border-[rgba(95,255,96,0.1)] hover:border-[rgba(95,255,96,0.3)] aspect-video bg-[rgba(10,12,10,0.7)] cursor-pointer transition-all"
+                  className="relative group overflow-hidden rounded-[4px] border border-[rgba(var(--hk-card-border-rgb),0.16)] dark:border-[rgba(var(--hk-accent-rgb),0.1)] hover:border-[rgba(var(--hk-accent-rgb),0.3)] aspect-video bg-[rgba(var(--hk-card-bg),0.7)] cursor-pointer transition-all"
                 >
-                  <span className="absolute top-[-1px] left-[-1px] w-2 h-2 border-t-2 border-l-2 border-[rgba(95,255,96,0.35)] z-10" />
-                  <span className="absolute bottom-[-1px] right-[-1px] w-2 h-2 border-b-2 border-r-2 border-[rgba(95,255,96,0.35)] z-10" />
+                  <span className="absolute top-[-1px] left-[-1px] w-2 h-2 border-t-2 border-l-2 border-[rgba(var(--hk-accent-rgb),0.35)] z-10" />
+                  <span className="absolute bottom-[-1px] right-[-1px] w-2 h-2 border-b-2 border-r-2 border-[rgba(var(--hk-accent-rgb),0.35)] z-10" />
 
                   {vid ? (
                     <>
@@ -157,10 +158,10 @@ const Gallery = ({ hackathonId }) => {
                         muted
                       />
                       <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/50 transition-all">
-                        <div className="w-10 h-10 rounded-[3px] bg-[rgba(95,255,96,0.15)] border border-[rgba(95,255,96,0.3)] flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-[3px] bg-[rgba(var(--hk-accent-rgb),0.15)] border border-[rgba(var(--hk-accent-rgb),0.3)] flex items-center justify-center">
                           <Play
                             size={16}
-                            className="text-[#5fff60] ml-0.5"
+                            className="text-[var(--hk-accent-solid)] ml-0.5"
                             fill="currentColor"
                           />
                         </div>
@@ -206,8 +207,8 @@ const Gallery = ({ hackathonId }) => {
                 onClick={() => setCurrentIndex(idx)}
                 className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
                   idx === currentIndex
-                    ? "w-6 bg-[#5fff60]"
-                    : "w-1.5 bg-[rgba(95,255,96,0.2)] hover:bg-[rgba(95,255,96,0.4)]"
+                    ? "w-6 bg-[var(--hk-accent-solid)]"
+                    : "w-1.5 bg-[rgba(var(--hk-accent-rgb),0.2)] hover:bg-[rgba(var(--hk-accent-rgb),0.4)]"
                 }`}
               />
             ))}

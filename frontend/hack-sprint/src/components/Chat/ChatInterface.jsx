@@ -6,8 +6,15 @@ import { DiscussionAPI } from "../../api/discussion.api.js";
 import { useAuth } from "../../hooks/useAuth";
 
 const PAGE_SIZE = 20;
+const POLL_MS = 6000;
+const NEAR_BOTTOM_PX = 120;
 
-const Replies = ({ messageId, currentUserId, onDelete, refreshKey }) => {
+// Replies own their own delete handling entirely — this was the source of
+// the "deleted reply doesn't disappear" bug: the old code routed reply
+// deletes through the parent's message-list updater, which only ever
+// searched the top-level messages array (replies live here, in this
+// component's own local state, not there).
+const Replies = ({ messageId, currentUserId, refreshKey }) => {
   const [replies, setReplies] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -25,29 +32,36 @@ const Replies = ({ messageId, currentUserId, onDelete, refreshKey }) => {
     };
   }, [messageId, refreshKey]);
 
+  const handleDeleteReply = async (replyId) => {
+    try {
+      await DiscussionAPI.deleteMessage(replyId);
+      setReplies((prev) =>
+        prev.map((r) => (r._id === replyId ? { ...r, content: "[deleted]", isDeleted: true } : r))
+      );
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to delete reply");
+    }
+  };
+
   if (loading)
     return (
-      <div className="flex items-center gap-2 pl-9 py-2 text-[rgba(95,255,96,0.35)]">
+      <div className="flex items-center gap-2 pl-9 py-2 text-muted-foreground">
         <Loader2 size={12} className="animate-spin" />
-        <span className="text-[0.55rem] tracking-[0.08em] uppercase">Loading replies…</span>
+        <span className="text-xs">Loading replies…</span>
       </div>
     );
 
   if (replies.length === 0)
-    return (
-      <p className="pl-9 py-2 text-[0.58rem] text-[rgba(180,220,180,0.3)]">
-        No replies yet.
-      </p>
-    );
+    return <p className="pl-9 py-2 text-xs text-muted-foreground">No replies yet.</p>;
 
   return (
-    <div className="pl-6 border-l border-[rgba(95,255,96,0.08)] flex flex-col gap-1">
+    <div className="pl-6 border-l border-border flex flex-col gap-1">
       {replies.map((r) => (
         <MessageBubble
           key={r._id}
           message={r}
           isMe={String(r.sender?._id || r.sender) === String(currentUserId)}
-          onDelete={onDelete}
+          onDelete={handleDeleteReply}
         />
       ))}
     </div>
@@ -66,11 +80,21 @@ const ChatInterface = ({ hackathonId }) => {
   const [replyDrafts, setReplyDrafts] = useState({});
   const [replyRefresh, setReplyRefresh] = useState({});
   const scrollRef = useRef(null);
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages;
+  const expandedRef = useRef(expanded);
+  expandedRef.current = expanded;
 
   const scrollToBottom = () => {
     requestAnimationFrame(() => {
       if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     });
+  };
+
+  const isNearBottom = () => {
+    const el = scrollRef.current;
+    if (!el) return true;
+    return el.scrollHeight - el.scrollTop - el.clientHeight < NEAR_BOTTOM_PX;
   };
 
   // Backend returns newest-first pages; page 1 is reversed into chronological
@@ -115,6 +139,52 @@ const ChatInterface = ({ hackathonId }) => {
   useEffect(() => {
     loadMessages(1);
   }, [loadMessages]);
+
+  // Polling stand-in for real-time — there's no WebSocket/SSE layer in this
+  // app yet, so this is what makes new messages (and deletes) from other
+  // people show up without a manual refresh. Merges by id instead of
+  // replacing wholesale, and only auto-scrolls if the viewer was already
+  // near the bottom, so it never yanks someone away from history they're
+  // reading.
+  useEffect(() => {
+    if (!hackathonId) return;
+    const interval = setInterval(async () => {
+      try {
+        const wasNearBottom = isNearBottom();
+        const res = await DiscussionAPI.getMessages(hackathonId, {
+          page: 1,
+          limit: PAGE_SIZE,
+        });
+        const fresh = [...(res.data.messages || [])].reverse();
+        const freshById = new Map(fresh.map((m) => [m._id, m]));
+        const current = messagesRef.current;
+        const currentIds = new Set(current.map((m) => m._id));
+
+        const merged = current.map((m) => freshById.get(m._id) || m);
+        const appended = fresh.filter((m) => !currentIds.has(m._id));
+
+        if (appended.length > 0 || merged.some((m, i) => m !== current[i])) {
+          setMessages([...merged, ...appended]);
+          if (appended.length > 0 && wasNearBottom) scrollToBottom();
+        }
+
+        // Nudge any open reply threads to refetch too, same "feels live"
+        // idea applied to replies.
+        if (expandedRef.current.size > 0) {
+          setReplyRefresh((prev) => {
+            const next = { ...prev };
+            expandedRef.current.forEach((id) => {
+              next[id] = (next[id] || 0) + 1;
+            });
+            return next;
+          });
+        }
+      } catch {
+        // Silent — a missed poll tick isn't worth surfacing to the user.
+      }
+    }, POLL_MS);
+    return () => clearInterval(interval);
+  }, [hackathonId]);
 
   const handlePost = async (e) => {
     e.preventDefault();
@@ -176,33 +246,23 @@ const ChatInterface = ({ hackathonId }) => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto font-[family-name:'JetBrains_Mono',monospace]">
-      <div className="relative bg-[rgba(10,12,10,0.92)] border border-[rgba(95,255,96,0.12)] rounded-[4px] backdrop-blur-sm flex flex-col overflow-hidden">
-        <span className="absolute top-[-1px] left-[-1px] w-2.5 h-2.5 border-t-2 border-l-2 border-[rgba(95,255,96,0.45)] z-10" />
-        <span className="absolute bottom-[-1px] right-[-1px] w-2.5 h-2.5 border-b-2 border-r-2 border-[rgba(95,255,96,0.45)] z-10" />
-
-        <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[rgba(95,255,96,0.08)] bg-[rgba(8,10,8,0.7)] flex-shrink-0">
-          <MessageSquare size={14} className="text-[rgba(95,255,96,0.55)]" />
-          <span className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-sm tracking-tight">
-            Discussion
-          </span>
+    <div className="w-full max-w-2xl mx-auto">
+      <div className="bg-card border border-border rounded-2xl shadow-sm flex flex-col overflow-hidden">
+        <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border flex-shrink-0">
+          <MessageSquare size={16} className="text-primary" />
+          <span className="font-display font-bold text-foreground text-sm">Discussion</span>
         </div>
 
-        <div
-          ref={scrollRef}
-          className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-1 h-[65vh]"
-        >
+        <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-1 h-[65vh]">
           {isLoading && messages.length === 0 ? (
-            <div className="flex flex-1 items-center justify-center gap-2 text-[rgba(95,255,96,0.35)]">
+            <div className="flex flex-1 items-center justify-center gap-2 text-muted-foreground">
               <Loader2 size={20} className="animate-spin" />
-              <span className="text-[0.6rem] tracking-[0.1em] uppercase">Loading…</span>
+              <span className="text-xs">Loading…</span>
             </div>
           ) : messages.length === 0 ? (
-            <div className="flex flex-1 flex-col items-center justify-center gap-2 text-[rgba(95,255,96,0.25)]">
-              <MessageSquare size={32} />
-              <p className="text-[0.6rem] tracking-[0.08em] uppercase">
-                No messages yet. Start the conversation!
-              </p>
+            <div className="flex flex-1 flex-col items-center justify-center gap-2 text-muted-foreground">
+              <MessageSquare size={32} className="opacity-40" />
+              <p className="text-sm">No messages yet. Start the conversation!</p>
             </div>
           ) : (
             <>
@@ -210,7 +270,7 @@ const ChatInterface = ({ hackathonId }) => {
                 <button
                   onClick={() => loadMessages(page + 1)}
                   disabled={isLoading}
-                  className="self-center mb-2 text-[0.58rem] tracking-[0.08em] uppercase text-[rgba(95,255,96,0.45)] hover:text-[#5fff60] transition-colors cursor-pointer disabled:opacity-40"
+                  className="self-center mb-2 text-xs font-medium text-primary hover:opacity-80 transition-opacity cursor-pointer disabled:opacity-40"
                 >
                   {isLoading ? "Loading…" : "Load earlier messages"}
                 </button>
@@ -225,9 +285,9 @@ const ChatInterface = ({ hackathonId }) => {
                     <div className={`flex ${isMe ? "justify-end" : "justify-start"} pl-9 -mt-1`}>
                       <button
                         onClick={() => toggleExpanded(msg._id)}
-                        className="flex items-center gap-1 text-[0.55rem] tracking-[0.08em] uppercase text-[rgba(95,255,96,0.4)] hover:text-[#5fff60] transition-colors cursor-pointer"
+                        className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                       >
-                        {isOpen ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+                        {isOpen ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
                         Replies
                       </button>
                     </div>
@@ -237,7 +297,6 @@ const ChatInterface = ({ hackathonId }) => {
                         <Replies
                           messageId={msg._id}
                           currentUserId={user?._id}
-                          onDelete={handleDelete}
                           refreshKey={replyRefresh[msg._id] || 0}
                         />
                         {isAuthenticated && (
@@ -258,14 +317,14 @@ const ChatInterface = ({ hackathonId }) => {
                                 }
                               }}
                               placeholder="Write a reply…"
-                              className="flex-1 bg-[rgba(18,22,18,0.7)] border border-[rgba(95,255,96,0.1)] rounded-[3px] px-3 py-2 text-[0.65rem] text-[#e8ffe8] placeholder-[rgba(95,255,96,0.2)] focus:outline-none focus:border-[rgba(95,255,96,0.32)] [color-scheme:dark]"
+                              className="flex-1 bg-secondary border border-border rounded-full px-3.5 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/40 transition-colors"
                             />
                             <button
                               onClick={() => handleReply(msg._id)}
                               disabled={!(replyDrafts[msg._id] || "").trim()}
-                              className="px-3 py-2 rounded-[3px] border border-[rgba(95,255,96,0.2)] text-[rgba(95,255,96,0.6)] hover:text-[#5fff60] hover:border-[rgba(95,255,96,0.4)] transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                              className="w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-full bg-primary text-primary-foreground hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                             >
-                              <Send size={11} />
+                              <Send size={13} />
                             </button>
                           </div>
                         )}
@@ -278,25 +337,22 @@ const ChatInterface = ({ hackathonId }) => {
           )}
         </div>
 
-        <div className="px-4 py-3 border-t border-[rgba(95,255,96,0.08)] flex-shrink-0">
+        <div className="px-4 py-3 border-t border-border flex-shrink-0">
           <form onSubmit={handlePost} className="flex gap-2">
             <input
               type="text"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              placeholder={
-                isAuthenticated ? "Share your thoughts…" : "Login to join the discussion"
-              }
+              placeholder={isAuthenticated ? "Share your thoughts…" : "Login to join the discussion"}
               disabled={!isAuthenticated || posting}
-              className="flex-1 bg-[rgba(18,22,18,0.7)] border border-[rgba(95,255,96,0.12)] rounded-[3px] px-3 py-2.5 text-[0.7rem] text-[#e8ffe8] placeholder-[rgba(95,255,96,0.22)] focus:outline-none focus:border-[rgba(95,255,96,0.38)] focus:shadow-[0_0_0_2px_rgba(95,255,96,0.05)] transition-all [color-scheme:dark] disabled:opacity-50"
+              className="flex-1 bg-secondary border border-border rounded-full px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/40 transition-colors disabled:opacity-50"
             />
             <button
               type="submit"
               disabled={!isAuthenticated || !newMessage.trim() || posting}
-              className="font-[family-name:'JetBrains_Mono',monospace] inline-flex items-center gap-1.5 text-[0.6rem] tracking-[0.1em] uppercase px-4 py-2.5 rounded-[3px] border cursor-pointer transition-all duration-150 bg-[#5fff60] border-[#5fff60] text-[#050905] font-bold hover:bg-[#7fff80] hover:shadow-[0_0_16px_rgba(95,255,96,0.28)] disabled:opacity-35 disabled:cursor-not-allowed disabled:shadow-none"
+              className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-full bg-primary text-primary-foreground hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
             >
-              <Send size={12} />
-              <span className="hidden sm:inline">Post</span>
+              <Send size={15} />
             </button>
           </form>
         </div>

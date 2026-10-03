@@ -4,7 +4,10 @@ import { ProfileAPI } from "../../api/profile.api.js";
 import { AuthAPI } from "../../api/auth.api.js";
 import { HackathonAPI } from "../../api/hackathon.api.js";
 import { MediaAPI } from "../../api/media.api.js";
-import { useNavigate } from "react-router-dom";
+import { ConnectionsAPI } from "../../api/connections.api.js";
+import SkillPicker from "../../components/SkillPicker.jsx";
+import { UpNextCard, RecentActivity, Recommended } from "../../components/Dashboard/DashboardWidgets.jsx";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useAuth } from "../../hooks/useAuth.js";
 import {
@@ -35,14 +38,16 @@ import {
 } from "lucide-react";
 import { jwtDecode } from "jwt-decode";
 import CameraCapture from "../../components/CameraCapture.jsx";
+import StreakHeatmap from "../../components/Daily/StreakHeatmap.jsx";
 import "../Styles/Dashboard.css";
+import "../Styles/AllHackathons.css";
 
 const inputCls = [
-  "w-full bg-[rgba(18,22,18,0.7)] border border-[rgba(95,255,96,0.12)] rounded-[3px]",
-  "px-3 py-2 text-[0.72rem] text-[#e8ffe8] placeholder-[rgba(95,255,96,0.22)]",
+  "w-full bg-[rgba(var(--hk-input-bg),0.7)] border border-[rgba(var(--hk-card-border-rgb),0.19)] dark:border-[rgba(var(--hk-card-border-rgb),0.12)] rounded-[3px]",
+  "px-3 py-2 text-[0.72rem] text-[var(--hk-text)] placeholder-[rgba(var(--hk-accent-rgb),0.52)] dark:placeholder-[rgba(var(--hk-accent-rgb),0.22)]",
   "font-[family-name:var(--font-mono,_'JetBrains_Mono',monospace)]",
-  "focus:outline-none focus:border-[rgba(95,255,96,0.42)] focus:shadow-[0_0_0_2px_rgba(95,255,96,0.05)]",
-  "transition-all [color-scheme:dark]",
+  "focus:outline-none focus:border-[rgba(var(--hk-accent-rgb),0.42)] focus:shadow-[0_0_0_2px_rgba(var(--hk-accent-rgb),0.05)]",
+  "transition-all [color-scheme:light] dark:[color-scheme:dark]",
 ].join(" ");
 
 const selectCls = inputCls + " cursor-pointer";
@@ -51,7 +56,7 @@ const Card = ({ children, amber, className = "" }) => (
   <div
     className={`ud-card${
       amber ? " ud-card-amber" : ""
-    } relative bg-[rgba(10,12,10,0.88)] border border-[rgba(95,255,96,0.1)] rounded-[4px] backdrop-blur-sm p-5 ${className}`}
+    } relative bg-[rgba(var(--hk-card-bg),0.88)] border border-[rgba(var(--hk-card-border-rgb),0.16)] dark:border-[rgba(var(--hk-card-border-rgb),0.1)] rounded-[4px] backdrop-blur-sm p-5 ${className}`}
   >
     {children}
   </div>
@@ -59,7 +64,7 @@ const Card = ({ children, amber, className = "" }) => (
 
 const SectionHead = ({ children, action }) => (
   <div className="flex items-center justify-between mb-4">
-    <h3 className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-[0.92rem] tracking-tight">
+    <h3 className="font-[family-name:'Syne',sans-serif] font-extrabold text-[var(--hk-text)] text-[0.92rem] tracking-tight">
       {children}
     </h3>
     {action}
@@ -75,12 +80,12 @@ const Btn = ({
 }) => {
   const colors = {
     green:
-      "bg-[rgba(95,255,96,0.08)] border-[rgba(95,255,96,0.25)] text-[#5fff60] hover:bg-[rgba(95,255,96,0.15)]",
-    red: "bg-[rgba(255,60,60,0.08)] border-[rgba(255,60,60,0.25)] text-[#ff9090] hover:bg-[rgba(255,60,60,0.15)]",
+      "bg-[rgba(var(--hk-accent-rgb),0.08)] border-[rgba(var(--hk-card-border-rgb),0.4)] dark:border-[rgba(var(--hk-card-border-rgb),0.25)] text-[var(--hk-accent-solid)] hover:bg-[rgba(var(--hk-accent-rgb),0.15)]",
+    red: "bg-[rgba(var(--hk-red-rgb),0.08)] border-[rgba(var(--hk-red-rgb),0.25)] text-[rgb(var(--hk-red-rgb))] hover:bg-[rgba(var(--hk-red-rgb),0.15)]",
     amber:
-      "bg-[rgba(255,184,77,0.08)] border-[rgba(255,184,77,0.25)] text-[#ffb84d] hover:bg-[rgba(255,184,77,0.15)]",
+      "bg-[rgba(var(--hk-amber-rgb),0.08)] border-[rgba(var(--hk-amber-rgb),0.25)] text-[rgb(var(--hk-amber-rgb))] hover:bg-[rgba(var(--hk-amber-rgb),0.15)]",
     solid:
-      "bg-[#5fff60] border-[#5fff60] text-[#050905] font-bold hover:bg-[#7fff80] hover:shadow-[0_0_14px_rgba(95,255,96,0.28)]",
+      "bg-[var(--hk-accent-solid)] border-[var(--hk-accent-solid)] text-[var(--hk-accent-solid-text)] font-bold hover:brightness-110 hover:shadow-[0_0_14px_rgba(var(--hk-accent-rgb),0.28)]",
   };
   return (
     <button
@@ -96,10 +101,10 @@ const Btn = ({
 const Tag = ({ children, onDelete, color = "green" }) => {
   const c =
     color === "blue"
-      ? "bg-[rgba(96,200,255,0.07)] border-[rgba(96,200,255,0.2)] text-[rgba(96,200,255,0.75)]"
+      ? "bg-[rgba(var(--hk-blue-rgb),0.07)] border-[rgba(var(--hk-blue-rgb),0.2)] text-[rgba(var(--hk-blue-rgb),0.75)]"
       : color === "amber"
-      ? "bg-[rgba(255,184,77,0.07)] border-[rgba(255,184,77,0.2)] text-[rgba(255,184,77,0.8)]"
-      : "bg-[rgba(95,255,96,0.07)] border-[rgba(95,255,96,0.2)] text-[rgba(95,255,96,0.75)]";
+      ? "bg-[rgba(var(--hk-amber-rgb),0.07)] border-[rgba(var(--hk-amber-rgb),0.2)] text-[rgba(var(--hk-amber-rgb),0.8)]"
+      : "bg-[rgba(var(--hk-accent-rgb),0.07)] border-[rgba(var(--hk-card-border-rgb),0.32)] dark:border-[rgba(var(--hk-card-border-rgb),0.2)] text-[rgba(var(--hk-accent-rgb),1.0)] dark:text-[rgba(var(--hk-accent-rgb),0.75)]";
   return (
     <span
       className={`font-[family-name:'JetBrains_Mono',monospace] inline-flex items-center gap-1.5 text-[0.6rem] tracking-[0.05em] px-2.5 py-1 rounded-[2px] border ${c}`}
@@ -117,6 +122,8 @@ const Tag = ({ children, onDelete, color = "green" }) => {
   );
 };
 
+const errCls = "!border-[rgba(var(--hk-red-rgb),0.6)]";
+
 const EditProfileModal = ({ data, onClose, onSaved }) => {
   const [form, setForm] = useState({
     name: data.name || "",
@@ -131,8 +138,39 @@ const EditProfileModal = ({ data, onClose, onSaved }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [nameStatus, setNameStatus] = useState("idle");
   const fileRef = useRef(null);
   const avatarMenuRef = useRef(null);
+
+  // Live "is this username free?" check — skipped while the field still
+  // holds the user's own current username.
+  useEffect(() => {
+    const candidate = form.userName;
+    if (!candidate || candidate === data.userName) {
+      setNameStatus("idle");
+      return;
+    }
+    if (!/^[a-z0-9_]{3,20}$/.test(candidate)) {
+      setNameStatus("invalid");
+      return;
+    }
+    setNameStatus("checking");
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      ProfileAPI.checkUserName(candidate)
+        .then((res) => {
+          if (!cancelled) setNameStatus(res.data.available ? "available" : "taken");
+        })
+        .catch(() => {
+          if (!cancelled) setNameStatus("idle");
+        });
+    }, 350);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [form.userName, data.userName]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -165,8 +203,28 @@ const EditProfileModal = ({ data, onClose, onSaved }) => {
   };
 
   const handleSave = async () => {
-    if (!form.name.trim()) {
-      toast.error("Name is required.");
+    setSubmitted(true);
+    const missing = [
+      !form.name.trim() && "name",
+      !form.userName.trim() && "username",
+      !form.gender && "gender",
+      !form.bio.trim() && "bio",
+      !form.location.trim() && "location",
+      !form.contactNumber.trim() && "contact number",
+      !avatarPreview && "profile photo",
+    ].filter(Boolean);
+    if (missing.length > 0) {
+      toast.error(`Please fill in: ${missing.join(", ")}`);
+      return;
+    }
+    if (!/^\+?[0-9]{10,15}$/.test(form.contactNumber.trim())) {
+      toast.error("Contact number must be 10-15 digits, optionally starting with +");
+      return;
+    }
+    if (nameStatus === "invalid" || nameStatus === "taken") {
+      toast.error(
+        nameStatus === "taken" ? "That username is already taken." : "Username must be 3-20 letters, numbers or underscores."
+      );
       return;
     }
     setIsSaving(true);
@@ -206,18 +264,23 @@ const EditProfileModal = ({ data, onClose, onSaved }) => {
         className="absolute inset-0 bg-black/80 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative w-full max-w-md bg-[#0b0f0b] border border-[rgba(95,255,96,0.2)] rounded-[4px] p-6 max-h-[90vh] overflow-y-auto">
+      <div className="relative w-full max-w-md bg-[var(--hk-bg)] border border-[rgba(var(--hk-card-border-rgb),0.32)] dark:border-[rgba(var(--hk-card-border-rgb),0.2)] rounded-[4px] p-6 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-5">
-          <h3 className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-lg">
+          <h3 className="font-[family-name:'Syne',sans-serif] font-extrabold text-[var(--hk-text)] text-lg">
             Edit Profile
           </h3>
           <button
             onClick={onClose}
-            className="text-[rgba(180,220,180,0.4)] hover:text-white transition-colors"
+            className="text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-text-rgb),0.4)] hover:text-[var(--hk-text)] transition-colors"
           >
             <X size={16} />
           </button>
         </div>
+
+        <p className="text-[0.62rem] leading-relaxed text-[rgba(var(--hk-text-rgb),0.9)] dark:text-[rgba(var(--hk-text-rgb),0.55)] mb-4">
+          Every field is required — a complete profile is needed to register, join a team or
+          submit in any event.
+        </p>
 
         <div className="flex flex-col items-center gap-3 mb-5">
           <div className="relative" ref={avatarMenuRef}>
@@ -227,24 +290,24 @@ const EditProfileModal = ({ data, onClose, onSaved }) => {
                 "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png"
               }
               alt="Avatar"
-              className="w-20 h-20 rounded-full border-2 border-[rgba(95,255,96,0.3)] object-cover"
+              className="w-20 h-20 rounded-full border-2 border-[rgba(var(--hk-card-border-rgb),0.48)] dark:border-[rgba(var(--hk-card-border-rgb),0.3)] object-cover"
             />
             <button
               onClick={() => setShowAvatarMenu((v) => !v)}
               title="Change photo"
-              className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-[#5fff60] flex items-center justify-center text-[#050905] hover:bg-[#7fff80] transition-colors cursor-pointer"
+              className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-[var(--hk-accent-solid)] flex items-center justify-center text-[var(--hk-accent-solid-text)] hover:brightness-110 transition-colors cursor-pointer"
             >
               <Camera size={13} />
             </button>
 
             {showAvatarMenu && (
-              <div className="absolute top-full right-0 mt-2 w-44 bg-[rgba(8,10,8,0.98)] border border-[rgba(95,255,96,0.15)] rounded-[4px] shadow-[0_8px_32px_rgba(0,0,0,0.6)] overflow-hidden z-10">
+              <div className="absolute top-full right-0 mt-2 w-44 bg-[rgba(var(--hk-card-bg),0.98)] border border-[rgba(var(--hk-card-border-rgb),0.24)] dark:border-[rgba(var(--hk-card-border-rgb),0.15)] rounded-[4px] shadow-[0_8px_32px_rgba(0,0,0,0.18)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.6)] overflow-hidden z-10">
                 <button
                   onClick={() => {
                     setShowAvatarMenu(false);
                     setShowCamera(true);
                   }}
-                  className="w-full flex items-center gap-2 px-3 py-2.5 text-[0.65rem] tracking-[0.03em] text-[rgba(180,220,180,0.75)] hover:bg-[rgba(95,255,96,0.08)] hover:text-[#5fff60] transition-colors cursor-pointer"
+                  className="w-full flex items-center gap-2 px-3 py-2.5 text-[0.65rem] tracking-[0.03em] text-[rgba(var(--hk-text-rgb),0.95)] dark:text-[rgba(var(--hk-text-rgb),0.75)] hover:bg-[rgba(var(--hk-accent-rgb),0.08)] hover:text-[var(--hk-accent-solid)] transition-colors cursor-pointer"
                 >
                   <Camera size={13} /> Take Photo
                 </button>
@@ -253,7 +316,7 @@ const EditProfileModal = ({ data, onClose, onSaved }) => {
                     setShowAvatarMenu(false);
                     fileRef.current?.click();
                   }}
-                  className="w-full flex items-center gap-2 px-3 py-2.5 text-[0.65rem] tracking-[0.03em] text-[rgba(180,220,180,0.75)] hover:bg-[rgba(95,255,96,0.08)] hover:text-[#5fff60] transition-colors cursor-pointer border-t border-[rgba(95,255,96,0.1)]"
+                  className="w-full flex items-center gap-2 px-3 py-2.5 text-[0.65rem] tracking-[0.03em] text-[rgba(var(--hk-text-rgb),0.95)] dark:text-[rgba(var(--hk-text-rgb),0.75)] hover:bg-[rgba(var(--hk-accent-rgb),0.08)] hover:text-[var(--hk-accent-solid)] transition-colors cursor-pointer border-t border-[rgba(var(--hk-card-border-rgb),0.16)] dark:border-[rgba(var(--hk-card-border-rgb),0.1)]"
                 >
                   <Upload size={13} /> Upload from Computer
                 </button>
@@ -268,8 +331,12 @@ const EditProfileModal = ({ data, onClose, onSaved }) => {
               onChange={(e) => e.target.files[0] && handleAvatarSelect(e.target.files[0])}
             />
           </div>
-          <p className="text-[0.58rem] text-[rgba(180,220,180,0.3)]">
-            JPEG, PNG, WEBP · Max 5MB
+          <p
+            className={`text-[0.58rem] ${
+              submitted && !avatarPreview ? "text-[rgb(var(--hk-red-rgb))]" : "text-[rgba(var(--hk-text-rgb),0.65)] dark:text-[rgba(var(--hk-text-rgb),0.3)]"
+            }`}
+          >
+            {submitted && !avatarPreview ? "Profile photo is required · " : ""}JPEG, PNG, WEBP · Max 5MB
           </p>
         </div>
 
@@ -282,22 +349,26 @@ const EditProfileModal = ({ data, onClose, onSaved }) => {
 
         <div className="flex flex-col gap-3">
           <div>
-            <label className="text-[0.6rem] tracking-[0.06em] uppercase text-[rgba(180,220,180,0.45)] mb-1 block">
+            <label className="text-[0.6rem] tracking-[0.06em] uppercase text-[rgba(var(--hk-text-rgb),0.8)] dark:text-[rgba(var(--hk-text-rgb),0.45)] mb-1 block">
               Name *
             </label>
             <input
-              className={inputCls}
+              className={`${inputCls} ${submitted && !form.name.trim() ? errCls : ""}`}
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               placeholder="Your name"
             />
           </div>
           <div>
-            <label className="text-[0.6rem] tracking-[0.06em] uppercase text-[rgba(180,220,180,0.45)] mb-1 block">
-              Username
+            <label className="text-[0.6rem] tracking-[0.06em] uppercase text-[rgba(var(--hk-text-rgb),0.8)] dark:text-[rgba(var(--hk-text-rgb),0.45)] mb-1 block">
+              Username *
             </label>
             <input
-              className={inputCls}
+              className={`${inputCls} ${
+                nameStatus === "taken" || nameStatus === "invalid" || (submitted && !form.userName.trim())
+                  ? errCls
+                  : ""
+              }`}
               value={form.userName}
               onChange={(e) =>
                 setForm({
@@ -307,13 +378,29 @@ const EditProfileModal = ({ data, onClose, onSaved }) => {
               }
               placeholder="e.g. jane_doe"
             />
+            {nameStatus !== "idle" && (
+              <p
+                className={`mt-1 text-[0.58rem] ${
+                  nameStatus === "available"
+                    ? "text-[var(--hk-accent-solid)]"
+                    : nameStatus === "checking"
+                    ? "text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-text-rgb),0.4)]"
+                    : "text-[rgb(var(--hk-red-rgb))]"
+                }`}
+              >
+                {nameStatus === "checking" && "Checking availability…"}
+                {nameStatus === "available" && "Username is available"}
+                {nameStatus === "taken" && "That username is already taken"}
+                {nameStatus === "invalid" && "3-20 characters: letters, numbers, underscores"}
+              </p>
+            )}
           </div>
           <div>
-            <label className="text-[0.6rem] tracking-[0.06em] uppercase text-[rgba(180,220,180,0.45)] mb-1 block">
-              Gender
+            <label className="text-[0.6rem] tracking-[0.06em] uppercase text-[rgba(var(--hk-text-rgb),0.8)] dark:text-[rgba(var(--hk-text-rgb),0.45)] mb-1 block">
+              Gender *
             </label>
             <select
-              className={selectCls}
+              className={`${selectCls} ${submitted && !form.gender ? errCls : ""}`}
               value={form.gender}
               onChange={(e) => setForm({ ...form, gender: e.target.value })}
             >
@@ -325,11 +412,11 @@ const EditProfileModal = ({ data, onClose, onSaved }) => {
             </select>
           </div>
           <div>
-            <label className="text-[0.6rem] tracking-[0.06em] uppercase text-[rgba(180,220,180,0.45)] mb-1 block">
-              Bio
+            <label className="text-[0.6rem] tracking-[0.06em] uppercase text-[rgba(var(--hk-text-rgb),0.8)] dark:text-[rgba(var(--hk-text-rgb),0.45)] mb-1 block">
+              Bio *
             </label>
             <textarea
-              className={inputCls}
+              className={`${inputCls} ${submitted && !form.bio.trim() ? errCls : ""}`}
               rows={3}
               value={form.bio}
               onChange={(e) => setForm({ ...form, bio: e.target.value.slice(0, 500) })}
@@ -337,22 +424,22 @@ const EditProfileModal = ({ data, onClose, onSaved }) => {
             />
           </div>
           <div>
-            <label className="text-[0.6rem] tracking-[0.06em] uppercase text-[rgba(180,220,180,0.45)] mb-1 block">
-              Location
+            <label className="text-[0.6rem] tracking-[0.06em] uppercase text-[rgba(var(--hk-text-rgb),0.8)] dark:text-[rgba(var(--hk-text-rgb),0.45)] mb-1 block">
+              Location *
             </label>
             <input
-              className={inputCls}
+              className={`${inputCls} ${submitted && !form.location.trim() ? errCls : ""}`}
               value={form.location}
               onChange={(e) => setForm({ ...form, location: e.target.value })}
               placeholder="City, Country"
             />
           </div>
           <div>
-            <label className="text-[0.6rem] tracking-[0.06em] uppercase text-[rgba(180,220,180,0.45)] mb-1 block">
-              Contact Number
+            <label className="text-[0.6rem] tracking-[0.06em] uppercase text-[rgba(var(--hk-text-rgb),0.8)] dark:text-[rgba(var(--hk-text-rgb),0.45)] mb-1 block">
+              Contact Number *
             </label>
             <input
-              className={inputCls}
+              className={`${inputCls} ${submitted && !form.contactNumber.trim() ? errCls : ""}`}
               value={form.contactNumber}
               onChange={(e) => setForm({ ...form, contactNumber: e.target.value })}
               placeholder="+91XXXXXXXXXX"
@@ -392,39 +479,26 @@ export const UserDashboard = () => {
   const [editAppsIndex, setEditAppsIndex] = useState(undefined);
   const [tempAppName, setTempAppName] = useState("");
   const [tempAppUrl, setTempAppUrl] = useState("");
-  const [selectedLanguage, setSelectedLanguage] = useState("");
-  const [isAddingLanguage, setIsAddingLanguage] = useState(false);
-  const [selectedSkill, setSelectedSkill] = useState("");
-  const [isAddingSkill, setIsAddingSkill] = useState(false);
   const [likedHackathons, setLikedHackathons] = useState([]);
   const [loadingWishlist, setLoadingWishlist] = useState(false);
   const [myRegistrations, setMyRegistrations] = useState([]);
   const [loadingRegistrations, setLoadingRegistrations] = useState(false);
   const [registrationsError, setRegistrationsError] = useState(false);
+  const [tab, setTab] = useState("overview");
+  const [friends, setFriends] = useState([]);
+  const [loadingFriends, setLoadingFriends] = useState(true);
   const navigate = useNavigate();
   const { logoutAndClear, login } = useAuth();
   const [showEditProfile, setShowEditProfile] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const availableLanguages = [
-    "C++",
-    "C",
-    "Java",
-    "Python",
-    "JavaScript",
-    "TypeScript",
-    "Go",
-    "Rust",
-  ];
-  const availableSkills = [
-    "Frontend",
-    "Backend",
-    "DevOps",
-    "Websockets",
-    "Machine Learning",
-    "DSA",
-    "Cybersecurity",
-    "Operating Systems",
-  ];
+  // Sent here from a hackathon action that needs a complete profile — open
+  // the edit form straight away instead of making them hunt for it.
+  useEffect(() => {
+    if (searchParams.get("completeProfile") !== "1" || !data) return;
+    if (data.isProfileComplete === false) setShowEditProfile(true);
+    setSearchParams({}, { replace: true });
+  }, [searchParams, data, setSearchParams]);
 
   const fetchData = async () => {
     try {
@@ -444,6 +518,11 @@ export const UserDashboard = () => {
     fetchData();
     fetchWishlist();
     fetchMyRegistrations();
+    ConnectionsAPI.listFriends()
+      .then((res) => setFriends(res.data.friends || []))
+      .catch(() => setFriends([]))
+      .finally(() => setLoadingFriends(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -464,11 +543,14 @@ export const UserDashboard = () => {
             }, 2000);
           }
         }
-      } catch {}
+      } catch {
+        // an undecodable token is handled by the 401 flow on the next request
+      }
     };
     check();
     const t = setInterval(check, 60000);
     return () => clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchWishlist = async () => {
@@ -479,6 +561,7 @@ export const UserDashboard = () => {
       const res = await HackathonAPI.getWishlist();
       if (res.data.success) setLikedHackathons(res.data.likedHackathons);
     } catch {
+      // the Saved tab simply shows its empty state
     } finally {
       setLoadingWishlist(false);
     }
@@ -496,7 +579,7 @@ export const UserDashboard = () => {
       } else {
         setRegistrationsError(true);
       }
-    } catch (err) {
+    } catch {
       setRegistrationsError(true);
     } finally {
       setLoadingRegistrations(false);
@@ -593,43 +676,16 @@ export const UserDashboard = () => {
     setTempAppUrl("");
   };
 
-  const handleSaveLanguage = async () => {
-    if (!selectedLanguage || data.languages?.includes(selectedLanguage)) return;
-    try {
-      const updated = [...(data.languages || []), selectedLanguage];
-      const res = await ProfileAPI.updateLanguages(updated);
-      setData({ ...data, languages: res.data.languages });
-      setSelectedLanguage("");
-      setIsAddingLanguage(false);
-      // toast.success("Language added");
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to add language");
-    }
-  };
-  const handleDeleteLanguage = async (langName) => {
-    try {
-      const updated = (data.languages || []).filter((l) => l !== langName);
-      const res = await ProfileAPI.updateLanguages(updated);
-      setData({ ...data, languages: res.data.languages });
-      // toast.success("Language removed");
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to remove language");
-    }
-  };
-
-  const handleSaveSkill = async () => {
-    if (!selectedSkill) return;
-    if (data.skills?.includes(selectedSkill)) {
+  // The skill picker only ever hands back a catalog skill (typeahead over
+  // the DB); the API re-validates the whole list against the catalog.
+  const handleAddSkill = async (skillName) => {
+    if (data.skills?.some((s) => s.toLowerCase() === skillName.toLowerCase())) {
       toast.error("Already added!");
       return;
     }
     try {
-      const updated = [...(data.skills || []), selectedSkill];
-      const res = await ProfileAPI.updateSkills(updated);
-      setData({ ...data, skills: res.data.skills });
-      setSelectedSkill("");
-      setIsAddingSkill(false);
-      // toast.success("Skill added");
+      const res = await ProfileAPI.updateSkills([...(data.skills || []), skillName]);
+      setData((prev) => ({ ...prev, skills: res.data.skills }));
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to add skill");
     }
@@ -638,8 +694,7 @@ export const UserDashboard = () => {
     try {
       const updated = (data.skills || []).filter((s) => s !== skillName);
       const res = await ProfileAPI.updateSkills(updated);
-      setData({ ...data, skills: res.data.skills });
-      // toast.success("Skill removed");
+      setData((prev) => ({ ...prev, skills: res.data.skills }));
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to remove skill");
     }
@@ -650,7 +705,7 @@ export const UserDashboard = () => {
     try {
       const res = await ProfileAPI.updateProfile({ showOnPeoplePage: next });
       setData({ ...data, showOnPeoplePage: res.data.profile.showOnPeoplePage });
-      toast.success(next ? "You're visible on the People page" : "You're hidden from the People page");
+      toast.success(next ? "You're visible on the Community page" : "You're hidden from the Community page");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to update visibility");
     }
@@ -664,10 +719,10 @@ export const UserDashboard = () => {
 
   if (loading)
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0a0a] gap-3 font-[family-name:'JetBrains_Mono',monospace]">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--hk-bg)] gap-3 font-[family-name:'JetBrains_Mono',monospace]">
         <style>{`@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@700;800&display=swap');`}</style>
         <div className="ud-spinner" />
-        <span className="text-[0.65rem] tracking-[0.12em] uppercase text-[rgba(95,255,96,0.4)]">
+        <span className="text-[0.65rem] tracking-[0.12em] uppercase text-[rgba(var(--hk-accent-rgb),0.7)] dark:text-[rgba(var(--hk-accent-rgb),0.4)]">
           Loading dashboard…
         </span>
       </div>
@@ -675,25 +730,20 @@ export const UserDashboard = () => {
 
   if (!data)
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] text-[rgba(255,96,96,0.6)] font-[family-name:'JetBrains_Mono',monospace] text-[0.75rem] tracking-widest uppercase">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--hk-bg)] text-[rgba(var(--hk-red-rgb),0.6)] font-[family-name:'JetBrains_Mono',monospace] text-[0.75rem] tracking-widest uppercase">
         Failed to load dashboard
       </div>
     );
 
   // Registrations whose linked hackathon still exists (defensive against deleted/unpopulated refs)
   const validRegistrations = myRegistrations.filter((reg) => reg?.hackathon);
-  const orphanedCount = myRegistrations.length - validRegistrations.length;
-  const ongoingCount = validRegistrations.filter(
-    (reg) => !reg.hackathon.endDate || new Date(reg.hackathon.endDate) > new Date()
-  ).length;
-  const completedCount = validRegistrations.length - ongoingCount;
 
   return (
     <>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@700;800&display=swap');`}</style>
-      <div className="ud-bg relative min-h-screen bg-[#0a0a0a] text-[#e8ffe8] overflow-x-hidden font-[family-name:'JetBrains_Mono',monospace]">
+      <div className="ud-bg relative min-h-screen bg-[var(--hk-bg)] text-[var(--hk-text)] overflow-x-clip font-[family-name:'JetBrains_Mono',monospace]">
         <div className="relative z-10 max-w-[1100px] mx-auto px-4 sm:px-6 py-8 flex flex-col lg:flex-row gap-5">
-          <aside className="w-full lg:w-[260px] flex-shrink-0 flex flex-col gap-4">
+          <aside className="w-full lg:w-[260px] flex-shrink-0 flex flex-col gap-4 lg:sticky lg:top-20 lg:self-start">
             <Card>
               <div className="flex flex-col items-center text-center gap-3">
                 <div className="relative">
@@ -703,19 +753,19 @@ export const UserDashboard = () => {
                       "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png"
                     }
                     alt="Avatar"
-                    className="w-20 h-20 rounded-full border-2 border-[rgba(95,255,96,0.3)] object-cover"
+                    className="w-20 h-20 rounded-full border-2 border-[rgba(var(--hk-card-border-rgb),0.48)] dark:border-[rgba(var(--hk-card-border-rgb),0.3)] object-cover"
                   />
                 </div>
                 <div>
-                  <h2 className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-[1.05rem] tracking-tight">
+                  <h2 className="font-[family-name:'Syne',sans-serif] font-extrabold text-[var(--hk-text)] text-[1.05rem] tracking-tight">
                     {data.name || "Unnamed"}
                   </h2>
                   {data.userName && (
-                    <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.62rem] text-[rgba(180,220,180,0.5)] mt-0.5">
+                    <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.62rem] text-[rgba(var(--hk-text-rgb),0.85)] dark:text-[rgba(var(--hk-text-rgb),0.5)] mt-0.5">
                       @{data.userName}
                     </p>
                   )}
-                  <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.58rem] text-[rgba(95,255,96,0.45)] tracking-[0.1em] uppercase mt-0.5">
+                  <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.58rem] text-[rgba(var(--hk-accent-rgb),0.75)] dark:text-[rgba(var(--hk-accent-rgb),0.45)] tracking-[0.1em] uppercase mt-0.5">
                     Student
                   </p>
                 </div>
@@ -734,214 +784,194 @@ export const UserDashboard = () => {
                   <LogOut size={11} /> Logout
                 </Btn>
               </div>
-            </Card>
-
-            <Card>
-              <div className="flex items-center gap-2 mb-3">
-                <Trophy size={14} className="text-[rgba(95,255,96,0.5)]" />
-                <span className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-[0.85rem] tracking-tight">
-                  Participation
+              <button
+                type="button"
+                role="switch"
+                aria-checked={data.showOnPeoplePage !== false}
+                onClick={handleTogglePeoplePage}
+                className="w-full flex items-center justify-between gap-3 mt-1 pt-3 border-t border-[rgba(var(--hk-card-border-rgb),0.14)] dark:border-[rgba(var(--hk-card-border-rgb),0.08)] cursor-pointer text-left"
+              >
+                <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.62rem] leading-snug text-[rgba(var(--hk-text-rgb),0.85)] dark:text-[rgba(var(--hk-text-rgb),0.55)]">
+                  Show me on the Community page
                 </span>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="flex flex-col items-center gap-0.5 p-2.5 bg-[rgba(95,255,96,0.04)] border border-[rgba(95,255,96,0.1)] rounded-[3px]">
-                  <span className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-[1.15rem] tracking-tight">
-                    {validRegistrations.length}
-                  </span>
-                  <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.52rem] tracking-[0.1em] uppercase text-[rgba(180,220,180,0.4)]">
-                    Joined
-                  </span>
-                </div>
-                <div className="flex flex-col items-center gap-0.5 p-2.5 bg-[rgba(95,255,96,0.04)] border border-[rgba(95,255,96,0.1)] rounded-[3px]">
-                  <span className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-[1.15rem] tracking-tight">
-                    {ongoingCount}
-                  </span>
-                  <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.52rem] tracking-[0.1em] uppercase text-[rgba(180,220,180,0.4)]">
-                    Ongoing
-                  </span>
-                </div>
-              </div>
-              {completedCount > 0 && (
-                <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.55rem] text-[rgba(180,220,180,0.35)] mt-2 tracking-[0.04em]">
-                  {completedCount} completed
+                <span className={`relative w-8 h-[18px] rounded-full flex-shrink-0 transition-colors ${data.showOnPeoplePage !== false ? "bg-[var(--hk-accent-solid)]" : "bg-[rgba(var(--hk-text-rgb),0.25)]"}`}>
+                  <span className={`absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white transition-all ${data.showOnPeoplePage !== false ? "left-[16px]" : "left-[2px]"}`} />
+                </span>
+              </button>
+            </Card>
+
+            {data.isProfileComplete === false && (
+              <Card amber>
+                <SectionHead>
+                  <AlertCircle size={13} className="inline mr-1.5 text-[rgba(var(--hk-amber-rgb),0.8)]" />
+                  Complete your profile
+                </SectionHead>
+                <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.62rem] text-[rgba(var(--hk-text-rgb),0.95)] dark:text-[rgba(var(--hk-text-rgb),0.6)] leading-relaxed mb-2">
+                  You can&apos;t register, join a team or submit in any hackathon until every
+                  field is filled. Still missing:
                 </p>
-              )}
-            </Card>
-
-            <Card>
-              <SectionHead
-                action={
-                  !isAddingLanguage && (
-                    <Btn onClick={() => setIsAddingLanguage(true)}>
-                      <Plus size={9} /> Add
-                    </Btn>
-                  )
-                }
-              >
-                <Code
-                  size={13}
-                  className="inline mr-1.5 text-[rgba(95,255,96,0.5)]"
-                />
-                Languages
-              </SectionHead>
-              <div className="flex flex-wrap gap-1.5 mb-2">
-                {data.languages?.length > 0 ? (
-                  data.languages.map((l, i) => (
-                    <Tag key={i} onDelete={() => handleDeleteLanguage(l)}>
-                      {l}
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {(data.missingProfileFields || []).map((f) => (
+                    <Tag key={f.key} color="amber">
+                      {f.label}
                     </Tag>
-                  ))
-                ) : (
-                  <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.62rem] text-[rgba(180,220,180,0.3)]">
-                    None added yet.
-                  </p>
-                )}
-              </div>
-              {isAddingLanguage && (
-                <div className="flex flex-col gap-2 mt-2 pt-2 border-t border-[rgba(95,255,96,0.07)]">
-                  <select
-                    value={selectedLanguage}
-                    onChange={(e) => setSelectedLanguage(e.target.value)}
-                    className={selectCls}
-                  >
-                    <option value="">Select language</option>
-                    {availableLanguages
-                      .filter((l) => !data.languages?.includes(l))
-                      .map((l, i) => (
-                        <option key={i} value={l}>
-                          {l}
-                        </option>
-                      ))}
-                  </select>
-                  <div className="flex gap-2">
-                    <Btn onClick={handleSaveLanguage} color="solid">
-                      Save
-                    </Btn>
-                    <Btn
-                      onClick={() => {
-                        setSelectedLanguage("");
-                        setIsAddingLanguage(false);
-                      }}
-                      color="red"
-                    >
-                      Cancel
-                    </Btn>
-                  </div>
+                  ))}
                 </div>
-              )}
-            </Card>
+                <Btn onClick={() => setShowEditProfile(true)} color="amber">
+                  <Pencil size={9} /> Complete profile
+                </Btn>
+              </Card>
+            )}
 
-            <Card>
-              <SectionHead
-                action={
-                  !isAddingSkill && (
-                    <Btn onClick={() => setIsAddingSkill(true)}>
-                      <Plus size={9} /> Add
-                    </Btn>
-                  )
-                }
-              >
+            <UpNextCard registrations={validRegistrations} />
+
+            <Card className="z-20">
+              <SectionHead>
                 <BookOpen
                   size={13}
-                  className="inline mr-1.5 text-[rgba(95,255,96,0.5)]"
+                  className="inline mr-1.5 text-[rgba(var(--hk-accent-rgb),0.8)] dark:text-[rgba(var(--hk-accent-rgb),0.5)]"
                 />
                 Skills
               </SectionHead>
-              <div className="flex flex-wrap gap-1.5 mb-2">
+              <div className="flex flex-wrap gap-1.5 mb-3">
                 {data.skills?.length > 0 ? (
-                  data.skills.map((s, i) => (
-                    <Tag
-                      key={i}
-                      color="blue"
-                      onDelete={() => handleDeleteSkill(s)}
-                    >
+                  data.skills.map((s) => (
+                    <Tag key={s} color="blue" onDelete={() => handleDeleteSkill(s)}>
                       {s}
                     </Tag>
                   ))
                 ) : (
-                  <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.62rem] text-[rgba(180,220,180,0.3)]">
+                  <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.62rem] text-[rgba(var(--hk-text-rgb),0.65)] dark:text-[rgba(var(--hk-text-rgb),0.3)]">
                     None added yet.
                   </p>
                 )}
               </div>
-              {isAddingSkill && (
-                <div className="flex flex-col gap-2 mt-2 pt-2 border-t border-[rgba(95,255,96,0.07)]">
-                  <select
-                    value={selectedSkill}
-                    onChange={(e) => setSelectedSkill(e.target.value)}
-                    className={selectCls}
-                  >
-                    <option value="">Select skill</option>
-                    {availableSkills.map((s, i) => (
-                      <option key={i} value={s}>
-                        {s}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="flex gap-2">
-                    <Btn onClick={handleSaveSkill} color="solid">
-                      Save
-                    </Btn>
-                    <Btn
-                      onClick={() => {
-                        setSelectedSkill("");
-                        setIsAddingSkill(false);
-                      }}
-                      color="red"
+              <SkillPicker selected={data.skills || []} onAdd={handleAddSkill} />
+            </Card>
+
+            {friends.length > 0 && (
+            <Card>
+              <SectionHead>
+                <Users size={13} className="inline mr-1.5 text-[rgba(var(--hk-accent-rgb),0.8)] dark:text-[rgba(var(--hk-accent-rgb),0.5)]" />
+                Friends ({friends.length})
+              </SectionHead>
+              {loadingFriends ? (
+                <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.62rem] text-[rgba(var(--hk-text-rgb),0.7)] dark:text-[rgba(var(--hk-text-rgb),0.35)]">
+                  Loading…
+                </p>
+              ) : friends.length === 0 ? (
+                <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.62rem] text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-text-rgb),0.4)] leading-relaxed">
+                  No friends yet — connect with someone from the Community page.
+                </p>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {friends.map(({ connectionId, friend }) => (
+                    <button
+                      key={connectionId}
+                      onClick={() =>
+                        window.dispatchEvent(
+                          new CustomEvent("hacksprint:open-friend-chat", {
+                            detail: { friendId: friend._id, friend },
+                          })
+                        )
+                      }
+                      className="flex items-center gap-2.5 text-left cursor-pointer group"
                     >
-                      Cancel
-                    </Btn>
-                  </div>
+                      <div className="flex-shrink-0 w-7 h-7 rounded-full overflow-hidden bg-[rgba(var(--hk-accent-rgb),0.08)] border border-[rgba(var(--hk-card-border-rgb),0.24)] dark:border-[rgba(var(--hk-card-border-rgb),0.15)]">
+                        {friend.image?.url ? (
+                          <img src={friend.image.url} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center font-[family-name:'Syne',sans-serif] font-extrabold text-[0.6rem] text-[var(--hk-accent-solid)]">
+                            {friend.name?.[0]?.toUpperCase() || "?"}
+                          </div>
+                        )}
+                      </div>
+                      <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.68rem] text-[rgba(var(--hk-text-rgb),0.95)] dark:text-[rgba(var(--hk-text-rgb),0.7)] group-hover:text-[var(--hk-accent-solid)] transition-colors truncate">
+                        {friend.name}
+                      </span>
+                    </button>
+                  ))}
                 </div>
               )}
             </Card>
-
-            <Card>
-              <SectionHead>
-                {data.showOnPeoplePage !== false ? (
-                  <Eye size={13} className="inline mr-1.5 text-[rgba(95,255,96,0.5)]" />
-                ) : (
-                  <EyeOff size={13} className="inline mr-1.5 text-[rgba(95,255,96,0.5)]" />
-                )}
-                People Directory
-              </SectionHead>
-              <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.62rem] text-[rgba(180,220,180,0.4)] leading-relaxed mb-3">
-                {data.showOnPeoplePage !== false
-                  ? "You're visible on the People page — anyone can find and message you there."
-                  : "You're hidden from the People page — no one can find you there."}
-              </p>
-              <Btn onClick={handleTogglePeoplePage} color={data.showOnPeoplePage !== false ? "red" : "green"}>
-                {data.showOnPeoplePage !== false ? "Hide me" : "Show me"}
-              </Btn>
-            </Card>
+            )}
           </aside>
 
           <main className="flex-1 flex flex-col gap-4 min-w-0">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { label: "Events", value: validRegistrations.length },
+                { label: "In a team", value: validRegistrations.filter((r) => r.team?.name).length },
+                { label: "Skills", value: (data.skills || []).length },
+                { label: "Friends", value: friends.length },
+              ].map((t) => (
+                <div
+                  key={t.label}
+                  className="relative bg-[rgba(var(--hk-card-bg),0.88)] border border-[rgba(var(--hk-card-border-rgb),0.16)] dark:border-[rgba(var(--hk-card-border-rgb),0.1)] rounded-[4px] px-4 py-3"
+                >
+                  <div className="font-[family-name:'Syne',sans-serif] font-extrabold text-[1.5rem] leading-none text-[var(--hk-text)]">
+                    {t.value}
+                  </div>
+                  <div className="mt-1.5 font-[family-name:'JetBrains_Mono',monospace] text-[0.55rem] tracking-[0.12em] uppercase text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-text-rgb),0.45)]">
+                    {t.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <Card>
+              <StreakHeatmap />
+            </Card>
+
+            <div role="tablist" className="flex gap-1 border-b border-[rgba(var(--hk-card-border-rgb),0.16)] dark:border-[rgba(var(--hk-card-border-rgb),0.1)]">
+              {[
+                { id: "overview", label: "Overview" },
+                { id: "profile", label: "Profile" },
+                { id: "saved", label: `Saved (${likedHackathons.length})` },
+              ].map((t) => (
+                <button
+                  key={t.id}
+                  role="tab"
+                  aria-selected={tab === t.id}
+                  onClick={() => setTab(t.id)}
+                  className={`font-[family-name:'JetBrains_Mono',monospace] text-[0.68rem] tracking-[0.08em] uppercase px-4 py-2.5 -mb-px border-b-2 cursor-pointer transition-colors ${
+                    tab === t.id
+                      ? "border-[var(--hk-accent-solid)] text-[var(--hk-accent-solid)] font-semibold"
+                      : "border-transparent text-[rgba(var(--hk-text-rgb),0.7)] dark:text-[rgba(var(--hk-text-rgb),0.45)] hover:text-[var(--hk-text)]"
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            {tab === "overview" && (
+              <>
             <Card>
               <SectionHead>
                 <Trophy
                   size={13}
-                  className="inline mr-1.5 text-[rgba(95,255,96,0.5)]"
+                  className="inline mr-1.5 text-[rgba(var(--hk-accent-rgb),0.8)] dark:text-[rgba(var(--hk-accent-rgb),0.5)]"
                 />
-                My Hackathons
+                My Events
               </SectionHead>
 
               {loadingRegistrations ? (
                 <div className="flex items-center gap-2 py-2">
                   <RefreshCw
                     size={12}
-                    className="animate-spin text-[rgba(95,255,96,0.4)]"
+                    className="animate-spin text-[rgba(var(--hk-accent-rgb),0.7)] dark:text-[rgba(var(--hk-accent-rgb),0.4)]"
                   />
-                  <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.62rem] text-[rgba(180,220,180,0.35)]">
-                    Loading your hackathons…
+                  <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.62rem] text-[rgba(var(--hk-text-rgb),0.7)] dark:text-[rgba(var(--hk-text-rgb),0.35)]">
+                    Loading your events…
                   </p>
                 </div>
               ) : registrationsError ? (
-                <div className="flex flex-col items-start gap-2 bg-[rgba(255,60,60,0.04)] border border-[rgba(255,60,60,0.15)] rounded-[3px] p-3.5">
-                  <div className="flex items-center gap-2 text-[rgba(255,144,144,0.8)]">
+                <div className="flex flex-col items-start gap-2 bg-[rgba(var(--hk-red-rgb),0.04)] border border-[rgba(var(--hk-red-rgb),0.15)] rounded-[3px] p-3.5">
+                  <div className="flex items-center gap-2 text-[rgba(var(--hk-red-rgb),0.9)]">
                     <AlertCircle size={13} />
                     <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.65rem]">
-                      Couldn't load your hackathons. Check your connection and
+                      Couldn't load your events. Check your connection and
                       try again.
                     </span>
                   </div>
@@ -951,19 +981,13 @@ export const UserDashboard = () => {
                 </div>
               ) : validRegistrations.length > 0 ? (
                 <div className="flex flex-col gap-3">
-                  {orphanedCount > 0 && (
-                    <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.55rem] text-[rgba(255,184,77,0.45)]">
-                      {orphanedCount} of your registrations reference a
-                      hackathon that's no longer available.
-                    </p>
-                  )}
                   {validRegistrations.map((reg, idx) => {
                     const hack = reg.hackathon;
                     const dateVal = reg.registeredAt || reg.createdAt;
                     return (
                       <div
                         key={reg._id || hack._id || idx}
-                        className="flex gap-3 bg-[rgba(95,255,96,0.03)] border border-[rgba(95,255,96,0.1)] rounded-[3px] p-3 hover:border-[rgba(95,255,96,0.28)] transition-all"
+                        className="flex gap-3 bg-[rgba(var(--hk-accent-rgb),0.03)] border border-[rgba(var(--hk-card-border-rgb),0.16)] dark:border-[rgba(var(--hk-card-border-rgb),0.1)] rounded-[3px] p-3 hover:border-[rgba(var(--hk-accent-rgb),0.28)] transition-all"
                       >
                         <div
                           onClick={() => navigate(`/hackathon/${hack.slug}`)}
@@ -984,33 +1008,33 @@ export const UserDashboard = () => {
                           )}
                           <div className="flex-1 min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
-                              <h4 className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-[0.82rem] tracking-tight truncate">
-                                {hack.title || "Untitled hackathon"}
+                              <h4 className="font-[family-name:'Syne',sans-serif] font-extrabold text-[var(--hk-text)] text-[0.82rem] tracking-tight truncate">
+                                {hack.title || "Untitled event"}
                               </h4>
                               {reg.status && (
                                 <Tag color="amber">{reg.status}</Tag>
                               )}
                             </div>
                             {hack.subTitle && (
-                              <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.6rem] text-[rgba(180,220,180,0.4)] truncate mt-0.5">
+                              <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.6rem] text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-text-rgb),0.4)] truncate mt-0.5">
                                 {hack.subTitle}
                               </p>
                             )}
                             <div className="flex flex-wrap gap-3 mt-1.5 items-center">
                               {reg.team?.name && (
-                                <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.55rem] text-[rgba(180,220,180,0.4)] flex items-center gap-1">
+                                <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.55rem] text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-text-rgb),0.4)] flex items-center gap-1">
                                   <Users size={10} />
                                   {reg.team.name}
                                 </span>
                               )}
                               {dateVal && (
-                                <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.55rem] text-[rgba(180,220,180,0.35)] flex items-center gap-1">
+                                <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.55rem] text-[rgba(var(--hk-text-rgb),0.7)] dark:text-[rgba(var(--hk-text-rgb),0.35)] flex items-center gap-1">
                                   <Calendar size={10} />
                                   {new Date(dateVal).toLocaleDateString()}
                                 </span>
                               )}
                               {hack.startDate && (
-                                <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.55rem] text-[rgba(180,220,180,0.35)]">
+                                <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.55rem] text-[rgba(var(--hk-text-rgb),0.7)] dark:text-[rgba(var(--hk-text-rgb),0.35)]">
                                   Starts{" "}
                                   {new Date(hack.startDate).toLocaleDateString()}
                                 </span>
@@ -1024,24 +1048,29 @@ export const UserDashboard = () => {
                 </div>
               ) : (
                 <div className="flex flex-col items-center text-center gap-3 py-8 px-4">
-                  <div className="w-14 h-14 rounded-full bg-[rgba(95,255,96,0.06)] border border-[rgba(95,255,96,0.18)] flex items-center justify-center">
-                    <Rocket size={22} className="text-[rgba(95,255,96,0.6)]" />
+                  <div className="w-14 h-14 rounded-full bg-[rgba(var(--hk-accent-rgb),0.06)] border border-[rgba(var(--hk-card-border-rgb),0.29)] dark:border-[rgba(var(--hk-card-border-rgb),0.18)] flex items-center justify-center">
+                    <Rocket size={22} className="text-[rgba(var(--hk-accent-rgb),0.9)] dark:text-[rgba(var(--hk-accent-rgb),0.6)]" />
                   </div>
-                  <h4 className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-[1rem] tracking-tight">
-                    You haven't joined a hackathon yet
+                  <h4 className="font-[family-name:'Syne',sans-serif] font-extrabold text-[var(--hk-text)] text-[1rem] tracking-tight">
+                    You haven't joined an event yet
                   </h4>
-                  <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.65rem] text-[rgba(180,220,180,0.45)] leading-relaxed max-w-xs">
+                  <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.65rem] text-[rgba(var(--hk-text-rgb),0.8)] dark:text-[rgba(var(--hk-text-rgb),0.45)] leading-relaxed max-w-xs">
                     Build something real, team up with other developers, and
-                    compete for prizes. Your first hackathon is one click
+                    compete for prizes. Your first event is one click
                     away.
                   </p>
                   <Btn onClick={() => navigate("/hackathons")} color="solid">
-                    <Trophy size={11} /> Browse Hackathons
+                    <Trophy size={11} /> Browse Events
                   </Btn>
                 </div>
               )}
             </Card>
-
+                <RecentActivity registrations={validRegistrations} />
+                <Recommended skills={data.skills || []} registrations={validRegistrations} />
+              </>
+            )}
+            {tab === "profile" && (
+              <>
             <Card>
               <SectionHead
                 action={
@@ -1064,7 +1093,7 @@ export const UserDashboard = () => {
               >
                 <School
                   size={13}
-                  className="inline mr-1.5 text-[rgba(95,255,96,0.5)]"
+                  className="inline mr-1.5 text-[rgba(var(--hk-accent-rgb),0.8)] dark:text-[rgba(var(--hk-accent-rgb),0.5)]"
                 />
                 Education
               </SectionHead>
@@ -1075,26 +1104,26 @@ export const UserDashboard = () => {
                     {data.education.map((edu, idx) => (
                       <div
                         key={edu._id || idx}
-                        className="bg-[rgba(95,255,96,0.03)] border border-[rgba(95,255,96,0.1)] rounded-[3px] p-4"
+                        className="bg-[rgba(var(--hk-accent-rgb),0.03)] border border-[rgba(var(--hk-card-border-rgb),0.16)] dark:border-[rgba(var(--hk-card-border-rgb),0.1)] rounded-[3px] p-4"
                       >
                         <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
                           <div className="flex items-center gap-2">
                             <School
                               size={14}
-                              className="text-[rgba(95,255,96,0.5)] flex-shrink-0"
+                              className="text-[rgba(var(--hk-accent-rgb),0.8)] dark:text-[rgba(var(--hk-accent-rgb),0.5)] flex-shrink-0"
                             />
-                            <span className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-[0.88rem] tracking-tight">
+                            <span className="font-[family-name:'Syne',sans-serif] font-extrabold text-[var(--hk-text)] text-[0.88rem] tracking-tight">
                               {edu.institute || "N/A"}
                             </span>
                           </div>
                           {edu.passOutYear && (
-                            <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.6rem] text-[rgba(95,255,96,0.5)] flex items-center gap-1">
+                            <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.6rem] text-[rgba(var(--hk-accent-rgb),0.8)] dark:text-[rgba(var(--hk-accent-rgb),0.5)] flex items-center gap-1">
                               <Clock size={10} />
                               {edu.passOutYear}
                             </span>
                           )}
                         </div>
-                        <div className="flex flex-wrap gap-3 text-[0.62rem] text-[rgba(180,220,180,0.45)] mb-3">
+                        <div className="flex flex-wrap gap-3 text-[0.62rem] text-[rgba(var(--hk-text-rgb),0.8)] dark:text-[rgba(var(--hk-text-rgb),0.45)] mb-3">
                           {edu.department && (
                             <span className="flex items-center gap-1">
                               <Laptop size={10} />
@@ -1129,7 +1158,7 @@ export const UserDashboard = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.65rem] text-[rgba(180,220,180,0.35)]">
+                  <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.65rem] text-[rgba(var(--hk-text-rgb),0.7)] dark:text-[rgba(var(--hk-text-rgb),0.35)]">
                     No education added yet.
                   </p>
                 )
@@ -1170,7 +1199,6 @@ export const UserDashboard = () => {
                 </div>
               )}
             </Card>
-
             <Card>
               <SectionHead
                 action={
@@ -1189,7 +1217,7 @@ export const UserDashboard = () => {
               >
                 <Globe
                   size={13}
-                  className="inline mr-1.5 text-[rgba(95,255,96,0.5)]"
+                  className="inline mr-1.5 text-[rgba(var(--hk-accent-rgb),0.8)] dark:text-[rgba(var(--hk-accent-rgb),0.5)]"
                 />
                 Connected Apps
               </SectionHead>
@@ -1200,9 +1228,9 @@ export const UserDashboard = () => {
                     {data.connectedApps.map((app, idx) => (
                       <div
                         key={app._id}
-                        className="flex flex-wrap items-center justify-between gap-2 bg-[rgba(95,255,96,0.03)] border border-[rgba(95,255,96,0.1)] rounded-[3px] px-4 py-3"
+                        className="flex flex-wrap items-center justify-between gap-2 bg-[rgba(var(--hk-accent-rgb),0.03)] border border-[rgba(var(--hk-card-border-rgb),0.16)] dark:border-[rgba(var(--hk-card-border-rgb),0.1)] rounded-[3px] px-4 py-3"
                       >
-                        <span className="font-[family-name:'Syne',sans-serif] font-bold text-white text-[0.82rem]">
+                        <span className="font-[family-name:'Syne',sans-serif] font-bold text-[var(--hk-text)] text-[0.82rem]">
                           {app.appName}
                         </span>
                         <div className="flex gap-2 flex-wrap">
@@ -1233,7 +1261,7 @@ export const UserDashboard = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.65rem] text-[rgba(180,220,180,0.35)]">
+                  <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.65rem] text-[rgba(var(--hk-text-rgb),0.7)] dark:text-[rgba(var(--hk-text-rgb),0.35)]">
                     No connected apps yet.
                   </p>
                 )
@@ -1264,18 +1292,21 @@ export const UserDashboard = () => {
                 </div>
               )}
             </Card>
-
+              </>
+            )}
+            {tab === "saved" && (
+              <>
             <Card>
               <SectionHead>
                 <Heart
                   size={13}
-                  className="inline mr-1.5 text-[rgba(95,255,96,0.5)]"
+                  className="inline mr-1.5 text-[rgba(var(--hk-accent-rgb),0.8)] dark:text-[rgba(var(--hk-accent-rgb),0.5)]"
                 />
                 Favourites
               </SectionHead>
 
               {loadingWishlist ? (
-                <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.62rem] text-[rgba(180,220,180,0.35)]">
+                <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.62rem] text-[rgba(var(--hk-text-rgb),0.7)] dark:text-[rgba(var(--hk-text-rgb),0.35)]">
                   Loading…
                 </p>
               ) : likedHackathons.length > 0 ? (
@@ -1284,7 +1315,7 @@ export const UserDashboard = () => {
                     <div
                       key={h._id}
                       onClick={() => navigate(`/hackathon/${h.slug}`)}
-                      className="flex gap-3 bg-[rgba(95,255,96,0.03)] border border-[rgba(95,255,96,0.1)] rounded-[3px] p-3 cursor-pointer hover:border-[rgba(95,255,96,0.28)] transition-all"
+                      className="flex gap-3 bg-[rgba(var(--hk-accent-rgb),0.03)] border border-[rgba(var(--hk-card-border-rgb),0.16)] dark:border-[rgba(var(--hk-card-border-rgb),0.1)] rounded-[3px] p-3 cursor-pointer hover:border-[rgba(var(--hk-accent-rgb),0.28)] transition-all"
                     >
                       {h.image?.url && (
                         <div className="w-20 h-14 sm:w-24 sm:h-16 rounded-[2px] overflow-hidden flex-shrink-0">
@@ -1296,17 +1327,17 @@ export const UserDashboard = () => {
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-[0.82rem] tracking-tight truncate">
+                        <h4 className="font-[family-name:'Syne',sans-serif] font-extrabold text-[var(--hk-text)] text-[0.82rem] tracking-tight truncate">
                           {h.title}
                         </h4>
                         {h.subTitle && (
-                          <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.6rem] text-[rgba(180,220,180,0.4)] truncate mt-0.5">
+                          <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.6rem] text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-text-rgb),0.4)] truncate mt-0.5">
                             {h.subTitle}
                           </p>
                         )}
                         <div className="flex flex-wrap gap-2 mt-1.5 items-center">
                           {h.phases?.length > 0 && (
-                            <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.55rem] text-[rgba(180,220,180,0.35)]">
+                            <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.55rem] text-[rgba(var(--hk-text-rgb),0.7)] dark:text-[rgba(var(--hk-text-rgb),0.35)]">
                               {new Date(
                                 Math.min(...h.phases.map((p) => new Date(p.startDate).getTime()))
                               ).toLocaleDateString()}
@@ -1319,12 +1350,14 @@ export const UserDashboard = () => {
                   ))}
                 </div>
               ) : (
-                <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.62rem] text-[rgba(180,220,180,0.3)] leading-relaxed">
-                  No favourites yet. Click the heart icon on any hackathon to
+                <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.62rem] text-[rgba(var(--hk-text-rgb),0.65)] dark:text-[rgba(var(--hk-text-rgb),0.3)] leading-relaxed">
+                  No favourites yet. Click the heart icon on any event to
                   save it here.
                 </p>
               )}
             </Card>
+              </>
+            )}
           </main>
         </div>
 

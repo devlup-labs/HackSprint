@@ -14,6 +14,7 @@ import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { HackathonAPI } from "../api/hackathon.api.js";
+import "../pages/Styles/AllHackathons.css";
 
 export const SocialShare = ({ hackathonId: id }) => {
   const [copied, setCopied] = useState(false);
@@ -24,7 +25,7 @@ export const SocialShare = ({ hackathonId: id }) => {
 
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
 
-  const shareText = "Check out this hackathon on HackSprint! 🚀";
+  const shareText = "Check out this event on HackSprint! 🚀";
 
   /* =========================================================
      MOUNT CHECK FOR PORTAL
@@ -72,12 +73,12 @@ export const SocialShare = ({ hackathonId: id }) => {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      toast.error("Please login to add hackathons to your wishlist");
+      toast.error("Please login to add events to your wishlist");
       return;
     }
 
     if (!id) {
-      toast.error("Hackathon ID not found");
+      toast.error("Event ID not found");
       return;
     }
 
@@ -108,7 +109,7 @@ export const SocialShare = ({ hackathonId: id }) => {
         setCopied(true);
 
         if (showToast) {
-          toast.success("Hackathon link copied");
+          toast.success("Event link copied");
         }
 
         setTimeout(() => {
@@ -255,7 +256,7 @@ export const SocialShare = ({ hackathonId: id }) => {
   const IconBtn = ({
     onClick,
     children,
-    hoverBg = "hover:bg-[rgba(95,255,96,0.1)]",
+    hoverBg = "hover:bg-[rgba(var(--hk-accent-rgb),0.1)]",
     hoverShadow = "",
     disabled = false,
     active = false,
@@ -285,10 +286,11 @@ export const SocialShare = ({ hackathonId: id }) => {
               border-[rgba(255,60,60,0.3)]
             `
             : `
-              bg-[rgba(10,12,10,0.7)]
-              border-[rgba(95,255,96,0.12)]
+              bg-[rgba(var(--hk-card-bg),0.7)]
+              border-[rgba(var(--hk-card-border-rgb),0.18)]
+              dark:border-[rgba(var(--hk-card-border-rgb),0.12)]
               ${hoverBg}
-              hover:border-[rgba(95,255,96,0.3)]
+              hover:border-[rgba(var(--hk-accent-rgb),0.3)]
             `
         }
 
@@ -313,7 +315,7 @@ export const SocialShare = ({ hackathonId: id }) => {
         h-6
         bg-gradient-to-b
         from-transparent
-        via-[rgba(95,255,96,0.15)]
+        via-[rgba(var(--hk-accent-rgb),0.15)]
         to-transparent
       "
     />
@@ -340,7 +342,7 @@ export const SocialShare = ({ hackathonId: id }) => {
     },
     {
       label: "LinkedIn",
-      description: "Share this hackathon as a post",
+      description: "Share this event as a post",
       icon: Linkedin,
       action: handleLinkedInShare,
       brand: "#0A66C2",
@@ -431,10 +433,10 @@ export const SocialShare = ({ hackathonId: id }) => {
 
                 max-h-[calc(100dvh-32px)]
 
-                bg-[#0b0f0b]
+                bg-[var(--hk-bg)]
 
                 border
-                border-[rgba(95,255,96,0.22)]
+                border-[rgba(var(--hk-accent-rgb),0.22)]
 
                 rounded-[4px]
 
@@ -456,9 +458,9 @@ export const SocialShare = ({ hackathonId: id }) => {
                   w-[70%]
                   h-[1px]
 
-                  bg-[#5fff60]
+                  bg-[var(--hk-accent-solid)]
 
-                  shadow-[0_0_30px_rgba(95,255,96,0.65)]
+                  shadow-[0_0_30px_rgba(var(--hk-accent-rgb),0.65)]
                 "
               />
 
@@ -492,14 +494,14 @@ export const SocialShare = ({ hackathonId: id }) => {
                         mb-1
                       "
                     >
-                      <Share2 size={15} className="text-[#5fff60]" />
+                      <Share2 size={15} className="text-[var(--hk-accent-solid)]" />
 
                       <span
                         className="
                           text-[10px]
                           uppercase
                           tracking-[0.18em]
-                          text-[#5fff60]/60
+                          text-[rgba(var(--hk-accent-rgb),0.6)]
                           font-mono
                         "
                       >
@@ -511,19 +513,19 @@ export const SocialShare = ({ hackathonId: id }) => {
                       id="share-modal-title"
                       className="
                         font-[family-name:'Syne',sans-serif]
-                        text-white
+                        text-[var(--hk-text)]
                         text-xl
                         sm:text-[22px]
                         font-extrabold
                         tracking-[-0.02em]
                       "
                     >
-                      Share this hackathon
+                      Share this event
                     </h2>
 
                     <p
                       className="
-                        text-white/40
+                        text-[rgba(var(--hk-text-rgb),0.4)]
                         text-xs
                         sm:text-sm
                         mt-1
@@ -545,17 +547,17 @@ export const SocialShare = ({ hackathonId: id }) => {
                       rounded-full
 
                       border
-                      border-white/10
+                      border-[rgba(var(--hk-text-rgb),0.1)]
 
                       flex
                       items-center
                       justify-center
 
-                      text-white/55
+                      text-[rgba(var(--hk-text-rgb),0.55)]
 
-                      hover:text-[#5fff60]
-                      hover:border-[#5fff60]/35
-                      hover:bg-[#5fff60]/5
+                      hover:text-[var(--hk-accent-solid)]
+                      hover:border-[rgba(var(--hk-accent-rgb),0.35)]
+                      hover:bg-[rgba(var(--hk-accent-rgb),0.05)]
 
                       active:scale-95
 
@@ -593,9 +595,9 @@ export const SocialShare = ({ hackathonId: id }) => {
                           rounded-[4px]
 
                           border
-                          border-white/[0.07]
+                          border-[rgba(var(--hk-text-rgb),0.07)]
 
-                          bg-white/[0.018]
+                          bg-[rgba(var(--hk-text-rgb),0.02)]
 
                           text-left
 
@@ -617,13 +619,13 @@ export const SocialShare = ({ hackathonId: id }) => {
                             rounded-full
 
                             border
-                            border-white/10
+                            border-[rgba(var(--hk-text-rgb),0.1)]
 
                             flex
                             items-center
                             justify-center
 
-                            text-white/65
+                            text-[rgba(var(--hk-text-rgb),0.65)]
 
                             group-hover:text-[var(--brand)]
                             group-hover:border-[var(--brand)]/30
@@ -643,7 +645,7 @@ export const SocialShare = ({ hackathonId: id }) => {
                               text-[13px]
                               sm:text-sm
                               font-semibold
-                              text-white/90
+                              text-[rgba(var(--hk-text-rgb),0.9)]
                             "
                           >
                             {label}
@@ -657,7 +659,7 @@ export const SocialShare = ({ hackathonId: id }) => {
                               text-[10px]
                               sm:text-[11px]
 
-                              text-white/35
+                              text-[rgba(var(--hk-text-rgb),0.35)]
 
                               truncate
                             "
@@ -670,9 +672,9 @@ export const SocialShare = ({ hackathonId: id }) => {
                           size={15}
                           className="
                             shrink-0
-                            text-white/25
+                            text-[rgba(var(--hk-text-rgb),0.25)]
 
-                            group-hover:text-[#5fff60]
+                            group-hover:text-[var(--hk-accent-solid)]
                             group-hover:translate-x-1
 
                             transition-all
@@ -703,16 +705,16 @@ export const SocialShare = ({ hackathonId: id }) => {
 
                     border
                     border-dashed
-                    border-[#5fff60]/20
+                    border-[rgba(var(--hk-accent-rgb),0.2)]
 
-                    bg-[#5fff60]/[0.025]
+                    bg-[rgba(var(--hk-accent-rgb),0.025)]
                   "
                 >
                   <Link2
                     size={14}
                     className="
                       shrink-0
-                      text-[#5fff60]/45
+                      text-[rgba(var(--hk-accent-rgb),0.45)]
                     "
                   />
 
@@ -729,7 +731,7 @@ export const SocialShare = ({ hackathonId: id }) => {
 
                       font-mono
 
-                      text-white/45
+                      text-[rgba(var(--hk-text-rgb),0.45)]
                     "
                   >
                     {currentUrl}
@@ -766,13 +768,13 @@ export const SocialShare = ({ hackathonId: id }) => {
                       ${
                         copied
                           ? `
-                            bg-[#5fff60]
-                            text-[#071007]
+                            bg-[var(--hk-accent-solid)]
+                            text-[var(--hk-accent-solid-text)]
                           `
                           : `
-                            bg-white
-                            text-black
-                            hover:bg-[#5fff60]
+                            bg-[var(--hk-text)]
+                            text-[var(--hk-bg)]
+                            hover:bg-[var(--hk-accent-solid)]
                           `
                       }
                     `}
@@ -798,7 +800,7 @@ export const SocialShare = ({ hackathonId: id }) => {
 
                     tracking-[0.05em]
 
-                    text-white/20
+                    text-[rgba(var(--hk-text-rgb),0.2)]
                   "
                 >
                   LINK COPIED AUTOMATICALLY WHEN SHARE OPENS
@@ -837,11 +839,12 @@ export const SocialShare = ({ hackathonId: id }) => {
             items-center
             gap-4
 
-            bg-[rgba(8,10,8,0.92)]
+            bg-[rgba(var(--hk-bg-rgb),0.92)]
             backdrop-blur-xl
 
             border-l
-            border-[rgba(95,255,96,0.08)]
+            border-[rgba(var(--hk-card-border-rgb),0.14)]
+            dark:border-[rgba(var(--hk-card-border-rgb),0.08)]
           "
         >
           {/* SHARE HEADING */}
@@ -855,14 +858,14 @@ export const SocialShare = ({ hackathonId: id }) => {
               select-none
             "
           >
-            <Share2 size={15} className="text-[rgba(95,255,96,0.55)]" />
+            <Share2 size={15} className="text-[rgba(var(--hk-accent-rgb),0.55)]" />
 
             <span
               className="
                 text-[0.45rem]
                 tracking-[0.12em]
                 uppercase
-                text-[rgba(95,255,96,0.35)]
+                text-[rgba(var(--hk-accent-rgb),0.35)]
               "
             >
               share

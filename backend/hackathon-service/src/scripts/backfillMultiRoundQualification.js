@@ -58,7 +58,7 @@ async function backfillPhaseWeights() {
     }
   }
 
-  console.log(`[1/3] Froze phase weights on ${updatedHackathons} hackathon(s).`);
+  console.log(`[1/3] Froze phase weights on ${updatedHackathons} event(s).`);
 }
 
 async function backfillQualificationStatus() {
@@ -85,7 +85,7 @@ async function backfillResultAvailable() {
   );
 
   console.log(
-    `[3/3a] Preserved visibility on ${preserved.modifiedCount} submission(s) from already-released hackathons.`
+    `[3/3a] Preserved visibility on ${preserved.modifiedCount} submission(s) from already-released events.`
   );
 
   // (b) Retroactively catch submissions that already satisfy the new

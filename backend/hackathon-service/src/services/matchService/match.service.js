@@ -93,11 +93,11 @@ export class MatchService {
     const hackathon = await this.hackathonRepository.getById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     if (hackathon.eventFormat !== "ON_SPOT") {
-      throw new BadRequestError("This hackathon is not an on-spot event");
+      throw new BadRequestError("This event is not an on-spot event");
     }
 
     await this.assertAdminAccess(hackathon, adminId);
@@ -108,7 +108,7 @@ export class MatchService {
     const teamIds = new Set(teams.map((t) => t._id.toString()));
 
     if (!teamIds.has(teamA.toString()) || !teamIds.has(teamB.toString())) {
-      throw new BadRequestError("Both teams must belong to this hackathon");
+      throw new BadRequestError("Both teams must belong to this event");
     }
 
     const [existingA, existingB] = await Promise.all([
@@ -183,7 +183,7 @@ export class MatchService {
     const hackathon = await this.hackathonRepository.getById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     await this.assertAdminAccess(hackathon, adminId);
@@ -297,7 +297,7 @@ export class MatchService {
     const hackathon = await this.hackathonRepository.getById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     await this.assertAdminAccess(hackathon, adminId);
@@ -338,7 +338,7 @@ export class MatchService {
     const hackathon = await this.hackathonRepository.getById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     await this.assertAdminAccess(hackathon, adminId);
@@ -404,7 +404,7 @@ export class MatchService {
     const hackathon = await this.hackathonRepository.getById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     await this.assertAdminAccess(hackathon, adminId);
@@ -427,7 +427,7 @@ export class MatchService {
     const hackathon = await this.hackathonRepository.getById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     await this.assertAdminAccess(hackathon, adminId);
@@ -456,13 +456,13 @@ export class MatchService {
 
   async getStandings({ hackathonId }) {
     if (!mongoose.Types.ObjectId.isValid(hackathonId)) {
-      throw new BadRequestError("Invalid hackathon id");
+      throw new BadRequestError("Invalid event id");
     }
 
     const hackathon = await this.hackathonRepository.getById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     const [teams, matches] = await Promise.all([

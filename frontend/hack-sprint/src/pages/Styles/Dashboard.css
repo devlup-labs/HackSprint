@@ -5,10 +5,10 @@
   z-index: 0;
   pointer-events: none;
   background-image: linear-gradient(
-      rgba(95, 255, 96, 0.026) 1px,
+      rgba(var(--hk-accent-rgb), 0.026) 1px,
       transparent 1px
     ),
-    linear-gradient(90deg, rgba(95, 255, 96, 0.026) 1px, transparent 1px);
+    linear-gradient(90deg, rgba(var(--hk-accent-rgb), 0.026) 1px, transparent 1px);
   background-size: 44px 44px;
 }
 .ud-bg::after {
@@ -20,7 +20,7 @@
   height: 600px;
   background: radial-gradient(
     circle,
-    rgba(95, 255, 96, 0.055) 0%,
+    rgba(var(--hk-accent-rgb), 0.055) 0%,
     transparent 65%
   );
   top: -60px;
@@ -36,7 +36,7 @@
   width: 9px;
   height: 9px;
   border-style: solid;
-  border-color: rgba(95, 255, 96, 0.35);
+  border-color: rgba(var(--hk-accent-rgb), 0.35);
   transition: border-color 0.2s;
 }
 .ud-card::before {
@@ -51,17 +51,17 @@
 }
 .ud-card:hover::before,
 .ud-card:hover::after {
-  border-color: rgba(95, 255, 96, 0.65);
+  border-color: rgba(var(--hk-accent-rgb), 0.65);
 }
 
 /* amber card corners */
 .ud-card-amber::before,
 .ud-card-amber::after {
-  border-color: rgba(255, 184, 77, 0.35);
+  border-color: rgba(var(--hk-amber-rgb), 0.35);
 }
 .ud-card-amber:hover::before,
 .ud-card-amber:hover::after {
-  border-color: rgba(255, 184, 77, 0.65);
+  border-color: rgba(var(--hk-amber-rgb), 0.65);
 }
 
 /* ── heatmap override ── */
@@ -69,23 +69,23 @@
   rx: 2px;
 }
 .react-calendar-heatmap text {
-  fill: rgba(95, 255, 96, 0.3);
+  fill: rgba(var(--hk-accent-rgb), 0.3);
   font-size: 8px;
 }
 .react-calendar-heatmap .color-empty {
-  fill: rgba(95, 255, 96, 0.06);
+  fill: rgba(var(--hk-accent-rgb), 0.06);
 }
 .react-calendar-heatmap .color-scale-1 {
-  fill: rgba(95, 255, 96, 0.2);
+  fill: rgba(var(--hk-accent-rgb), 0.2);
 }
 .react-calendar-heatmap .color-scale-2 {
-  fill: rgba(95, 255, 96, 0.4);
+  fill: rgba(var(--hk-accent-rgb), 0.4);
 }
 .react-calendar-heatmap .color-scale-3 {
-  fill: rgba(95, 255, 96, 0.65);
+  fill: rgba(var(--hk-accent-rgb), 0.65);
 }
 .react-calendar-heatmap .color-scale-4 {
-  fill: rgba(95, 255, 96, 0.9);
+  fill: rgba(var(--hk-accent-rgb), 0.9);
 }
 
 /* ── reward modal animate ── */
@@ -112,8 +112,8 @@
 .ud-spinner {
   width: 26px;
   height: 26px;
-  border: 2px solid rgba(95, 255, 96, 0.15);
-  border-top-color: #5fff60;
+  border: 2px solid rgba(var(--hk-accent-rgb), 0.15);
+  border-top-color: var(--hk-accent-solid);
   border-radius: 50%;
   animation: ud-spin 0.7s linear infinite;
 }

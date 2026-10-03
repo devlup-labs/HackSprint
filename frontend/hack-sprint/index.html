@@ -8,7 +8,18 @@
     integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="theme-color" content="#fbfbf9" />
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem("hacksprint-theme");
+        // Light is the default; dark only if the visitor chose it.
+        document.documentElement.classList.toggle("dark", stored === "dark");
+      } catch (e) {
+        document.documentElement.classList.remove("dark");
+      }
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <link rel="apple-touch-icon" href="/icon-192.png" />
@@ -17,25 +28,25 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="HackSprint" />
 
-  <title>HackSprint — Hackathon Platform</title>
+  <title>HackSprint — Event Platform</title>
   <meta name="description"
-    content="Register for hackathons, form a team with a shareable invite code, submit your project, and get judged — HackSprint is a centralized hackathon platform built at IIT Jodhpur." />
+    content="Register for events, form a team with a shareable invite code, submit your project, and get judged — HackSprint is a centralized event platform built at IIT Jodhpur." />
   <link rel="canonical" href="https://hacksprint.devluplabs.tech/" />
 
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="HackSprint" />
-  <meta property="og:title" content="HackSprint — Hackathon Platform" />
+  <meta property="og:title" content="HackSprint — Event Platform" />
   <meta property="og:description"
-    content="Register for hackathons, form a team with a shareable invite code, submit your project, and get judged." />
+    content="Register for events, form a team with a shareable invite code, submit your project, and get judged." />
   <meta property="og:url" content="https://hacksprint.devluplabs.tech/" />
   <meta property="og:image" content="https://hacksprint.devluplabs.tech/og-image.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
 
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="HackSprint — Hackathon Platform" />
+  <meta name="twitter:title" content="HackSprint — Event Platform" />
   <meta name="twitter:description"
-    content="Register for hackathons, form a team with a shareable invite code, submit your project, and get judged." />
+    content="Register for events, form a team with a shareable invite code, submit your project, and get judged." />
   <meta name="twitter:image" content="https://hacksprint.devluplabs.tech/og-image.png" />
 
   <script type="application/ld+json">

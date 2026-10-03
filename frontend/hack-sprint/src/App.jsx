@@ -2,6 +2,9 @@ import { Toaster } from "react-hot-toast";
 import AppRoutes from "./routes/AppRoute";
 import InstallPrompt from "./components/InstallPrompt.jsx";
 import Chatbot from "./components/Chatbot.jsx";
+import FriendsChat from "./components/FriendsChat/FriendsChat.jsx";
+import DialogHost from "./components/DialogHost.jsx";
+import DailyChallenge from "./components/Daily/DailyChallenge.jsx";
 import FirstVisitIntro from "./components/FirstVisitIntro.jsx";
 import { usePageViewTracking } from "./hooks/useAnalytics.js";
 import React from 'react';
@@ -22,6 +25,9 @@ function App() {
       <FirstVisitIntro />
       <AppRoutes />
       <Chatbot />
+      <FriendsChat />
+      <DailyChallenge />
+      <DialogHost />
       <InstallPrompt />
     </>
   );

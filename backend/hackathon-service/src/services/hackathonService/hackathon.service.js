@@ -52,7 +52,7 @@ export class HackathonService {
             err: error,
             hackathonId: hackathon._id,
           },
-          "Failed to delete old hackathon image"
+          "Failed to delete old event image"
         );
       }
     }
@@ -104,7 +104,7 @@ export class HackathonService {
 
   async getHackathonById(id) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new BadRequestError("Invalid hackathon id");
+      throw new BadRequestError("Invalid event id");
     }
 
     const cacheKey = REDIS_KEYS.HACKATHON(id);
@@ -113,7 +113,7 @@ export class HackathonService {
       const cachedData = await this.cacheService.get(cacheKey);
 
       if (cachedData) {
-        this.logger.info({ hackathonId: id }, "Hackathon cache hit");
+        this.logger.info({ hackathonId: id }, "Event cache hit");
 
         return cachedData;
       }
@@ -121,12 +121,12 @@ export class HackathonService {
       this.logger.error({ error }, "Redis read failed");
     }
 
-    this.logger.info({ hackathonId: id }, "Hackathon cache miss");
+    this.logger.info({ hackathonId: id }, "Event cache miss");
 
     const hackathon = await this.hackathonRepository.getById(id);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     try {
@@ -140,13 +140,13 @@ export class HackathonService {
 
   async getHackathonGallery(id) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new BadRequestError("Invalid hackathon id");
+      throw new BadRequestError("Invalid event id");
     }
 
     const hackathon = await this.hackathonRepository.getGallery(id);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     return hackathon.gallery || [];
@@ -161,12 +161,21 @@ export class HackathonService {
       );
     }
 
-    if (!admin.profileCompleted) {
-      throw new ForbiddenError("Complete your profile to proceed");
-    }
+    // Controllers do the verifying, so neither check applies to them.
+    if (!admin.controller) {
+      if (!admin.profileCompleted) {
+        throw new ForbiddenError("Complete your profile to proceed");
+      }
 
-    if (!admin.isVerified || admin.verificationStatus !== "APPROVED") {
-      throw new ForbiddenError("Organizer has not been verified yet");
+      if (!admin.isVerified || admin.verificationStatus !== "APPROVED") {
+        throw new ForbiddenError("Organizer has not been verified yet");
+      }
+
+      if (!admin.verificationDocuments?.length) {
+        throw new ForbiddenError(
+          "Submit your organiser details and documents for verification before creating events"
+        );
+      }
     }
 
     const existingHackathon = await this.hackathonRepository.findByTitle(
@@ -174,11 +183,11 @@ export class HackathonService {
     );
 
     if (existingHackathon) {
-      throw new BadRequestError("Hackathon with this title already exist");
+      throw new BadRequestError("Event with this title already exist");
     }
 
     if (payload.participationType === "TEAM" && payload.maxTeamSize < 2) {
-      throw new BadRequestError("Team hackathon must have maxTeamSize >= 2");
+      throw new BadRequestError("Team event must have maxTeamSize >= 2");
     }
 
     if (!payload.phases || payload.phases.length === 0) {
@@ -245,7 +254,7 @@ export class HackathonService {
     const hackathon = await this.hackathonRepository.findById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     const isOwner = hackathon.createdBy.toString() === adminId.toString();
@@ -254,12 +263,12 @@ export class HackathonService {
       const admin = await this.adminRepository.getById(adminId);
 
       if (!admin?.controller) {
-        throw new ForbiddenError("Not your hackathon");
+        throw new ForbiddenError("Not your event");
       }
     }
 
     if (hackathon.lifecycleStatus === "COMPLETED") {
-      throw new ForbiddenError("Completed hackathons cannot be edited");
+      throw new ForbiddenError("Completed events cannot be edited");
     }
 
     /**
@@ -267,7 +276,7 @@ export class HackathonService {
      */
 
     if (payload.participationType === "TEAM" && payload.maxTeamSize < 2) {
-      throw new BadRequestError("Team hackathon must have maxTeamSize >= 2");
+      throw new BadRequestError("Team event must have maxTeamSize >= 2");
     }
 
     /**
@@ -350,7 +359,7 @@ export class HackathonService {
         hackathonId,
         adminId,
       },
-      "Hackathon updated"
+      "Event updated"
     );
 
     return updated;
@@ -360,11 +369,11 @@ export class HackathonService {
     const hackathon = await this.hackathonRepository.findById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     if (hackathon.createdBy.toString() !== adminId.toString()) {
-      throw new ForbiddenError("Not your hackathon");
+      throw new ForbiddenError("Not your event");
     }
 
     if (hackathon.status === "PENDING_APPROVAL") {
@@ -372,11 +381,11 @@ export class HackathonService {
     }
 
     if (hackathon.lifecycleStatus === "COMPLETED") {
-      throw new ForbiddenError("Completed hackathons cannot be edited");
+      throw new ForbiddenError("Completed events cannot be edited");
     }
 
     if (hackathon.status === "APPROVED") {
-      throw new BadRequestError("Hackathon already approved");
+      throw new BadRequestError("Event already approved");
     }
 
     /**
@@ -392,7 +401,7 @@ export class HackathonService {
     }
 
     if (!hackathon.image?.url || !hackathon.image?.key) {
-      throw new BadRequestError("Hackathon image is required");
+      throw new BadRequestError("Event image is required");
     }
 
     if (!hackathon.phases || hackathon.phases.length === 0) {
@@ -420,7 +429,24 @@ export class HackathonService {
         hackathonId,
         adminId,
       },
-      "Hackathon submitted for approval"
+      "Event submitted for approval"
+    );
+
+    // Tell the platform controllers there's something waiting for them.
+    const [owner, controllers] = await Promise.all([
+      this.adminRepository.getById(adminId),
+      this.adminRepository.getControllers(),
+    ]);
+    await Promise.all(
+      controllers.map((c) =>
+        this.notificationClient.createNotification({
+          userId: c._id,
+          title: "Event awaiting approval",
+          message: `${owner?.adminName || "An organizer"} submitted "${hackathon.title}" for approval.`,
+          type: "SYSTEM",
+          actionUrl: "/admin",
+        })
+      )
     );
 
     return updated;
@@ -456,11 +482,11 @@ export class HackathonService {
     const hackathon = await this.hackathonRepository.findById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     if (hackathon.status !== "PENDING_APPROVAL") {
-      throw new BadRequestError("Hackathon is not pending approval");
+      throw new BadRequestError("Event is not pending approval");
     }
 
     const updated = await this.hackathonRepository.update(hackathonId, {
@@ -474,7 +500,7 @@ export class HackathonService {
 
     await this.notificationClient.createNotification({
       userId: hackathon.createdBy,
-      title: "Hackathon Approved",
+      title: "Event Approved",
       message: `${hackathon.title} has been approved and is now live.`,
       type: "HACKATHON",
       actionUrl: `/hackathon/${updated.slug}`,
@@ -503,7 +529,7 @@ export class HackathonService {
     mapWithConcurrency(allUsers, (u) =>
       this.notificationClient.createNotification({
         userId: u._id,
-        title: "New Hackathon Just Dropped",
+        title: "New Event Just Dropped",
         message: `${hackathon.title} is now live on HackSprint — check it out.`,
         type: "HACKATHON",
         actionUrl: `/hackathon/${updated.slug}`,
@@ -529,11 +555,11 @@ export class HackathonService {
     const hackathon = await this.hackathonRepository.findById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     if (hackathon.status !== "PENDING_APPROVAL") {
-      throw new BadRequestError("Hackathon is not pending approval");
+      throw new BadRequestError("Event is not pending approval");
     }
 
     const rejected = await this.hackathonRepository.update(hackathonId, {
@@ -545,7 +571,7 @@ export class HackathonService {
 
     await this.notificationClient.createNotification({
       userId: hackathon.createdBy,
-      title: "Hackathon Rejected",
+      title: "Event Rejected",
       message: reason
         ? `${hackathon.title} was rejected: ${reason}`
         : `${hackathon.title} was rejected by a platform controller.`,
@@ -571,13 +597,13 @@ export class HackathonService {
 
   async getHackathonAdminOverview({ hackathonId, adminId }) {
     if (!mongoose.Types.ObjectId.isValid(hackathonId)) {
-      throw new BadRequestError("Invalid hackathon id");
+      throw new BadRequestError("Invalid event id");
     }
 
     const hackathon = await this.hackathonRepository.getById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     const isOwner = hackathon.createdBy._id.toString() === adminId.toString();
@@ -621,9 +647,28 @@ export class HackathonService {
       submissions.filter((s) => s.team).map((s) => s.team._id.toString())
     );
 
+    // For a judge: which submissions they've already scored, so the list can
+    // say "reviewed" instead of making them open each one to find out.
+    const myScoreBySubmission = new Map();
+    if (canScore && submissions.length > 0) {
+      const mine = await this.submissionReviewRepository.getMyScoresForSubmissions(
+        adminId,
+        submissions.map((s) => s._id)
+      );
+      mine.forEach((r) => myScoreBySubmission.set(r.submission.toString(), r.score));
+    }
+    const progressFor = (pred) => {
+      const subs = submissions.filter(pred);
+      const done = subs.filter((s) => myScoreBySubmission.has(s._id.toString()));
+      return { total: subs.length, reviewed: done.length };
+    };
+
     const teamsWithStatus = teams.map((team) => ({
       ...team,
       hasSubmitted: submittedTeamIds.has(team._id.toString()),
+      ...(canScore && {
+        myReview: progressFor((s) => s.team && s.team._id.toString() === team._id.toString()),
+      }),
     }));
 
     const individualParticipants = registrations
@@ -631,6 +676,9 @@ export class HackathonService {
       .map((r) => ({
         ...r,
         hasSubmitted: submittedParticipantIds.has(r.user._id.toString()),
+        ...(canScore && {
+          myReview: progressFor((s) => s.participant && s.participant._id.toString() === r.user._id.toString()),
+        }),
       }));
 
     return {
@@ -660,7 +708,7 @@ export class HackathonService {
     const hackathon = await this.hackathonRepository.getById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     const isOwner = hackathon.createdBy._id.toString() === adminId.toString();
@@ -893,7 +941,7 @@ export class HackathonService {
     const hackathon = await this.hackathonRepository.getById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     const isOwner = hackathon.createdBy._id.toString() === adminId.toString();
@@ -920,6 +968,15 @@ export class HackathonService {
       phaseId
     );
 
+    let myScores = new Map();
+    if (isAssignedJudge && submissions.length > 0) {
+      const mine = await this.submissionReviewRepository.getMyScoresForSubmissions(
+        adminId,
+        submissions.map((s) => s._id)
+      );
+      myScores = new Map(mine.map((r) => [r.submission.toString(), r.score]));
+    }
+
     return {
       phase: {
         _id: phase._id,
@@ -933,7 +990,14 @@ export class HackathonService {
       },
       canScore: isAssignedJudge,
       viewerRole: isOwner ? "owner" : admin?.controller ? "controller" : "judge",
-      submissions,
+      submissions: isAssignedJudge
+        ? submissions.map((sub) => ({
+            ...(sub.toObject ? sub.toObject() : sub),
+            myReview: myScores.has(sub._id.toString())
+              ? { reviewed: true, score: myScores.get(sub._id.toString()) }
+              : { reviewed: false },
+          }))
+        : submissions,
     };
   }
 
@@ -945,13 +1009,13 @@ export class HackathonService {
   // publicLeaderboardLimit.
   async getAdminResults({ hackathonId, adminId }) {
     if (!mongoose.Types.ObjectId.isValid(hackathonId)) {
-      throw new BadRequestError("Invalid hackathon id");
+      throw new BadRequestError("Invalid event id");
     }
 
     const hackathon = await this.hackathonRepository.getById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     const isOwner = hackathon.createdBy._id.toString() === adminId.toString();
@@ -979,13 +1043,13 @@ export class HackathonService {
   // so results can never leak piecemeal as individual judges finish scoring.
   async releaseResults({ hackathonId, adminId }) {
     if (!mongoose.Types.ObjectId.isValid(hackathonId)) {
-      throw new BadRequestError("Invalid hackathon id");
+      throw new BadRequestError("Invalid event id");
     }
 
     const hackathon = await this.hackathonRepository.getById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     const isOwner = hackathon.createdBy._id.toString() === adminId.toString();
@@ -994,13 +1058,13 @@ export class HackathonService {
       const admin = await this.adminRepository.getById(adminId);
 
       if (!admin?.controller) {
-        throw new ForbiddenError("Not your hackathon");
+        throw new ForbiddenError("Not your event");
       }
     }
 
     if (getLifecycleStatus(hackathon) !== "COMPLETED") {
       throw new ForbiddenError(
-        "Results can only be released after the hackathon has concluded"
+        "Results can only be released after the event has concluded"
       );
     }
 
@@ -1120,7 +1184,7 @@ export class HackathonService {
     const hackathon = await this.hackathonRepository.getById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     const ownerId = hackathon.createdBy._id
@@ -1251,9 +1315,18 @@ export class HackathonService {
       })
     );
 
-    const statuses = Array.from(statusBySubmission.values());
-    const qualifiedCount = statuses.filter((s) => s === "QUALIFIED").length;
-    const eliminatedCount = statuses.filter((s) => s === "ELIMINATED").length;
+    // Report the real outcome for the whole round: submissions an organiser
+    // set by hand are skipped by the automatic pass, but they still count
+    // toward who qualified / didn't — otherwise a round whose only entry was
+    // set manually would read "0 qualified".
+    const finalStatuses = submissions.map((submission) =>
+      submission.qualificationOverride
+        ? submission.qualificationStatus
+        : statusBySubmission.get(submission._id.toString())
+    );
+    const qualifiedCount = finalStatuses.filter((x) => x === "QUALIFIED").length;
+    const eliminatedCount = finalStatuses.filter((x) => x === "ELIMINATED").length;
+    const manualCount = submissions.length - eligible.length;
 
     this.logger.info(
       { hackathonId, phaseId, adminId, qualifiedCount, eliminatedCount },
@@ -1264,6 +1337,7 @@ export class HackathonService {
       concluded: true,
       qualifiedCount,
       eliminatedCount,
+      manualCount,
       unreviewedCount,
       notifiedCount,
     };
@@ -1287,7 +1361,7 @@ export class HackathonService {
     const hackathon = await this.hackathonRepository.getById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     const ownerId = hackathon.createdBy._id
@@ -1366,7 +1440,7 @@ export class HackathonService {
     const hackathon = await this.hackathonRepository.findById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     const admin = await this.adminRepository.getById(adminId);
@@ -1389,7 +1463,7 @@ export class HackathonService {
 
       if (!allowedStatuses.includes(hackathon.status)) {
         throw new ForbiddenError(
-          "Only draft or rejected hackathons can be deleted"
+          "Only draft or rejected events can be deleted"
         );
       }
     }
@@ -1403,7 +1477,7 @@ export class HackathonService {
             err: error,
             hackathonId,
           },
-          "Failed to delete hackathon image"
+          "Failed to delete event image"
         );
       }
     }
@@ -1436,12 +1510,12 @@ export class HackathonService {
         hackathonId,
         adminId,
       },
-      "Hackathon deleted"
+      "Event deleted"
     );
 
     return {
       success: true,
-      message: "Hackathon deleted successfully",
+      message: "Event deleted successfully",
     };
   }
 
@@ -1547,8 +1621,9 @@ export class HackathonService {
     }
 
     const total = hackathons.length;
-    const pageNum = Number(page);
-    const limitNum = Number(limit);
+    // Clamped so a bad or huge value can't produce NaN or an unbounded page.
+    const pageNum = Math.max(parseInt(page, 10) || 1, 1);
+    const limitNum = Math.min(Math.max(parseInt(limit, 10) || 12, 1), 50);
     const skip = (pageNum - 1) * limitNum;
     hackathons.sort(
       (a, b) =>
@@ -1562,9 +1637,9 @@ export class HackathonService {
       data,
       pagination: {
         total,
-        page: Number(page),
-        limit: Number(limit),
-        totalPages: Math.ceil(total / limit),
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum),
         hasNext: skip + data.length < total,
       },
     };
@@ -1582,7 +1657,7 @@ export class HackathonService {
     const hackathon = await this.hackathonRepository.findBySlug(slug);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     await this.cacheService.set(cacheKey, hackathon, 300);

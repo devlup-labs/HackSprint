@@ -4,6 +4,7 @@ import { BadRequestError } from "../../errors/BadRequestError.js";
 import { NotFoundError } from "../../errors/NotFoundError.js";
 import { getNowUTC } from "../../utils/dateUtils.js";
 import { getLifecycleStatus } from "../../utils/lifecycleStatus.js";
+import { assertProfileComplete } from "../../utils/profileCompleteness.js";
 
 export class TeamService {
   constructor(
@@ -48,8 +49,10 @@ export class TeamService {
 
   async createTeam({ userId, hackathonId, teamName }) {
     if (!mongoose.Types.ObjectId.isValid(hackathonId)) {
-      throw new BadRequestError("Invalid hackathon id");
+      throw new BadRequestError("Invalid event id");
     }
+
+    await assertProfileComplete(this.userRepository, userId);
 
     const hackathon = await this.hackathonRepository.getById(hackathonId);
 
@@ -67,13 +70,13 @@ export class TeamService {
 
     if (!hackathon) {
       throw new NotFoundError(
-        "Seems like the hackathon you are trying to join does not exist"
+        "Seems like the event you are trying to join does not exist"
       );
     }
 
     if (hackathon.participationType !== "TEAM") {
       throw new BadRequestError(
-        "This hackathon does not support team participation"
+        "This event does not support team participation"
       );
     }
 
@@ -85,12 +88,12 @@ export class TeamService {
 
     if (!registration) {
       throw new BadRequestError(
-        "Please register for the hackathon before creating a team"
+        "Please register for the event before creating a team"
       );
     }
 
     if (registration.team) {
-      throw new BadRequestError("You are already in a team for this hackathon");
+      throw new BadRequestError("You are already in a team for this event");
     }
 
     const existingTeam = await this.teamRepository.findByNameAndHackathon(
@@ -162,6 +165,8 @@ export class TeamService {
       throw new BadRequestError("Team code is required");
     }
 
+    await assertProfileComplete(this.userRepository, userId);
+
     const team = await this.teamRepository.findByCode(secretCode.trim());
 
     if (!team) {
@@ -172,7 +177,7 @@ export class TeamService {
 
     if (!hackathon) {
       throw new NotFoundError(
-        "The hackathon you are trying to join does not exist"
+        "The event you are trying to join does not exist"
       );
     }
 
@@ -186,7 +191,7 @@ export class TeamService {
 
     if (hackathon.participationType !== "TEAM") {
       throw new BadRequestError(
-        "This hackathon does not support team participation"
+        "This event does not support team participation"
       );
     }
 
@@ -198,12 +203,12 @@ export class TeamService {
 
     if (!registration) {
       throw new BadRequestError(
-        "Please register for the hackathon before joining a team"
+        "Please register for the event before joining a team"
       );
     }
 
     if (registration.team) {
-      throw new BadRequestError("You are already in a team for this hackathon");
+      throw new BadRequestError("You are already in a team for this event");
     }
 
     const isPending = team.pendingMembers.some(
@@ -329,12 +334,12 @@ export class TeamService {
       );
 
     if (!registration) {
-      throw new BadRequestError("The user is not registered for the hackathon");
+      throw new BadRequestError("The user is not registered for the event");
     }
 
     if (registration.team) {
       throw new BadRequestError(
-        "The user is already in a team for this hackathon"
+        "The user is already in a team for this event"
       );
     }
 
@@ -550,7 +555,7 @@ export class TeamService {
     const hackathon = await this.hackathonRepository.getById(team.hackathon);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     this.ensureTeamModificationAllowed(hackathon);
@@ -653,7 +658,7 @@ export class TeamService {
     const hackathon = await this.hackathonRepository.getById(team.hackathon);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     this.ensureTeamModificationAllowed(hackathon);
@@ -728,7 +733,7 @@ export class TeamService {
     this.ensureTeamModificationAllowed(hackathon);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     const now = getNowUTC();
@@ -794,7 +799,7 @@ export class TeamService {
     this.ensureTeamModificationAllowed(hackathon);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     const now = getNowUTC();

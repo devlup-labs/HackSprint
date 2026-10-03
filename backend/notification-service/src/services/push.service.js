@@ -32,7 +32,7 @@ export class PushService {
   // subscribed from. Best-effort per subscription — one dead endpoint
   // (uninstalled browser, revoked permission) must never block delivery to
   // the user's other devices.
-  async sendToUser(userId, { title, message, actionUrl }) {
+  async sendToUser(userId, { notificationId, title, message, actionUrl }) {
     const subscriptions = await this.pushSubscriptionRepository.findByUser(userId);
     if (!subscriptions.length) return;
 
@@ -40,14 +40,21 @@ export class PushService {
       title,
       body: message,
       url: actionUrl || "/",
+      // Same tag on a retry replaces the earlier copy instead of stacking.
+      tag: notificationId || undefined,
     });
+
+    let transientFailure = null;
 
     await Promise.all(
       subscriptions.map(async (sub) => {
         try {
           await webpush.sendNotification(
             { endpoint: sub.endpoint, keys: sub.keys },
-            payload
+            payload,
+            // Keep trying for a day if the device is offline, and ask the push
+            // service to deliver promptly rather than batching it.
+            { TTL: 60 * 60 * 24, urgency: "high" }
           );
         } catch (error) {
           if (error.statusCode === 404 || error.statusCode === 410) {
@@ -57,6 +64,7 @@ export class PushService {
               "Removed expired push subscription"
             );
           } else {
+            transientFailure = error;
             this.logger.error(
               { err: error, userId, endpoint: sub.endpoint },
               "Failed to send push notification"
@@ -65,5 +73,10 @@ export class PushService {
         }
       })
     );
+
+    // A temporary failure (network, push-service 5xx, rate limit) has to fail
+    // the job so the queue retries it — swallowing it would silently drop the
+    // Chrome notification even though the in-app one exists.
+    if (transientFailure) throw transientFailure;
   }
 }

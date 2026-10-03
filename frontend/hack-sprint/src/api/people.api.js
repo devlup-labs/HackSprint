@@ -2,11 +2,13 @@ import client from "./client";
 import { API } from "./endpoints";
 
 export const PeopleAPI = {
-  getCluster() {
-    return client.get(`${API.PROFILE}/people`);
+  search(q, signal) {
+    return client.get(`${API.PROFILE}/people`, { params: { q, limit: 6 }, signal });
   },
-
-  sendMessage(userId, message) {
-    return client.post(`${API.PROFILE}/id/${userId}/contact`, { message });
+  campus() {
+    return client.get(`${API.PROFILE}/people/campus`);
+  },
+  district(districtId, page = 1, limit = 5) {
+    return client.get(`${API.PROFILE}/people/district/${districtId}`, { params: { page, limit } });
   },
 };

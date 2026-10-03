@@ -7,8 +7,8 @@ import { Sentry } from "../config/sentry.js";
 export const pushWorker = new Worker(
   "push",
   async (job) => {
-    const { userId, title, message, actionUrl } = job.data;
-    await pushService.sendToUser(userId, { title, message, actionUrl });
+    const { userId, notificationId, title, message, actionUrl } = job.data;
+    await pushService.sendToUser(userId, { notificationId, title, message, actionUrl });
 
     logger.info({ jobId: job.id, userId }, "Push job processed");
   },

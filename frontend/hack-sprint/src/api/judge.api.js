@@ -28,6 +28,18 @@ export const JudgeAPI = {
     );
   },
 
+  getMyInvitations(config = {}) {
+    return client.get(`${API.JUDGE}/judges/invitations`, config);
+  },
+
+  acceptInvitation(invitationId) {
+    return client.post(`${API.JUDGE}/judges/invitations/${invitationId}/accept`);
+  },
+
+  declineInvitation(invitationId) {
+    return client.post(`${API.JUDGE}/judges/invitations/${invitationId}/decline`);
+  },
+
   reviewSubmission(submissionId, data) {
     return client.post(
       `${API.JUDGE}/judges/submissions/${submissionId}/review`,

@@ -14,13 +14,13 @@ export class DiscussionService {
 
   async createMessage({ userId, hackathonId, content, parentMessage }) {
     if (!mongoose.Types.ObjectId.isValid(hackathonId)) {
-      throw new BadRequestError("Invalid hackathon id");
+      throw new BadRequestError("Invalid event id");
     }
 
     const hackathon = await this.hackathonRepository.getById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     if (!content?.trim()) {

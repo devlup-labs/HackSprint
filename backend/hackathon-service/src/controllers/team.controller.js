@@ -8,7 +8,7 @@ export const createTeam = async (req, res, next) => {
     const { teamName } = req.body || {};
 
     if (!hackathonId) {
-      throw new BadRequestError("Hackathon id is required");
+      throw new BadRequestError("Event id is required");
     }
 
     if (!teamName?.trim()) {

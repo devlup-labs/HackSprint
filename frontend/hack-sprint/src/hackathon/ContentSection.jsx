@@ -4,6 +4,7 @@ import {
   ChevronDown,
   ChevronUp,
   Trophy,
+  Check,
   Download,
   Mail,
   Phone as PhoneIcon,
@@ -15,6 +16,7 @@ import Upvote from "./Upvote";
 import Gallery from "./Gallery";
 import { HackathonAPI } from "../api/hackathon.api.js";
 import { getFileMeta, formatBytes } from "../utils/fileType.js";
+import "../pages/Styles/AllHackathons.css";
 
 const FontStyle = () => (
   <style>{`
@@ -24,7 +26,7 @@ const FontStyle = () => (
     .hk-details h4 {
       font-family: 'Syne', sans-serif;
       font-weight: 800;
-      color: #ffffff;
+      color: var(--hk-text);
       letter-spacing: -0.01em;
       margin-top: 2rem;
       margin-bottom: 0.75rem;
@@ -42,7 +44,7 @@ const FontStyle = () => (
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.78rem;
       line-height: 1.75;
-      color: rgba(180,220,180,0.62);
+      color: rgba(var(--hk-text-rgb),0.62);
       margin-bottom: 1rem;
     }
 
@@ -51,7 +53,7 @@ const FontStyle = () => (
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.78rem;
       line-height: 1.75;
-      color: rgba(180,220,180,0.62);
+      color: rgba(var(--hk-text-rgb),0.62);
       margin: 0 0 1.25rem 0;
       padding-left: 1.1rem;
       display: flex;
@@ -68,7 +70,7 @@ const FontStyle = () => (
       width: 5px;
       height: 5px;
       border-radius: 50%;
-      background: #5fff60;
+      background: var(--hk-accent-solid);
     }
     .hk-details ol {
       list-style: none;
@@ -86,7 +88,7 @@ const FontStyle = () => (
       top: 0;
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.68rem;
-      color: #5fff60;
+      color: var(--hk-accent-solid);
       font-weight: 600;
     }
     .hk-details li > ul,
@@ -96,42 +98,43 @@ const FontStyle = () => (
     }
 
     .hk-details strong {
-      color: #ffffff;
+      color: var(--hk-text);
       font-weight: 600;
     }
     .hk-details em {
       font-style: italic;
-      color: rgba(180,220,180,0.45);
+      color: rgba(var(--hk-text-rgb),0.45);
     }
 
     .hk-details a {
-      color: #5fff60;
+      color: var(--hk-accent-solid);
       text-decoration: underline;
       text-underline-offset: 2px;
-      text-decoration-color: rgba(95,255,96,0.4);
+      text-decoration-color: rgba(var(--hk-accent-rgb),0.4);
       transition: color 0.15s;
     }
     .hk-details a:hover {
-      color: #7fff80;
-      text-decoration-color: #7fff80;
+      color: var(--hk-accent-solid);
+      opacity: 0.8;
+      text-decoration-color: var(--hk-accent-solid);
     }
 
     .hk-details blockquote {
       margin: 1.5rem 0;
       padding: 0.9rem 1.2rem;
-      border-left: 2px solid #5fff60;
-      background: rgba(95,255,96,0.04);
+      border-left: 2px solid var(--hk-accent-solid);
+      background: rgba(var(--hk-accent-rgb),0.04);
       border-radius: 0 3px 3px 0;
     }
     .hk-details blockquote p {
       font-style: italic;
-      color: rgba(180,220,180,0.75);
+      color: rgba(var(--hk-text-rgb),0.75);
       margin-bottom: 0;
     }
 
     .hk-details hr {
       border: none;
-      border-top: 1px solid rgba(95,255,96,0.1);
+      border-top: 1px solid rgba(var(--hk-accent-rgb),0.1);
       margin: 2rem 0;
     }
 
@@ -144,44 +147,44 @@ const FontStyle = () => (
     }
     .hk-details th,
     .hk-details td {
-      border: 1px solid rgba(95,255,96,0.1);
+      border: 1px solid rgba(var(--hk-accent-rgb),0.1);
       padding: 0.5rem 0.75rem;
       text-align: left;
-      color: rgba(180,220,180,0.6);
+      color: rgba(var(--hk-text-rgb),0.6);
     }
     .hk-details th {
-      color: #5fff60;
+      color: var(--hk-accent-solid);
       font-weight: 600;
-      background: rgba(95,255,96,0.03);
+      background: rgba(var(--hk-accent-rgb),0.03);
     }
   `}</style>
 );
 
 const Card = ({ children, className = "" }) => (
   <div
-    className={`relative bg-[rgba(10,12,10,0.88)] border border-[rgba(95,255,96,0.1)] rounded-[4px] backdrop-blur-sm p-5 hover:border-[rgba(95,255,96,0.24)] transition-all ${className}`}
+    className={`relative bg-[rgba(var(--hk-card-bg),0.88)] border border-[rgba(var(--hk-card-border-rgb),0.16)] dark:border-[rgba(var(--hk-card-border-rgb),0.1)] rounded-[4px] backdrop-blur-sm p-5 hover:border-[rgba(var(--hk-accent-rgb),0.24)] transition-all ${className}`}
   >
-    <span className="absolute top-[-1px] left-[-1px] w-2 h-2 border-t-2 border-l-2 border-[rgba(95,255,96,0.35)]" />
-    <span className="absolute bottom-[-1px] right-[-1px] w-2 h-2 border-b-2 border-r-2 border-[rgba(95,255,96,0.35)]" />
+    <span className="absolute top-[-1px] left-[-1px] w-2 h-2 border-t-2 border-l-2 border-[rgba(var(--hk-accent-rgb),0.35)]" />
+    <span className="absolute bottom-[-1px] right-[-1px] w-2 h-2 border-b-2 border-r-2 border-[rgba(var(--hk-accent-rgb),0.35)]" />
     {children}
   </div>
 );
 
 const SectionHead = ({ children }) => (
-  <h3 className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-2xl sm:text-3xl tracking-tight mb-5">
+  <h3 className="font-[family-name:'Syne',sans-serif] font-extrabold text-[var(--hk-text)] text-2xl sm:text-3xl tracking-tight mb-5">
     {children}
   </h3>
 );
 
 const SubHead = ({ icon: Icon, children }) => (
-  <h4 className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-lg tracking-tight mb-3 flex items-center gap-2">
-    {Icon && <Icon size={16} className="text-[#5fff60] flex-shrink-0" />}
+  <h4 className="font-[family-name:'Syne',sans-serif] font-extrabold text-[var(--hk-text)] text-lg tracking-tight mb-3 flex items-center gap-2">
+    {Icon && <Icon size={16} className="text-[var(--hk-accent-solid)] flex-shrink-0" />}
     {children}
   </h4>
 );
 
 const Empty = ({ label }) => (
-  <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.65rem] text-[rgba(180,220,180,0.35)] tracking-[0.04em]">
+  <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.65rem] text-[rgba(var(--hk-text-rgb),0.35)] tracking-[0.04em]">
     No {label} information provided.
   </p>
 );
@@ -217,7 +220,7 @@ const ResultsSection = ({ hackathonId }) => {
         {[...Array(3)].map((_, i) => (
           <div
             key={i}
-            className="h-16 rounded-[4px] bg-[rgba(95,255,96,0.04)] border border-[rgba(95,255,96,0.08)] overflow-hidden relative animate-pulse"
+            className="h-16 rounded-[4px] bg-[rgba(var(--hk-accent-rgb),0.04)] border border-[rgba(var(--hk-accent-rgb),0.08)] overflow-hidden relative animate-pulse"
           />
         ))}
       </div>
@@ -227,13 +230,13 @@ const ResultsSection = ({ hackathonId }) => {
     return (
       <Card>
         <div className="flex flex-col items-center justify-center py-10 gap-3">
-          <div className="w-12 h-12 rounded-[3px] bg-[rgba(95,255,96,0.05)] border border-[rgba(95,255,96,0.1)] flex items-center justify-center">
-            <Trophy size={20} className="text-[rgba(95,255,96,0.2)]" />
+          <div className="w-12 h-12 rounded-[3px] bg-[rgba(var(--hk-accent-rgb),0.05)] border border-[rgba(var(--hk-accent-rgb),0.1)] flex items-center justify-center">
+            <Trophy size={20} className="text-[rgba(var(--hk-accent-rgb),0.2)]" />
           </div>
-          <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.65rem] text-[rgba(180,220,180,0.35)] tracking-[0.06em] uppercase">
+          <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.65rem] text-[rgba(var(--hk-text-rgb),0.35)] tracking-[0.06em] uppercase">
             {error || "No results announced yet."}
           </p>
-          <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.58rem] text-[rgba(180,220,180,0.22)]">
+          <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.58rem] text-[rgba(var(--hk-text-rgb),0.22)]">
             Check back once judging is complete.
           </p>
         </div>
@@ -276,7 +279,7 @@ const ResultsSection = ({ hackathonId }) => {
 
   return (
     <div>
-      <SectionHead>Hackathon Results</SectionHead>
+      <SectionHead>Event Results</SectionHead>
 
       {results.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
@@ -291,7 +294,7 @@ const ResultsSection = ({ hackathonId }) => {
                 key={sub._id}
                 className={`relative rounded-[4px] border ${p.border} ${p.bg} p-4 flex flex-col gap-3 hover:-translate-y-0.5 transition-all`}
               >
-                <span className="absolute top-[-1px] left-[-1px] w-2 h-2 border-t-2 border-l-2 border-[rgba(95,255,96,0.25)]" />
+                <span className="absolute top-[-1px] left-[-1px] w-2 h-2 border-t-2 border-l-2 border-[rgba(var(--hk-accent-rgb),0.25)]" />
                 <div className="flex items-center justify-between">
                   <span
                     className={`font-[family-name:'JetBrains_Mono',monospace] text-[0.55rem] tracking-[0.12em] uppercase px-2 py-[3px] rounded-[2px] border ${p.badgeCls}`}
@@ -301,10 +304,10 @@ const ResultsSection = ({ hackathonId }) => {
                   <span className="text-xl">{p.emoji}</span>
                 </div>
                 <div>
-                  <h4 className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-sm tracking-tight">
+                  <h4 className="font-[family-name:'Syne',sans-serif] font-extrabold text-[var(--hk-text)] text-sm tracking-tight">
                     {name}
                   </h4>
-                  <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.55rem] text-[rgba(180,220,180,0.3)] mt-0.5">
+                  <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.55rem] text-[rgba(var(--hk-text-rgb),0.3)] mt-0.5">
                     {sub.team ? "Team" : "Individual"}
                   </p>
                 </div>
@@ -315,11 +318,11 @@ const ResultsSection = ({ hackathonId }) => {
                     >
                       {sub.finalScore?.toFixed?.(1) ?? sub.finalScore}
                     </span>
-                    <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.5rem] text-[rgba(180,220,180,0.28)] uppercase tracking-[0.1em]">
+                    <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.5rem] text-[rgba(var(--hk-text-rgb),0.28)] uppercase tracking-[0.1em]">
                       pts
                     </span>
                   </div>
-                  <div className="h-1 w-full rounded-full bg-[rgba(255,255,255,0.06)] overflow-hidden">
+                  <div className="h-1 w-full rounded-full bg-[rgba(var(--hk-text-rgb),0.08)] overflow-hidden">
                     <div
                       className={`h-full rounded-full ${p.bar} transition-all duration-700`}
                       style={{ width: `${pct}%` }}
@@ -333,12 +336,12 @@ const ResultsSection = ({ hackathonId }) => {
       )}
 
       {results.length > 3 && (
-        <div className="bg-[rgba(10,12,10,0.88)] border border-[rgba(95,255,96,0.1)] rounded-[4px] overflow-hidden">
-          <div className="grid grid-cols-[2rem_1fr_auto] gap-4 px-5 py-3 border-b border-[rgba(95,255,96,0.07)]">
+        <div className="bg-[rgba(var(--hk-card-bg),0.88)] border border-[rgba(var(--hk-card-border-rgb),0.16)] dark:border-[rgba(var(--hk-card-border-rgb),0.1)] rounded-[4px] overflow-hidden">
+          <div className="grid grid-cols-[2rem_1fr_auto] gap-4 px-5 py-3 border-b border-[rgba(var(--hk-accent-rgb),0.07)]">
             {["#", "Participant", "Score"].map((h) => (
               <span
                 key={h}
-                className="font-[family-name:'JetBrains_Mono',monospace] text-[0.5rem] tracking-[0.16em] uppercase text-[rgba(95,255,96,0.3)]"
+                className="font-[family-name:'JetBrains_Mono',monospace] text-[0.5rem] tracking-[0.16em] uppercase text-[rgba(var(--hk-accent-rgb),0.3)]"
               >
                 {h}
               </span>
@@ -352,31 +355,31 @@ const ResultsSection = ({ hackathonId }) => {
             return (
               <div
                 key={sub._id}
-                className="grid grid-cols-[2rem_1fr_auto] gap-4 items-center px-5 py-3 border-b border-[rgba(95,255,96,0.05)] last:border-b-0 hover:bg-[rgba(95,255,96,0.03)] transition-colors"
+                className="grid grid-cols-[2rem_1fr_auto] gap-4 items-center px-5 py-3 border-b border-[rgba(var(--hk-accent-rgb),0.05)] last:border-b-0 hover:bg-[rgba(var(--hk-accent-rgb),0.03)] transition-colors"
               >
-                <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.6rem] text-[rgba(95,255,96,0.3)]">
+                <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.6rem] text-[rgba(var(--hk-accent-rgb),0.3)]">
                   {String(rank).padStart(2, "0")}
                 </span>
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-7 h-7 rounded-[2px] bg-[rgba(95,255,96,0.06)] border border-[rgba(95,255,96,0.12)] flex items-center justify-center flex-shrink-0">
-                    <span className="font-[family-name:'Syne',sans-serif] font-extrabold text-[0.65rem] text-[rgba(95,255,96,0.5)]">
+                  <div className="w-7 h-7 rounded-[2px] bg-[rgba(var(--hk-accent-rgb),0.06)] border border-[rgba(var(--hk-accent-rgb),0.12)] flex items-center justify-center flex-shrink-0">
+                    <span className="font-[family-name:'Syne',sans-serif] font-extrabold text-[0.65rem] text-[rgba(var(--hk-accent-rgb),0.5)]">
                       {name.charAt(0).toUpperCase()}
                     </span>
                   </div>
                   <div className="min-w-0">
-                    <p className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-sm truncate">
+                    <p className="font-[family-name:'Syne',sans-serif] font-extrabold text-[var(--hk-text)] text-sm truncate">
                       {name}
                     </p>
-                    <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.55rem] text-[rgba(180,220,180,0.28)]">
+                    <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.55rem] text-[rgba(var(--hk-text-rgb),0.28)]">
                       {sub.team ? "Team" : "Individual"}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="font-[family-name:'Syne',sans-serif] font-extrabold text-[#5fff60] text-sm">
+                  <span className="font-[family-name:'Syne',sans-serif] font-extrabold text-[var(--hk-accent-solid)] text-sm">
                     {sub.finalScore?.toFixed?.(1) ?? sub.finalScore}
                   </span>
-                  <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.5rem] text-[rgba(95,255,96,0.3)] ml-1">
+                  <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.5rem] text-[rgba(var(--hk-accent-rgb),0.3)] ml-1">
                     pts
                   </span>
                 </div>
@@ -386,7 +389,7 @@ const ResultsSection = ({ hackathonId }) => {
         </div>
       )}
 
-      <p className="font-[family-name:'JetBrains_Mono',monospace] text-center text-[0.52rem] tracking-[0.12em] uppercase text-[rgba(95,255,96,0.2)] mt-4">
+      <p className="font-[family-name:'JetBrains_Mono',monospace] text-center text-[0.52rem] tracking-[0.12em] uppercase text-[rgba(var(--hk-accent-rgb),0.2)] mt-4">
         Final standings · Ranked by judge score
       </p>
     </div>
@@ -396,26 +399,87 @@ const ResultsSection = ({ hackathonId }) => {
 export const ContentSection = ({ activeSection, hackathon }) => {
   const [expandedFAQ, setExpandedFAQ] = useState(null);
 
-  const TimelineRow = ({ label, range, last }) => (
-    <div
-      className={`flex gap-4 pb-5 ${
-        !last ? "border-b border-[rgba(95,255,96,0.06)]" : ""
-      }`}
-    >
-      <div className="flex flex-col items-center gap-1 flex-shrink-0">
-        <div className="w-2 h-2 rounded-full bg-[#5fff60] mt-1" />
-        {!last && <div className="w-px flex-1 bg-[rgba(95,255,96,0.15)]" />}
-      </div>
-      <div className="pb-1">
-        <div className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-sm tracking-tight">
-          {label}
+  // Re-evaluated every 30s so "live now" flips on its own while the page is open.
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 30000);
+    return () => clearInterval(t);
+  }, []);
+
+  const phaseState = (p) => {
+    const start = new Date(p.startDate).getTime();
+    const end = new Date(p.endDate).getTime();
+    if (p.isActive === false) return "off";
+    if (now >= start && now <= end) return "live";
+    return now > end ? "done" : "upcoming";
+  };
+
+  const span = (ms) => {
+    const mins = Math.max(1, Math.floor(ms / 60000));
+    const d = Math.floor(mins / 1440), h = Math.floor((mins % 1440) / 60), m = mins % 60;
+    if (d >= 1) return `${d}d ${h}h`;
+    if (h >= 1) return `${h}h ${m}m`;
+    return `${m}m`;
+  };
+
+  const TimelineRow = ({ phase, range, last, nextDone }) => {
+    const state = phaseState(phase);
+    const live = state === "live", done = state === "done";
+    return (
+      <div className={`flex gap-4 ${last ? "" : "pb-1"}`}>
+        <div className="flex flex-col items-center flex-shrink-0 pt-3.5">
+          {live ? (
+            <span className="relative flex w-3.5 h-3.5">
+              <span className="absolute inset-0 rounded-full bg-[var(--hk-accent-solid)] opacity-50 animate-ping" />
+              <span className="relative w-3.5 h-3.5 rounded-full bg-[var(--hk-accent-solid)] ring-4 ring-[rgba(var(--hk-accent-rgb),0.2)]" />
+            </span>
+          ) : done ? (
+            <span className="w-3.5 h-3.5 rounded-full bg-[var(--hk-accent-solid)] flex items-center justify-center">
+              <Check size={9} strokeWidth={3.5} className="text-[var(--hk-accent-solid-text)]" />
+            </span>
+          ) : (
+            <span className="w-3.5 h-3.5 rounded-full border-2 border-[rgba(var(--hk-text-rgb),0.3)] bg-transparent" />
+          )}
+          {!last && (
+            <div className={`w-0.5 flex-1 mt-1 rounded ${done && nextDone ? "bg-[var(--hk-accent-solid)]" : done ? "bg-[linear-gradient(var(--hk-accent-solid),rgba(var(--hk-text-rgb),0.15))]" : "bg-[rgba(var(--hk-text-rgb),0.15)]"}`} />
+          )}
         </div>
-        <div className="font-[family-name:'JetBrains_Mono',monospace] text-[0.62rem] text-[rgba(180,220,180,0.45)] mt-0.5">
-          {range}
+
+        <div
+          className={`flex-1 min-w-0 py-2.5 mb-2 ${done || state === "off" ? "opacity-60" : ""}`}
+        >
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="font-[family-name:'Syne',sans-serif] font-extrabold text-[var(--hk-text)] text-sm tracking-tight">
+              {phase.phaseName}
+            </div>
+            {live && (
+              <span className="font-[family-name:'JetBrains_Mono',monospace] inline-flex items-center gap-1.5 text-[0.55rem] font-bold tracking-[0.12em] uppercase px-2 py-0.5 rounded-full bg-[var(--hk-accent-solid)] text-[var(--hk-accent-solid-text)]">
+                Live now
+              </span>
+            )}
+            {done && (
+              <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.55rem] tracking-[0.12em] uppercase text-[rgba(var(--hk-text-rgb),0.65)]">
+                Completed
+              </span>
+            )}
+            {state === "upcoming" && (
+              <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.55rem] tracking-[0.12em] uppercase text-[rgba(var(--hk-text-rgb),0.65)]">
+                Starts in {span(new Date(phase.startDate).getTime() - now)}
+              </span>
+            )}
+          </div>
+          <div className="font-[family-name:'JetBrains_Mono',monospace] text-[0.62rem] text-[rgba(var(--hk-text-rgb),0.7)] dark:text-[rgba(var(--hk-text-rgb),0.45)] mt-0.5">
+            {range}
+          </div>
+          {live && (
+            <div className="font-[family-name:'JetBrains_Mono',monospace] text-[0.64rem] font-semibold text-[var(--hk-accent-solid)] mt-1.5">
+              Ends in {span(new Date(phase.endDate).getTime() - now)}
+            </div>
+          )}
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderContent = () => {
     switch (activeSection) {
@@ -427,7 +491,7 @@ export const ContentSection = ({ activeSection, hackathon }) => {
           <div className="flex flex-col gap-5">
             <Card>
               <SubHead>Description</SubHead>
-              <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.72rem] text-[rgba(180,220,180,0.6)] leading-relaxed">
+              <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.72rem] text-[rgba(var(--hk-text-rgb),0.6)] leading-relaxed">
                 {hackathon.description}
               </p>
             </Card>
@@ -439,9 +503,10 @@ export const ContentSection = ({ activeSection, hackathon }) => {
                   {sortedPhases.map((p, i) => (
                     <TimelineRow
                       key={p._id}
-                      label={p.phaseName}
+                      phase={p}
                       range={fmtDateRange(p.startDate, p.endDate)}
                       last={i === sortedPhases.length - 1}
+                      nextDone={sortedPhases[i + 1] ? phaseState(sortedPhases[i + 1]) === "done" : false}
                     />
                   ))}
                 </div>
@@ -484,9 +549,9 @@ export const ContentSection = ({ activeSection, hackathon }) => {
               {prizes.length > 0 ? (
                 <div className="flex flex-col gap-3">
                   {total > 0 && (
-                    <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.68rem] text-[rgba(180,220,180,0.55)]">
+                    <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.68rem] text-[rgba(var(--hk-text-rgb),0.55)]">
                       Total prize pool:{" "}
-                      <span className="text-[#5fff60] font-semibold">
+                      <span className="text-[var(--hk-accent-solid)] font-semibold">
                         ₹{total.toLocaleString("en-IN")}
                       </span>
                     </p>
@@ -495,19 +560,19 @@ export const ContentSection = ({ activeSection, hackathon }) => {
                     {prizes.map((p, i) => (
                       <div
                         key={i}
-                        className="flex items-start justify-between gap-4 py-1.5 border-b border-[rgba(95,255,96,0.06)] last:border-b-0"
+                        className="flex items-start justify-between gap-4 py-1.5 border-b border-[rgba(var(--hk-accent-rgb),0.06)] last:border-b-0"
                       >
                         <div>
-                          <p className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-sm">
+                          <p className="font-[family-name:'Syne',sans-serif] font-extrabold text-[var(--hk-text)] text-sm">
                             {p.title}
                           </p>
                           {p.description && (
-                            <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.6rem] text-[rgba(180,220,180,0.4)] mt-0.5">
+                            <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.6rem] text-[rgba(var(--hk-text-rgb),0.4)] mt-0.5">
                               {p.description}
                             </p>
                           )}
                         </div>
-                        <span className="font-[family-name:'Syne',sans-serif] font-extrabold text-[#5fff60] text-sm flex-shrink-0">
+                        <span className="font-[family-name:'Syne',sans-serif] font-extrabold text-[var(--hk-accent-solid)] text-sm flex-shrink-0">
                           ₹{(p.amount || 0).toLocaleString("en-IN")}
                         </span>
                       </div>
@@ -530,13 +595,13 @@ export const ContentSection = ({ activeSection, hackathon }) => {
             <Card>
               {jc && (jc.minScore != null || jc.maxScore != null) ? (
                 <div className="flex items-center gap-3">
-                  <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.72rem] text-[rgba(180,220,180,0.6)]">
+                  <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.72rem] text-[rgba(var(--hk-text-rgb),0.6)]">
                     Submissions are scored on a scale of{" "}
-                    <span className="text-[#5fff60] font-semibold">
+                    <span className="text-[var(--hk-accent-solid)] font-semibold">
                       {jc.minScore}
                     </span>{" "}
                     to{" "}
-                    <span className="text-[#5fff60] font-semibold">
+                    <span className="text-[var(--hk-accent-solid)] font-semibold">
                       {jc.maxScore}
                     </span>
                     .
@@ -564,32 +629,32 @@ export const ContentSection = ({ activeSection, hackathon }) => {
                       key={idx}
                       className={`relative border rounded-[4px] overflow-hidden transition-all ${
                         open
-                          ? "border-[rgba(95,255,96,0.28)] bg-[rgba(95,255,96,0.04)]"
-                          : "border-[rgba(95,255,96,0.1)] bg-[rgba(10,12,10,0.88)]"
+                          ? "border-[rgba(var(--hk-accent-rgb),0.28)] bg-[rgba(var(--hk-accent-rgb),0.04)]"
+                          : "border-[rgba(var(--hk-card-border-rgb),0.16)] dark:border-[rgba(var(--hk-card-border-rgb),0.1)] bg-[rgba(var(--hk-card-bg),0.88)]"
                       }`}
                     >
                       <button
                         onClick={() => setExpandedFAQ(open ? null : idx)}
                         className="w-full flex items-center justify-between gap-4 px-5 py-4 cursor-pointer text-left group"
                       >
-                        <span className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-sm tracking-tight group-hover:text-[rgba(255,255,255,0.85)]">
+                        <span className="font-[family-name:'Syne',sans-serif] font-extrabold text-[var(--hk-text)] text-sm tracking-tight group-hover:opacity-85">
                           {faq.question}
                         </span>
                         {open ? (
                           <ChevronUp
                             size={14}
-                            className="text-[#5fff60] flex-shrink-0"
+                            className="text-[var(--hk-accent-solid)] flex-shrink-0"
                           />
                         ) : (
                           <ChevronDown
                             size={14}
-                            className="text-[rgba(95,255,96,0.45)] flex-shrink-0"
+                            className="text-[rgba(var(--hk-accent-rgb),0.45)] flex-shrink-0"
                           />
                         )}
                       </button>
                       {open && (
-                        <div className="px-5 pb-4 border-t border-[rgba(95,255,96,0.08)]">
-                          <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.68rem] text-[rgba(180,220,180,0.55)] leading-relaxed pt-3">
+                        <div className="px-5 pb-4 border-t border-[rgba(var(--hk-accent-rgb),0.08)]">
+                          <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.68rem] text-[rgba(var(--hk-text-rgb),0.55)] leading-relaxed pt-3">
                             {faq.answer}
                           </p>
                         </div>
@@ -623,9 +688,9 @@ export const ContentSection = ({ activeSection, hackathon }) => {
                       target="_blank"
                       rel="noopener noreferrer"
                       download={r.title || undefined}
-                      className="group relative flex items-center gap-3 bg-[rgba(10,12,10,0.88)] border border-[rgba(95,255,96,0.1)] rounded-[4px] p-4 hover:border-[rgba(95,255,96,0.3)] hover:-translate-y-0.5 transition-all"
+                      className="group relative flex items-center gap-3 bg-[rgba(var(--hk-card-bg),0.88)] border border-[rgba(var(--hk-card-border-rgb),0.16)] dark:border-[rgba(var(--hk-card-border-rgb),0.1)] rounded-[4px] p-4 hover:border-[rgba(var(--hk-accent-rgb),0.3)] hover:-translate-y-0.5 transition-all"
                     >
-                      <span className="absolute top-[-1px] left-[-1px] w-2 h-2 border-t-2 border-l-2 border-[rgba(95,255,96,0.3)]" />
+                      <span className="absolute top-[-1px] left-[-1px] w-2 h-2 border-t-2 border-l-2 border-[rgba(var(--hk-accent-rgb),0.3)]" />
                       <div
                         className="w-10 h-10 rounded-[3px] flex items-center justify-center flex-shrink-0 border"
                         style={{
@@ -636,15 +701,15 @@ export const ContentSection = ({ activeSection, hackathon }) => {
                         <Icon size={18} style={{ color }} />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-sm truncate">
+                        <p className="font-[family-name:'Syne',sans-serif] font-extrabold text-[var(--hk-text)] text-sm truncate">
                           {r.title || label}
                         </p>
-                        <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.6rem] text-[rgba(180,220,180,0.4)] tracking-[0.04em] mt-0.5">
+                        <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.6rem] text-[rgba(var(--hk-text-rgb),0.4)] tracking-[0.04em] mt-0.5">
                           {label}
                           {r.size ? ` · ${formatBytes(r.size)}` : ""}
                         </p>
                       </div>
-                      <div className="w-8 h-8 rounded-[3px] flex items-center justify-center flex-shrink-0 border border-[rgba(95,255,96,0.15)] text-[rgba(95,255,96,0.5)] group-hover:bg-[rgba(95,255,96,0.1)] group-hover:border-[rgba(95,255,96,0.35)] group-hover:text-[#5fff60] transition-all">
+                      <div className="w-8 h-8 rounded-[3px] flex items-center justify-center flex-shrink-0 border border-[rgba(var(--hk-accent-rgb),0.15)] text-[rgba(var(--hk-accent-rgb),0.5)] group-hover:bg-[rgba(var(--hk-accent-rgb),0.1)] group-hover:border-[rgba(var(--hk-accent-rgb),0.35)] group-hover:text-[var(--hk-accent-solid)] transition-all">
                         <Download size={14} />
                       </div>
                     </a>
@@ -681,7 +746,7 @@ export const ContentSection = ({ activeSection, hackathon }) => {
                       content = (
                         <a
                           href={`mailto:${value}`}
-                          className="font-[family-name:'JetBrains_Mono',monospace] text-[0.7rem] text-[#5fff60] hover:underline break-all flex items-center gap-1.5"
+                          className="font-[family-name:'JetBrains_Mono',monospace] text-[0.7rem] text-[var(--hk-accent-solid)] hover:underline break-all flex items-center gap-1.5"
                         >
                           <Mail size={12} /> {value}
                         </a>
@@ -690,7 +755,7 @@ export const ContentSection = ({ activeSection, hackathon }) => {
                       content = (
                         <a
                           href={`tel:${value}`}
-                          className="font-[family-name:'JetBrains_Mono',monospace] text-[0.7rem] text-[#5fff60] hover:underline break-all flex items-center gap-1.5"
+                          className="font-[family-name:'JetBrains_Mono',monospace] text-[0.7rem] text-[var(--hk-accent-solid)] hover:underline break-all flex items-center gap-1.5"
                         >
                           <PhoneIcon size={12} /> {value}
                         </a>
@@ -703,14 +768,14 @@ export const ContentSection = ({ activeSection, hackathon }) => {
                           href={value}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-[family-name:'JetBrains_Mono',monospace] text-[0.7rem] text-[#5fff60] hover:underline break-all"
+                          className="font-[family-name:'JetBrains_Mono',monospace] text-[0.7rem] text-[var(--hk-accent-solid)] hover:underline break-all"
                         >
                           {value}
                         </a>
                       );
                     else
                       content = (
-                        <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.7rem] text-[rgba(180,220,180,0.6)] break-all">
+                        <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.7rem] text-[rgba(var(--hk-text-rgb),0.6)] break-all">
                           {value}
                         </p>
                       );
@@ -720,7 +785,7 @@ export const ContentSection = ({ activeSection, hackathon }) => {
                         key={i}
                         className="flex items-center justify-between gap-3"
                       >
-                        <p className="text-[0.6rem] text-[#5fff60] uppercase tracking-wider">
+                        <p className="text-[0.6rem] text-[var(--hk-accent-solid)] uppercase tracking-wider">
                           {label}
                         </p>
                         {content}
@@ -753,7 +818,7 @@ export const ContentSection = ({ activeSection, hackathon }) => {
       default:
         return (
           <div className="text-center py-12">
-            <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.68rem] text-[rgba(180,220,180,0.35)] tracking-[0.06em] uppercase">
+            <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.68rem] text-[rgba(var(--hk-text-rgb),0.35)] tracking-[0.06em] uppercase">
               Section not found.
             </p>
           </div>

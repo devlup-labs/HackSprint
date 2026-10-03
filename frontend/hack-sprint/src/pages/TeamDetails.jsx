@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { confirmAction } from "../utils/dialogs.js";
 import { createPortal } from "react-dom";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import { ProfileAPI } from "../api/profile.api.js";
 import { TeamAPI } from "../api/team.api.js";
 import { SubmissionAPI } from "../api/submission.api.js";
+import "./Styles/AllHackathons.css";
 import {
   Users,
   Crown,
@@ -34,8 +36,8 @@ const syne = "font-[family-name:'Syne',sans-serif]";
 const IconBtn = ({ onClick, disabled, color = "green", title, children }) => {
   const c = {
     green:
-      "border-[rgba(95,255,96,0.2)] bg-[rgba(95,255,96,0.07)] text-[rgba(95,255,96,0.65)] hover:bg-[rgba(95,255,96,0.14)] hover:text-[#5fff60]",
-    red: "border-[rgba(255,60,60,0.2)] bg-[rgba(255,60,60,0.07)] text-[rgba(255,100,100,0.65)] hover:bg-[rgba(255,60,60,0.14)] hover:text-[#ff9090]",
+      "border-[rgba(var(--hk-card-border-rgb),0.32)] dark:border-[rgba(var(--hk-card-border-rgb),0.2)] bg-[rgba(var(--hk-accent-rgb),0.07)] text-[rgba(var(--hk-accent-rgb),0.95)] dark:text-[rgba(var(--hk-accent-rgb),0.65)] hover:bg-[rgba(var(--hk-accent-rgb),0.14)] hover:text-[var(--hk-accent-solid)]",
+    red: "border-[rgba(var(--hk-red-rgb),0.2)] bg-[rgba(var(--hk-red-rgb),0.07)] text-[rgba(var(--hk-red-rgb),0.65)] hover:bg-[rgba(var(--hk-red-rgb),0.14)] hover:text-[rgb(var(--hk-red-rgb))]",
   }[color];
   return (
     <button
@@ -52,13 +54,13 @@ const IconBtn = ({ onClick, disabled, color = "green", title, children }) => {
 const CopyRow = ({ label, value, copyKey, copiedItem, onCopy }) => (
   <div>
     <div
-      className={`${mono} text-[0.52rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.45)] mb-1.5`}
+      className={`${mono} text-[0.52rem] tracking-[0.14em] uppercase text-[rgba(var(--hk-accent-rgb),0.75)] dark:text-[rgba(var(--hk-accent-rgb),0.45)] mb-1.5`}
     >
       {label}
     </div>
-    <div className="flex items-center gap-2 px-3 py-2.5 bg-[rgba(95,255,96,0.04)] border border-[rgba(95,255,96,0.15)] rounded-[3px]">
+    <div className="flex items-center gap-2 px-3 py-2.5 bg-[rgba(var(--hk-accent-rgb),0.04)] border border-[rgba(var(--hk-card-border-rgb),0.24)] dark:border-[rgba(var(--hk-card-border-rgb),0.15)] rounded-[3px]">
       <span
-        className={`${mono} flex-1 text-[#5fff60] text-[0.68rem] truncate`}
+        className={`${mono} flex-1 text-[var(--hk-accent-solid)] text-[0.68rem] truncate`}
         title={value}
       >
         {value}
@@ -71,35 +73,35 @@ const CopyRow = ({ label, value, copyKey, copiedItem, onCopy }) => (
 );
 
 const MemberCard = ({ member, isLeader, canRemove, onRemove, removing }) => (
-  <div className="relative bg-[rgba(10,12,10,0.88)] border border-[rgba(95,255,96,0.1)] rounded-[4px] p-4 hover:border-[rgba(95,255,96,0.25)] transition-all">
-    <span className="absolute top-[-1px] left-[-1px] w-2 h-2 border-t-2 border-l-2 border-[rgba(95,255,96,0.35)]" />
-    <span className="absolute bottom-[-1px] right-[-1px] w-2 h-2 border-b-2 border-r-2 border-[rgba(95,255,96,0.35)]" />
+  <div className="relative bg-[rgba(var(--hk-card-bg),0.88)] border border-[rgba(var(--hk-card-border-rgb),0.16)] dark:border-[rgba(var(--hk-card-border-rgb),0.1)] rounded-[4px] p-4 hover:border-[rgba(var(--hk-accent-rgb),0.25)] transition-all">
+    <span className="absolute top-[-1px] left-[-1px] w-2 h-2 border-t-2 border-l-2 border-[rgba(var(--hk-card-border-rgb),0.56)] dark:border-[rgba(var(--hk-card-border-rgb),0.35)]" />
+    <span className="absolute bottom-[-1px] right-[-1px] w-2 h-2 border-b-2 border-r-2 border-[rgba(var(--hk-card-border-rgb),0.56)] dark:border-[rgba(var(--hk-card-border-rgb),0.35)]" />
     <div className="flex items-start justify-between gap-2 mb-3">
       <div className="flex items-center gap-3 min-w-0">
         <div
           className={`w-9 h-9 rounded-full flex items-center justify-center border flex-shrink-0 ${
             isLeader
-              ? "bg-[rgba(255,184,77,0.1)] border-[rgba(255,184,77,0.3)]"
-              : "bg-[rgba(95,255,96,0.07)] border-[rgba(95,255,96,0.2)]"
+              ? "bg-[rgba(var(--hk-amber-rgb),0.1)] border-[rgba(var(--hk-amber-rgb),0.3)]"
+              : "bg-[rgba(var(--hk-accent-rgb),0.07)] border-[rgba(var(--hk-card-border-rgb),0.32)] dark:border-[rgba(var(--hk-card-border-rgb),0.2)]"
           }`}
         >
           {isLeader ? (
-            <Crown size={14} className="text-[#ffb84d]" />
+            <Crown size={14} className="text-[rgb(var(--hk-amber-rgb))]" />
           ) : (
-            <User size={14} className="text-[rgba(95,255,96,0.6)]" />
+            <User size={14} className="text-[rgba(var(--hk-accent-rgb),0.9)] dark:text-[rgba(var(--hk-accent-rgb),0.6)]" />
           )}
         </div>
         <div className="min-w-0">
           <h3
-            className={`${syne} font-extrabold text-white text-sm tracking-tight truncate`}
+            className={`${syne} font-extrabold text-[var(--hk-text)] text-sm tracking-tight truncate`}
           >
             {member.name}
           </h3>
           <p
             className={`${mono} text-[0.55rem] tracking-[0.08em] ${
               isLeader
-                ? "text-[rgba(255,184,77,0.6)]"
-                : "text-[rgba(180,220,180,0.4)]"
+                ? "text-[rgba(var(--hk-amber-rgb),0.6)]"
+                : "text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-text-rgb),0.4)]"
             }`}
           >
             {isLeader ? "Team Leader" : "Member"}
@@ -118,30 +120,30 @@ const MemberCard = ({ member, isLeader, canRemove, onRemove, removing }) => (
       )}
     </div>
     <div
-      className={`${mono} flex items-center gap-1.5 text-[0.62rem] text-[rgba(180,220,180,0.55)]`}
+      className={`${mono} flex items-center gap-1.5 text-[0.62rem] text-[rgba(var(--hk-text-rgb),0.9)] dark:text-[rgba(var(--hk-text-rgb),0.55)]`}
     >
-      <Mail size={11} className="text-[rgba(95,255,96,0.45)] flex-shrink-0" />
+      <Mail size={11} className="text-[rgba(var(--hk-accent-rgb),0.75)] dark:text-[rgba(var(--hk-accent-rgb),0.45)] flex-shrink-0" />
       <span className="truncate">{member.email}</span>
     </div>
   </div>
 );
 
 const PendingCard = ({ request, onAction, actionLoading, formatDate }) => (
-  <div className="relative bg-[rgba(10,12,10,0.88)] border border-[rgba(255,184,77,0.15)] rounded-[4px] p-4 hover:border-[rgba(255,184,77,0.28)] transition-all">
-    <span className="absolute top-[-1px] left-[-1px] w-2 h-2 border-t-2 border-l-2 border-[rgba(255,184,77,0.4)]" />
-    <span className="absolute bottom-[-1px] right-[-1px] w-2 h-2 border-b-2 border-r-2 border-[rgba(255,184,77,0.4)]" />
+  <div className="relative bg-[rgba(var(--hk-card-bg),0.88)] border border-[rgba(var(--hk-amber-rgb),0.15)] rounded-[4px] p-4 hover:border-[rgba(var(--hk-amber-rgb),0.28)] transition-all">
+    <span className="absolute top-[-1px] left-[-1px] w-2 h-2 border-t-2 border-l-2 border-[rgba(var(--hk-amber-rgb),0.4)]" />
+    <span className="absolute bottom-[-1px] right-[-1px] w-2 h-2 border-b-2 border-r-2 border-[rgba(var(--hk-amber-rgb),0.4)]" />
     <div className="flex items-start justify-between gap-3 mb-3">
       <div className="flex items-center gap-2.5 min-w-0">
-        <div className="w-9 h-9 rounded-full flex items-center justify-center border bg-[rgba(255,184,77,0.08)] border-[rgba(255,184,77,0.25)] flex-shrink-0">
-          <Clock size={13} className="text-[#ffb84d]" />
+        <div className="w-9 h-9 rounded-full flex items-center justify-center border bg-[rgba(var(--hk-amber-rgb),0.08)] border-[rgba(var(--hk-amber-rgb),0.25)] flex-shrink-0">
+          <Clock size={13} className="text-[rgb(var(--hk-amber-rgb))]" />
         </div>
         <div className="min-w-0">
           <h3
-            className={`${syne} font-extrabold text-white text-sm tracking-tight truncate`}
+            className={`${syne} font-extrabold text-[var(--hk-text)] text-sm tracking-tight truncate`}
           >
             {request.name}
           </h3>
-          <p className={`${mono} text-[0.55rem] text-[rgba(180,220,180,0.4)]`}>
+          <p className={`${mono} text-[0.55rem] text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-text-rgb),0.4)]`}>
             Requested {formatDate(request.createdAt)}
           </p>
         </div>
@@ -164,9 +166,9 @@ const PendingCard = ({ request, onAction, actionLoading, formatDate }) => (
       </div>
     </div>
     <div
-      className={`${mono} flex items-center gap-1.5 text-[0.62rem] text-[rgba(180,220,180,0.55)]`}
+      className={`${mono} flex items-center gap-1.5 text-[0.62rem] text-[rgba(var(--hk-text-rgb),0.9)] dark:text-[rgba(var(--hk-text-rgb),0.55)]`}
     >
-      <Mail size={11} className="text-[rgba(95,255,96,0.45)] flex-shrink-0" />
+      <Mail size={11} className="text-[rgba(var(--hk-accent-rgb),0.75)] dark:text-[rgba(var(--hk-accent-rgb),0.45)] flex-shrink-0" />
       <span className="truncate">{request.email}</span>
     </div>
   </div>
@@ -287,7 +289,7 @@ const TeamDetails = () => {
   };
 
   const handleRemoveMember = async (userId, name) => {
-    if (!window.confirm(`Remove ${name} from the team?`)) return;
+    if (!(await confirmAction({ title: `Remove ${name}?`, message: "They'll be taken off your team.", confirmLabel: "Remove", danger: true }))) return;
     setRemovingId(userId);
     try {
       await TeamAPI.removeMember(teamData._id, userId);
@@ -301,7 +303,7 @@ const TeamDetails = () => {
   };
 
   const handleLeaveTeam = async () => {
-    if (!window.confirm("Are you sure you want to leave this team?")) return;
+    if (!(await confirmAction({ title: "Leave this team?", message: "You can request to join again later with the team code.", confirmLabel: "Leave team", danger: true }))) return;
     setLeaving(true);
     try {
       await TeamAPI.leaveTeam(teamData._id);
@@ -314,12 +316,7 @@ const TeamDetails = () => {
   };
 
   const handleDeleteTeam = async () => {
-    if (
-      !window.confirm(
-        "Delete this team permanently? Every member will be removed. This cannot be undone."
-      )
-    )
-      return;
+    if (!(await confirmAction({ title: "Delete this team?", message: "Every member is removed and the team is gone for good. This can't be undone.", confirmLabel: "Delete team", danger: true }))) return;
     setDeleting(true);
     try {
       await TeamAPI.deleteTeam(teamData._id);
@@ -357,11 +354,11 @@ const TeamDetails = () => {
 
   if (loading || !teamData)
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center gap-3">
+      <div className="min-h-screen bg-[var(--hk-bg)] flex flex-col items-center justify-center gap-3">
         <style>{`@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@700;800&display=swap');`}</style>
-        <div className="w-8 h-8 rounded-full border-2 border-[rgba(95,255,96,0.15)] border-t-[#5fff60] animate-spin" />
+        <div className="w-8 h-8 rounded-full border-2 border-[rgba(var(--hk-card-border-rgb),0.24)] dark:border-[rgba(var(--hk-card-border-rgb),0.15)] border-t-[var(--hk-accent-solid)] animate-spin" />
         <p
-          className={`${mono} text-[0.62rem] tracking-[0.1em] uppercase text-[rgba(95,255,96,0.4)]`}
+          className={`${mono} text-[0.62rem] tracking-[0.1em] uppercase text-[rgba(var(--hk-accent-rgb),0.7)] dark:text-[rgba(var(--hk-accent-rgb),0.4)]`}
         >
           Loading team details…
         </p>
@@ -384,14 +381,14 @@ const TeamDetails = () => {
     <>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@700;800&display=swap');`}</style>
       <div
-        className={`${mono} min-h-screen bg-[#0a0a0a] text-[#e8ffe8] relative overflow-x-hidden`}
+        className={`${mono} min-h-screen bg-[var(--hk-bg)] text-[var(--hk-text)] relative overflow-x-hidden`}
       >
         {/* grid bg */}
         <div
           className="fixed inset-0 pointer-events-none z-0"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(95,255,96,.026) 1px,transparent 1px),linear-gradient(90deg,rgba(95,255,96,.026) 1px,transparent 1px)",
+              "linear-gradient(rgba(var(--hk-accent-rgb),.026) 1px,transparent 1px),linear-gradient(90deg,rgba(var(--hk-accent-rgb),.026) 1px,transparent 1px)",
             backgroundSize: "44px 44px",
           }}
         />
@@ -399,7 +396,7 @@ const TeamDetails = () => {
           className="fixed top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] pointer-events-none z-0 rounded-full"
           style={{
             background:
-              "radial-gradient(ellipse,rgba(95,255,96,.06) 0%,transparent 65%)",
+              "radial-gradient(ellipse,rgba(var(--hk-accent-rgb),.06) 0%,transparent 65%)",
           }}
         />
 
@@ -407,7 +404,7 @@ const TeamDetails = () => {
           <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
             <div>
               <div
-                className={`${mono} text-[0.52rem] tracking-[0.2em] uppercase text-[rgba(95,255,96,0.4)] mb-2`}
+                className={`${mono} text-[0.52rem] tracking-[0.2em] uppercase text-[rgba(var(--hk-accent-rgb),0.7)] dark:text-[rgba(var(--hk-accent-rgb),0.4)] mb-2`}
               >
                 Team Dashboard
               </div>
@@ -417,7 +414,7 @@ const TeamDetails = () => {
                     autoFocus
                     value={newTeamName}
                     onChange={(e) => setNewTeamName(e.target.value)}
-                    className={`${mono} bg-[rgba(18,22,18,0.7)] border border-[rgba(95,255,96,0.25)] rounded-[3px] px-3 py-1.5 text-white text-xl sm:text-2xl focus:outline-none focus:border-[rgba(95,255,96,0.5)]`}
+                    className={`${mono} bg-[rgba(var(--hk-input-bg),0.7)] border border-[rgba(var(--hk-card-border-rgb),0.4)] dark:border-[rgba(var(--hk-card-border-rgb),0.25)] rounded-[3px] px-3 py-1.5 text-[var(--hk-text)] text-xl sm:text-2xl focus:outline-none focus:border-[rgba(var(--hk-accent-rgb),0.5)]`}
                   />
                   <IconBtn onClick={handleSaveName} disabled={savingName} title="Save">
                     <Save size={13} />
@@ -428,14 +425,14 @@ const TeamDetails = () => {
                 </div>
               ) : (
                 <h1
-                  className={`${syne} font-extrabold text-white text-3xl sm:text-4xl tracking-tight mb-1.5 flex items-center gap-3`}
+                  className={`${syne} font-extrabold text-[var(--hk-text)] text-3xl sm:text-4xl tracking-tight mb-1.5 flex items-center gap-3`}
                 >
                   {teamData.name}
                   {isLeader && (
                     <button
                       onClick={startRename}
                       title="Rename team"
-                      className="text-[rgba(95,255,96,0.4)] hover:text-[#5fff60] transition-colors cursor-pointer"
+                      className="text-[rgba(var(--hk-accent-rgb),0.7)] dark:text-[rgba(var(--hk-accent-rgb),0.4)] hover:text-[var(--hk-accent-solid)] transition-colors cursor-pointer"
                     >
                       <Pencil size={16} />
                     </button>
@@ -443,7 +440,7 @@ const TeamDetails = () => {
                 </h1>
               )}
               <p
-                className={`${mono} text-[0.65rem] text-[rgba(180,220,180,0.5)] tracking-[0.04em]`}
+                className={`${mono} text-[0.65rem] text-[rgba(var(--hk-text-rgb),0.85)] dark:text-[rgba(var(--hk-text-rgb),0.5)] tracking-[0.04em]`}
               >
                 Created {formatDate(teamData.createdAt)} · {allMembers.length}/
                 {teamData.maxTeamSize} members
@@ -455,7 +452,7 @@ const TeamDetails = () => {
                 onClick={handleDeleteTeam}
                 disabled={deleting || !isRegistrationOpen}
                 title={!isRegistrationOpen ? lockedReason : undefined}
-                className={`${mono} inline-flex items-center gap-2 text-[0.62rem] tracking-[0.08em] uppercase px-4 py-2.5 rounded-[3px] border cursor-pointer transition-all border-[rgba(255,60,60,0.25)] bg-[rgba(255,60,60,0.06)] text-[rgba(255,120,120,0.75)] hover:bg-[rgba(255,60,60,0.12)] hover:text-[#ff9090] disabled:opacity-40 disabled:cursor-not-allowed`}
+                className={`${mono} inline-flex items-center gap-2 text-[0.62rem] tracking-[0.08em] uppercase px-4 py-2.5 rounded-[3px] border cursor-pointer transition-all border-[rgba(var(--hk-red-rgb),0.25)] bg-[rgba(var(--hk-red-rgb),0.06)] text-[rgba(var(--hk-red-rgb),0.75)] hover:bg-[rgba(var(--hk-red-rgb),0.12)] hover:text-[rgb(var(--hk-red-rgb))] disabled:opacity-40 disabled:cursor-not-allowed`}
               >
                 {isRegistrationOpen ? <Trash2 size={13} /> : <Lock size={13} />}{" "}
                 {deleting ? "Deleting…" : "Delete Team"}
@@ -465,7 +462,7 @@ const TeamDetails = () => {
                 onClick={handleLeaveTeam}
                 disabled={leaving || !isRegistrationOpen}
                 title={!isRegistrationOpen ? lockedReason : undefined}
-                className={`${mono} inline-flex items-center gap-2 text-[0.62rem] tracking-[0.08em] uppercase px-4 py-2.5 rounded-[3px] border cursor-pointer transition-all border-[rgba(255,60,60,0.25)] bg-[rgba(255,60,60,0.06)] text-[rgba(255,120,120,0.75)] hover:bg-[rgba(255,60,60,0.12)] hover:text-[#ff9090] disabled:opacity-40 disabled:cursor-not-allowed`}
+                className={`${mono} inline-flex items-center gap-2 text-[0.62rem] tracking-[0.08em] uppercase px-4 py-2.5 rounded-[3px] border cursor-pointer transition-all border-[rgba(var(--hk-red-rgb),0.25)] bg-[rgba(var(--hk-red-rgb),0.06)] text-[rgba(var(--hk-red-rgb),0.75)] hover:bg-[rgba(var(--hk-red-rgb),0.12)] hover:text-[rgb(var(--hk-red-rgb))] disabled:opacity-40 disabled:cursor-not-allowed`}
               >
                 {isRegistrationOpen ? <LogOut size={13} /> : <Lock size={13} />}{" "}
                 {leaving ? "Leaving…" : "Leave Team"}
@@ -474,7 +471,7 @@ const TeamDetails = () => {
           </div>
           {!isRegistrationOpen && (
             <p
-              className={`${mono} text-[0.58rem] text-[rgba(255,184,77,0.6)] -mt-6 mb-6 flex items-center gap-1.5`}
+              className={`${mono} text-[0.58rem] text-[rgba(var(--hk-amber-rgb),0.6)] -mt-6 mb-6 flex items-center gap-1.5`}
             >
               <Lock size={10} /> {lockedReason}
             </p>
@@ -483,16 +480,16 @@ const TeamDetails = () => {
           {isLeader && (
             <>
               {spotsLeft > 0 && (
-                <div className="relative bg-[rgba(10,12,10,0.88)] border border-[rgba(95,255,96,0.12)] rounded-[4px] p-6 mb-7">
-                  <span className="absolute top-[-1px] left-[-1px] w-2.5 h-2.5 border-t-2 border-l-2 border-[rgba(95,255,96,0.45)]" />
-                  <span className="absolute bottom-[-1px] right-[-1px] w-2.5 h-2.5 border-b-2 border-r-2 border-[rgba(95,255,96,0.45)]" />
+                <div className="relative bg-[rgba(var(--hk-card-bg),0.88)] border border-[rgba(var(--hk-card-border-rgb),0.19)] dark:border-[rgba(var(--hk-card-border-rgb),0.12)] rounded-[4px] p-6 mb-7">
+                  <span className="absolute top-[-1px] left-[-1px] w-2.5 h-2.5 border-t-2 border-l-2 border-[rgba(var(--hk-card-border-rgb),0.72)] dark:border-[rgba(var(--hk-card-border-rgb),0.45)]" />
+                  <span className="absolute bottom-[-1px] right-[-1px] w-2.5 h-2.5 border-b-2 border-r-2 border-[rgba(var(--hk-card-border-rgb),0.72)] dark:border-[rgba(var(--hk-card-border-rgb),0.45)]" />
                   <div className="flex items-center gap-2 mb-5">
                     <KeyRound
                       size={14}
-                      className="text-[rgba(95,255,96,0.55)]"
+                      className="text-[rgba(var(--hk-accent-rgb),0.85)] dark:text-[rgba(var(--hk-accent-rgb),0.55)]"
                     />
                     <h2
-                      className={`${syne} font-extrabold text-white text-base tracking-tight`}
+                      className={`${syne} font-extrabold text-[var(--hk-text)] text-base tracking-tight`}
                     >
                       Invite Team Members
                     </h2>
@@ -511,14 +508,14 @@ const TeamDetails = () => {
 
               <div className="mb-10">
                 <div className="flex items-center gap-2 mb-5">
-                  <Clock size={15} className="text-[#ffb84d]" />
+                  <Clock size={15} className="text-[rgb(var(--hk-amber-rgb))]" />
                   <h2
-                    className={`${syne} font-extrabold text-white text-lg tracking-tight`}
+                    className={`${syne} font-extrabold text-[var(--hk-text)] text-lg tracking-tight`}
                   >
                     Join Requests
                   </h2>
                   <span
-                    className={`${mono} text-[0.55rem] tracking-[0.1em] uppercase px-2 py-[3px] rounded-[2px] border bg-[rgba(255,184,77,0.08)] border-[rgba(255,184,77,0.25)] text-[#ffb84d]`}
+                    className={`${mono} text-[0.55rem] tracking-[0.1em] uppercase px-2 py-[3px] rounded-[2px] border bg-[rgba(var(--hk-amber-rgb),0.08)] border-[rgba(var(--hk-amber-rgb),0.25)] text-[rgb(var(--hk-amber-rgb))]`}
                   >
                     {teamData.pendingMembers.length}
                   </span>
@@ -536,9 +533,9 @@ const TeamDetails = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="relative bg-[rgba(10,12,10,0.6)] border border-[rgba(95,255,96,0.08)] rounded-[4px] p-6 text-center">
+                  <div className="relative bg-[rgba(var(--hk-card-bg),0.6)] border border-[rgba(var(--hk-card-border-rgb),0.14)] dark:border-[rgba(var(--hk-card-border-rgb),0.08)] rounded-[4px] p-6 text-center">
                     <p
-                      className={`${mono} text-[0.65rem] text-[rgba(180,220,180,0.35)] tracking-[0.04em]`}
+                      className={`${mono} text-[0.65rem] text-[rgba(var(--hk-text-rgb),0.7)] dark:text-[rgba(var(--hk-text-rgb),0.35)] tracking-[0.04em]`}
                     >
                       No pending requests.
                     </p>
@@ -550,14 +547,14 @@ const TeamDetails = () => {
 
           <div>
             <div className="flex items-center gap-2 mb-5">
-              <Users size={15} className="text-[rgba(95,255,96,0.6)]" />
+              <Users size={15} className="text-[rgba(var(--hk-accent-rgb),0.9)] dark:text-[rgba(var(--hk-accent-rgb),0.6)]" />
               <h2
-                className={`${syne} font-extrabold text-white text-lg tracking-tight`}
+                className={`${syne} font-extrabold text-[var(--hk-text)] text-lg tracking-tight`}
               >
                 Team Members
               </h2>
               <span
-                className={`${mono} text-[0.55rem] tracking-[0.1em] uppercase px-2 py-[3px] rounded-[2px] border bg-[rgba(95,255,96,0.07)] border-[rgba(95,255,96,0.2)] text-[rgba(95,255,96,0.65)]`}
+                className={`${mono} text-[0.55rem] tracking-[0.1em] uppercase px-2 py-[3px] rounded-[2px] border bg-[rgba(var(--hk-accent-rgb),0.07)] border-[rgba(var(--hk-card-border-rgb),0.32)] dark:border-[rgba(var(--hk-card-border-rgb),0.2)] text-[rgba(var(--hk-accent-rgb),0.95)] dark:text-[rgba(var(--hk-accent-rgb),0.65)]`}
               >
                 {allMembers.length}
               </span>
@@ -575,9 +572,9 @@ const TeamDetails = () => {
                 />
               ))}
               {spotsLeft > 0 && (
-                <div className="border border-dashed border-[rgba(95,255,96,0.15)] rounded-[4px] p-6 flex flex-col items-center justify-center gap-1">
+                <div className="border border-dashed border-[rgba(var(--hk-card-border-rgb),0.24)] dark:border-[rgba(var(--hk-card-border-rgb),0.15)] rounded-[4px] p-6 flex flex-col items-center justify-center gap-1">
                   <span
-                    className={`${mono} text-[0.65rem] text-[rgba(180,220,180,0.3)] tracking-[0.04em]`}
+                    className={`${mono} text-[0.65rem] text-[rgba(var(--hk-text-rgb),0.65)] dark:text-[rgba(var(--hk-text-rgb),0.3)] tracking-[0.04em]`}
                   >
                     {spotsLeft} spot{spotsLeft > 1 ? "s" : ""} remaining
                   </span>
@@ -588,19 +585,19 @@ const TeamDetails = () => {
 
           <div className="mt-10">
             <div className="flex items-center gap-2 mb-5">
-              <FileText size={15} className="text-[rgba(95,255,96,0.6)]" />
+              <FileText size={15} className="text-[rgba(var(--hk-accent-rgb),0.9)] dark:text-[rgba(var(--hk-accent-rgb),0.6)]" />
               <h2
-                className={`${syne} font-extrabold text-white text-lg tracking-tight`}
+                className={`${syne} font-extrabold text-[var(--hk-text)] text-lg tracking-tight`}
               >
                 Team Submission
               </h2>
             </div>
             {submissionPhases.length === 0 ? (
-              <div className="relative bg-[rgba(10,12,10,0.6)] border border-[rgba(95,255,96,0.08)] rounded-[4px] p-6 text-center">
+              <div className="relative bg-[rgba(var(--hk-card-bg),0.6)] border border-[rgba(var(--hk-card-border-rgb),0.14)] dark:border-[rgba(var(--hk-card-border-rgb),0.08)] rounded-[4px] p-6 text-center">
                 <p
-                  className={`${mono} text-[0.65rem] text-[rgba(180,220,180,0.35)] tracking-[0.04em]`}
+                  className={`${mono} text-[0.65rem] text-[rgba(var(--hk-text-rgb),0.7)] dark:text-[rgba(var(--hk-text-rgb),0.35)] tracking-[0.04em]`}
                 >
-                  No submission phases yet for this hackathon.
+                  No submission phases yet for this event.
                 </p>
               </div>
             ) : (
@@ -613,19 +610,19 @@ const TeamDetails = () => {
                   return (
                     <div
                       key={phase.phaseId}
-                      className="relative bg-[rgba(10,12,10,0.88)] border border-[rgba(95,255,96,0.1)] rounded-[4px] p-4"
+                      className="relative bg-[rgba(var(--hk-card-bg),0.88)] border border-[rgba(var(--hk-card-border-rgb),0.16)] dark:border-[rgba(var(--hk-card-border-rgb),0.1)] rounded-[4px] p-4"
                     >
                       <div className="flex items-center justify-between gap-2 mb-2">
                         <h3
-                          className={`${syne} font-extrabold text-white text-sm tracking-tight truncate`}
+                          className={`${syne} font-extrabold text-[var(--hk-text)] text-sm tracking-tight truncate`}
                         >
                           {phase.phaseName}
                         </h3>
                         <span
                           className={`${mono} text-[0.52rem] tracking-[0.1em] uppercase px-2 py-[3px] rounded-[2px] border flex-shrink-0 ${
                             phase.submitted
-                              ? "bg-[rgba(95,255,96,0.08)] border-[rgba(95,255,96,0.25)] text-[#5fff60]"
-                              : "bg-[rgba(255,184,77,0.08)] border-[rgba(255,184,77,0.25)] text-[#ffb84d]"
+                              ? "bg-[rgba(var(--hk-accent-rgb),0.08)] border-[rgba(var(--hk-card-border-rgb),0.4)] dark:border-[rgba(var(--hk-card-border-rgb),0.25)] text-[var(--hk-accent-solid)]"
+                              : "bg-[rgba(var(--hk-amber-rgb),0.08)] border-[rgba(var(--hk-amber-rgb),0.25)] text-[rgb(var(--hk-amber-rgb))]"
                           }`}
                         >
                           {phase.submitted ? "Submitted" : "Not Submitted"}
@@ -637,8 +634,8 @@ const TeamDetails = () => {
                           <span
                             className={`${mono} inline-block text-[0.5rem] tracking-[0.1em] uppercase px-2 py-[2px] rounded-[2px] border mb-2 ${
                               phase.qualificationStatus === "QUALIFIED"
-                                ? "bg-[rgba(95,255,96,0.06)] border-[rgba(95,255,96,0.2)] text-[rgba(95,255,96,0.75)]"
-                                : "bg-[rgba(255,96,96,0.06)] border-[rgba(255,96,96,0.2)] text-[rgba(255,96,96,0.75)]"
+                                ? "bg-[rgba(var(--hk-accent-rgb),0.06)] border-[rgba(var(--hk-card-border-rgb),0.32)] dark:border-[rgba(var(--hk-card-border-rgb),0.2)] text-[rgba(var(--hk-accent-rgb),1.0)] dark:text-[rgba(var(--hk-accent-rgb),0.75)]"
+                                : "bg-[rgba(var(--hk-red-rgb),0.06)] border-[rgba(var(--hk-red-rgb),0.2)] text-[rgba(var(--hk-red-rgb),0.75)]"
                             }`}
                           >
                             {phase.qualificationStatus === "QUALIFIED"
@@ -648,7 +645,7 @@ const TeamDetails = () => {
                         )}
 
                       {phase.submitted && phase.submittedAt && (
-                        <p className={`${mono} text-[0.6rem] text-[rgba(180,220,180,0.5)] mb-3`}>
+                        <p className={`${mono} text-[0.6rem] text-[rgba(var(--hk-text-rgb),0.85)] dark:text-[rgba(var(--hk-text-rgb),0.5)] mb-3`}>
                           Submitted {formatDate(phase.submittedAt)}
                         </p>
                       )}
@@ -656,7 +653,7 @@ const TeamDetails = () => {
                         <button
                           onClick={() => handleViewSubmission(phase.submissionId)}
                           disabled={loadingSubmission}
-                          className={`${mono} inline-flex items-center gap-1.5 text-[0.58rem] tracking-[0.08em] uppercase px-3 py-1.5 rounded-[3px] border cursor-pointer transition-all border-[rgba(95,255,96,0.2)] bg-[rgba(95,255,96,0.06)] text-[rgba(95,255,96,0.65)] hover:bg-[rgba(95,255,96,0.12)] hover:text-[#5fff60] disabled:opacity-40 disabled:cursor-not-allowed`}
+                          className={`${mono} inline-flex items-center gap-1.5 text-[0.58rem] tracking-[0.08em] uppercase px-3 py-1.5 rounded-[3px] border cursor-pointer transition-all border-[rgba(var(--hk-card-border-rgb),0.32)] dark:border-[rgba(var(--hk-card-border-rgb),0.2)] bg-[rgba(var(--hk-accent-rgb),0.06)] text-[rgba(var(--hk-accent-rgb),0.95)] dark:text-[rgba(var(--hk-accent-rgb),0.65)] hover:bg-[rgba(var(--hk-accent-rgb),0.12)] hover:text-[var(--hk-accent-solid)] disabled:opacity-40 disabled:cursor-not-allowed`}
                         >
                           {loadingSubmission ? (
                             <Loader2 size={11} className="animate-spin" />
@@ -666,11 +663,11 @@ const TeamDetails = () => {
                           View Submission
                         </button>
                       ) : blockedByPrevRound ? (
-                        <p className={`${mono} text-[0.6rem] text-[rgba(255,96,96,0.55)]`}>
+                        <p className={`${mono} text-[0.6rem] text-[rgba(var(--hk-red-rgb),0.55)]`}>
                           You didn't qualify for this round.
                         </p>
                       ) : (
-                        <p className={`${mono} text-[0.6rem] text-[rgba(180,220,180,0.35)]`}>
+                        <p className={`${mono} text-[0.6rem] text-[rgba(var(--hk-text-rgb),0.7)] dark:text-[rgba(var(--hk-text-rgb),0.35)]`}>
                           {phase.canSubmit
                             ? "Submission window is open"
                             : "Submission window is not open"}
@@ -688,20 +685,20 @@ const TeamDetails = () => {
       {viewingSubmission &&
         createPortal(
           <div
-            className={`${mono} fixed inset-0 bg-black/85 backdrop-blur-sm z-[99999] flex items-center justify-center p-3 sm:p-4`}
+            className={`${mono} fixed inset-0 bg-black/55 backdrop-blur-sm z-[99999] flex items-center justify-center p-3 sm:p-4`}
             onClick={() => setViewingSubmission(null)}
           >
             <div
-              className="relative w-full max-w-2xl bg-[rgba(8,10,8,0.98)] border border-[rgba(95,255,96,0.18)] rounded-[4px] p-4 sm:p-6 shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-y-auto overflow-x-hidden max-h-[90vh] [scrollbar-width:thin] [scrollbar-color:rgba(95,255,96,0.2)_transparent]"
+              className="relative w-full max-w-2xl bg-[rgba(var(--hk-card-bg),0.98)] border border-[rgba(var(--hk-card-border-rgb),0.29)] dark:border-[rgba(var(--hk-card-border-rgb),0.18)] rounded-[4px] p-4 sm:p-6 shadow-[0_0_50px_rgba(0,0,0,0.22)] dark:shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-y-auto overflow-x-hidden max-h-[90vh] [scrollbar-width:thin] [scrollbar-color:rgba(var(--hk-accent-rgb),0.2)_transparent]"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-start justify-between gap-4 mb-5">
-                <h2 className={`${syne} font-extrabold text-white text-xl tracking-tight`}>
+                <h2 className={`${syne} font-extrabold text-[var(--hk-text)] text-xl tracking-tight`}>
                   {viewingSubmission.title}
                 </h2>
                 <button
                   onClick={() => setViewingSubmission(null)}
-                  className="w-8 h-8 flex items-center justify-center rounded-[3px] border border-[rgba(95,255,96,0.15)] text-[rgba(95,255,96,0.45)] hover:text-[#5fff60] hover:border-[rgba(95,255,96,0.35)] transition-all cursor-pointer flex-shrink-0"
+                  className="w-8 h-8 flex items-center justify-center rounded-[3px] border border-[rgba(var(--hk-card-border-rgb),0.24)] dark:border-[rgba(var(--hk-card-border-rgb),0.15)] text-[rgba(var(--hk-accent-rgb),0.75)] dark:text-[rgba(var(--hk-accent-rgb),0.45)] hover:text-[var(--hk-accent-solid)] hover:border-[rgba(var(--hk-accent-rgb),0.35)] transition-all cursor-pointer flex-shrink-0"
                 >
                   <X size={14} />
                 </button>
@@ -710,25 +707,25 @@ const TeamDetails = () => {
               <div className="flex flex-col gap-5">
                 <div>
                   <div
-                    className={`${mono} text-[0.55rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.5)] mb-1.5`}
+                    className={`${mono} text-[0.55rem] tracking-[0.14em] uppercase text-[rgba(var(--hk-accent-rgb),0.8)] dark:text-[rgba(var(--hk-accent-rgb),0.5)] mb-1.5`}
                   >
                     Description
                   </div>
-                  <p className="text-[0.72rem] text-[#e8ffe8] whitespace-pre-wrap">
+                  <p className="text-[0.72rem] text-[var(--hk-text)] whitespace-pre-wrap">
                     {viewingSubmission.description}
                   </p>
                 </div>
 
                 {viewingSubmission.averageScore != null && (
-                  <div className="border border-[rgba(95,255,96,0.18)] bg-[rgba(95,255,96,0.04)] rounded-[3px] p-3.5 flex flex-col gap-3">
+                  <div className="border border-[rgba(var(--hk-card-border-rgb),0.29)] dark:border-[rgba(var(--hk-card-border-rgb),0.18)] bg-[rgba(var(--hk-accent-rgb),0.04)] rounded-[3px] p-3.5 flex flex-col gap-3">
                     <div className="flex items-center gap-2">
-                      <Trophy size={13} className="text-[#5fff60] flex-shrink-0" />
+                      <Trophy size={13} className="text-[var(--hk-accent-solid)] flex-shrink-0" />
                       <span
-                        className={`${mono} text-[0.55rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.7)]`}
+                        className={`${mono} text-[0.55rem] tracking-[0.14em] uppercase text-[rgba(var(--hk-accent-rgb),1.0)] dark:text-[rgba(var(--hk-accent-rgb),0.7)]`}
                       >
                         Results
                       </span>
-                      <span className="ml-auto text-[0.9rem] font-bold text-[#5fff60]">
+                      <span className="ml-auto text-[0.9rem] font-bold text-[var(--hk-accent-solid)]">
                         {viewingSubmission.averageScore.toFixed(1)}
                       </span>
                     </div>
@@ -736,14 +733,14 @@ const TeamDetails = () => {
                     {viewingSubmission.reviews?.length > 0 && (
                       <div className="flex flex-col gap-2">
                         <div
-                          className={`${mono} text-[0.5rem] tracking-[0.14em] uppercase text-[rgba(180,220,180,0.4)]`}
+                          className={`${mono} text-[0.5rem] tracking-[0.14em] uppercase text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-text-rgb),0.4)]`}
                         >
                           Judge Feedback
                         </div>
                         {viewingSubmission.reviews.map((review, i) => (
                           <p
                             key={i}
-                            className="text-[0.68rem] text-[rgba(232,255,232,0.8)] leading-relaxed italic border-l-2 border-[rgba(95,255,96,0.2)] pl-2.5"
+                            className="text-[0.68rem] text-[rgba(var(--hk-text-rgb),0.9)] leading-relaxed italic border-l-2 border-[rgba(var(--hk-card-border-rgb),0.32)] dark:border-[rgba(var(--hk-card-border-rgb),0.2)] pl-2.5"
                           >
                             "{review.feedback || "No written feedback."}"
                           </p>
@@ -755,9 +752,9 @@ const TeamDetails = () => {
 
                 {viewingSubmission.averageScore == null &&
                   viewingSubmission.reviewCount > 0 && (
-                    <div className="border border-[rgba(255,184,77,0.18)] bg-[rgba(255,184,77,0.04)] rounded-[3px] p-3.5 flex items-center gap-2">
-                      <Loader2 size={13} className="text-[#ffb84d] flex-shrink-0" />
-                      <span className="text-[0.68rem] text-[rgba(255,184,77,0.8)]">
+                    <div className="border border-[rgba(var(--hk-amber-rgb),0.18)] bg-[rgba(var(--hk-amber-rgb),0.04)] rounded-[3px] p-3.5 flex items-center gap-2">
+                      <Loader2 size={13} className="text-[rgb(var(--hk-amber-rgb))] flex-shrink-0" />
+                      <span className="text-[0.68rem] text-[rgba(var(--hk-amber-rgb),0.8)]">
                         Being reviewed — your score will appear here once every judge has scored it.
                       </span>
                     </div>
@@ -784,7 +781,7 @@ const TeamDetails = () => {
                     return (
                       <div key={field.fieldName}>
                         <div
-                          className={`${mono} text-[0.55rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.5)] mb-1.5`}
+                          className={`${mono} text-[0.55rem] tracking-[0.14em] uppercase text-[rgba(var(--hk-accent-rgb),0.8)] dark:text-[rgba(var(--hk-accent-rgb),0.5)] mb-1.5`}
                         >
                           {field.label}
                         </div>
@@ -796,7 +793,7 @@ const TeamDetails = () => {
                                 href={f.url}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="flex items-center gap-1.5 text-[0.68rem] text-[#5fff60] hover:underline"
+                                className="flex items-center gap-1.5 text-[0.68rem] text-[var(--hk-accent-solid)] hover:underline"
                               >
                                 <ExternalLink size={11} className="flex-shrink-0" />
                                 <span className="truncate">
@@ -810,13 +807,13 @@ const TeamDetails = () => {
                             href={value}
                             target="_blank"
                             rel="noreferrer"
-                            className="flex items-center gap-1.5 text-[0.68rem] text-[#5fff60] hover:underline break-all"
+                            className="flex items-center gap-1.5 text-[0.68rem] text-[var(--hk-accent-solid)] hover:underline break-all"
                           >
                             <ExternalLink size={11} className="flex-shrink-0" />
                             {value}
                           </a>
                         ) : (
-                          <p className="text-[0.72rem] text-[#e8ffe8] whitespace-pre-wrap break-words">
+                          <p className="text-[0.72rem] text-[var(--hk-text)] whitespace-pre-wrap break-words">
                             {value}
                           </p>
                         )}

@@ -3,19 +3,26 @@ import { X, FileText, Loader2 } from "lucide-react";
 import { MediaAPI } from "../api/media.api.js";
 import toast from "react-hot-toast";
 
-const inputCls =
-  "font-[family-name:'JetBrains_Mono',monospace] w-full bg-[rgba(18,22,18,0.7)] border border-[rgba(95,255,96,0.15)] rounded-[3px] px-3 py-2.5 text-[0.72rem] text-[#e8ffe8] placeholder-[rgba(95,255,96,0.28)] focus:outline-none focus:border-[rgba(95,255,96,0.45)] focus:shadow-[0_0_0_2px_rgba(95,255,96,0.07)] transition-all";
+import "../pages/Styles/AllHackathons.css";
+const inputCls = [
+  "font-[family-name:'JetBrains_Mono',monospace] w-full bg-[rgba(var(--hk-input-bg),0.7)]",
+  "border border-[rgba(var(--hk-card-border-rgb),0.2)] dark:border-[rgba(var(--hk-card-border-rgb),0.15)]",
+  "rounded-[4px] px-3.5 py-3 text-[0.78rem] text-[var(--hk-text)]",
+  "placeholder-[rgba(var(--hk-text-rgb),0.45)] dark:placeholder-[rgba(var(--hk-accent-rgb),0.28)]",
+  "focus:outline-none focus:border-[rgba(var(--hk-accent-rgb),0.6)] focus:shadow-[0_0_0_3px_rgba(var(--hk-accent-rgb),0.1)]",
+  "disabled:opacity-60 disabled:cursor-not-allowed transition-all [color-scheme:light] dark:[color-scheme:dark]",
+].join(" ");
 
 const Label = ({ children, required }) => (
-  <label className="font-[family-name:'JetBrains_Mono',monospace] text-[0.58rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.55)] mb-1.5 block">
+  <label className="font-[family-name:'JetBrains_Mono',monospace] text-[0.6rem] tracking-[0.12em] uppercase text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-accent-rgb),0.6)] mb-1.5 block">
     {children}
-    {required && <span className="text-[#ff9090] ml-1">*</span>}
+    {required && <span className="text-[rgb(var(--hk-red-rgb))] ml-1">*</span>}
   </label>
 );
 
 const ErrorText = ({ children }) =>
   children ? (
-    <p className="text-[0.58rem] text-[#ff9090] mt-1">{children}</p>
+    <p className="text-[0.58rem] text-[rgb(var(--hk-red-rgb))] mt-1">{children}</p>
   ) : null;
 
 function FileInput({ field, value, onChange, error, resourceType, hackathonId }) {
@@ -44,7 +51,7 @@ function FileInput({ field, value, onChange, error, resourceType, hackathonId })
   return (
     <div>
       <Label required={field.required}>{field.label}</Label>
-      <label className="flex flex-col items-center justify-center w-full h-24 border border-dashed border-[rgba(95,255,96,0.2)] rounded-[3px] cursor-pointer hover:border-[rgba(95,255,96,0.38)] transition-all px-3">
+      <label className="flex flex-col items-center justify-center w-full h-24 border border-dashed border-[rgba(var(--hk-card-border-rgb),0.32)] dark:border-[rgba(var(--hk-card-border-rgb),0.2)] rounded-[4px] cursor-pointer hover:border-[rgba(var(--hk-accent-rgb),0.38)] transition-all px-3">
         <input
           type="file"
           accept={field.accept}
@@ -53,10 +60,10 @@ function FileInput({ field, value, onChange, error, resourceType, hackathonId })
           disabled={uploading}
         />
         {uploading ? (
-          <Loader2 size={18} className="animate-spin text-[#5fff60]" />
+          <Loader2 size={18} className="animate-spin text-[var(--hk-accent-solid)]" />
         ) : value?.url ? (
-          <div className="flex items-center gap-2 text-[0.62rem] text-[rgba(180,220,180,0.6)] max-w-full">
-            <FileText size={14} className="text-[#5fff60] flex-shrink-0" />
+          <div className="flex items-center gap-2 text-[0.62rem] text-[rgba(var(--hk-text-rgb),0.95)] dark:text-[rgba(var(--hk-text-rgb),0.6)] max-w-full">
+            <FileText size={14} className="text-[var(--hk-accent-solid)] flex-shrink-0" />
             <span className="truncate">{value.originalName || "File uploaded"}</span>
             <button
               type="button"
@@ -66,11 +73,11 @@ function FileInput({ field, value, onChange, error, resourceType, hackathonId })
               }}
               className="ml-2 flex-shrink-0"
             >
-              <X size={12} className="text-[rgba(255,100,100,0.7)]" />
+              <X size={12} className="text-[rgba(var(--hk-red-rgb),0.7)]" />
             </button>
           </div>
         ) : (
-          <span className="text-[0.6rem] text-[rgba(95,255,96,0.3)]">
+          <span className="text-[0.6rem] text-[rgba(var(--hk-accent-rgb),0.6)] dark:text-[rgba(var(--hk-accent-rgb),0.3)]">
             Click to upload
           </span>
         )}
@@ -139,18 +146,18 @@ function MultiFileInput({ field, value = [], onChange, error, resourceType, hack
         {value.map((f, i) => (
           <div
             key={i}
-            className="flex items-center justify-between gap-2 bg-[rgba(95,255,96,0.04)] border border-[rgba(95,255,96,0.12)] rounded-[3px] px-3 py-2"
+            className="flex items-center justify-between gap-2 bg-[rgba(var(--hk-accent-rgb),0.04)] border border-[rgba(var(--hk-card-border-rgb),0.19)] dark:border-[rgba(var(--hk-card-border-rgb),0.12)] rounded-[4px] px-3 py-2"
           >
-            <span className="text-[0.62rem] text-[rgba(180,220,180,0.6)] truncate">
+            <span className="text-[0.62rem] text-[rgba(var(--hk-text-rgb),0.95)] dark:text-[rgba(var(--hk-text-rgb),0.6)] truncate">
               {f.originalName || `File ${i + 1}`}
             </span>
             <button type="button" onClick={() => removeAt(i)}>
-              <X size={12} className="text-[rgba(255,100,100,0.7)]" />
+              <X size={12} className="text-[rgba(var(--hk-red-rgb),0.7)]" />
             </button>
           </div>
         ))}
         {value.length < field.maxFiles && (
-          <label className="flex items-center justify-center h-16 border border-dashed border-[rgba(95,255,96,0.2)] rounded-[3px] cursor-pointer hover:border-[rgba(95,255,96,0.38)] transition-all">
+          <label className="flex items-center justify-center h-16 border border-dashed border-[rgba(var(--hk-card-border-rgb),0.32)] dark:border-[rgba(var(--hk-card-border-rgb),0.2)] rounded-[4px] cursor-pointer hover:border-[rgba(var(--hk-accent-rgb),0.38)] transition-all">
             <input
               type="file"
               accept={field.accept}
@@ -160,9 +167,9 @@ function MultiFileInput({ field, value = [], onChange, error, resourceType, hack
               disabled={uploading}
             />
             {uploading ? (
-              <Loader2 size={16} className="animate-spin text-[#5fff60]" />
+              <Loader2 size={16} className="animate-spin text-[var(--hk-accent-solid)]" />
             ) : (
-              <span className="text-[0.58rem] text-[rgba(95,255,96,0.3)]">
+              <span className="text-[0.58rem] text-[rgba(var(--hk-accent-rgb),0.6)] dark:text-[rgba(var(--hk-accent-rgb),0.3)]">
                 + Add file{field.maxFiles - value.length > 1 ? "s" : ""}
               </span>
             )}

@@ -1,4 +1,5 @@
 import axios from "axios";
+import toast from "react-hot-toast";
 import { API } from "./endpoints";
 
 const client = axios.create({
@@ -46,6 +47,18 @@ client.interceptors.response.use(
   async (error) => {
     const { config, response } = error;
     const admin = isAdminRequest(config || {});
+
+    // Hackathon actions are blocked until every Edit Profile field is filled
+    // — send people to the form instead of leaving them on a dead-end error.
+    if (response?.status === 403 && response.data?.code === "PROFILE_INCOMPLETE") {
+      toast.error(response.data.message || "Complete your profile to take part in hackathons", {
+        id: "profile-incomplete",
+      });
+      if (!window.location.pathname.startsWith("/dashboard")) {
+        setTimeout(() => window.location.assign("/dashboard?completeProfile=1"), 1400);
+      }
+      return Promise.reject(error);
+    }
 
     if (!response || response.status !== 401 || !config || config._retry || isAuthEndpoint(config.url)) {
       if (response?.status === 401) localStorage.removeItem(storageKey(admin));

@@ -20,5 +20,5 @@ export const env = {
   GEMINI_API_KEY: process.env.GEMINI_API_KEY,
   // Kept overridable — Gemini model names/tiers change over time and the
   // right choice depends on the caller's own API plan/quota.
-  GEMINI_MODEL: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+  GEMINI_MODEL: process.env.GEMINI_MODEL || "gemini-3.5-flash",
 };

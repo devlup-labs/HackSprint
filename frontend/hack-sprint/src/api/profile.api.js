@@ -20,12 +20,6 @@ export const ProfileAPI = {
   updateProfile(data) {
     return client.patch(`${API.PROFILE}/me`, data);
   },
-  getPublicProfile(userName, config = {}) {
-    return client.get(`${API.PROFILE}/${userName}`, config);
-  },
-  searchProfiles(query, config = {}) {
-    return client.get(`${API.PROFILE}/search`, { params: { q: query }, ...config });
-  },
   addEducation(payload) {
     return client.post(`${API.PROFILE}/me/education`, payload);
   },
@@ -47,8 +41,8 @@ export const ProfileAPI = {
   updateSkills(skills) {
     return client.put(`${API.PROFILE}/me/skills`, { skills });
   },
-  updateLanguages(languages) {
-    return client.put(`${API.PROFILE}/me/languages`, { languages });
+  checkUserName(userName) {
+    return client.get(`${API.PROFILE}/check-username/${encodeURIComponent(userName)}`);
   },
   updateAvatar(image) {
     return client.patch(`${API.PROFILE}/me/avatar`, { image });

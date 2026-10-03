@@ -35,6 +35,14 @@ export const useAuthStore = create((set) => ({
 
     localStorage.removeItem(isAdmin ? "adminToken" : "token");
 
+    // Without this, Google's auto sign-in would put the person straight back
+    // in the next time they open the login page after logging out.
+    try {
+      window.google?.accounts?.id?.disableAutoSelect();
+    } catch {
+      // Google script not loaded on this page; nothing to disable.
+    }
+
     set({
       user: null,
       role: null,

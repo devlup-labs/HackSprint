@@ -3,6 +3,7 @@ import { JudgeAssignmentRepository } from "../../repositories/judgeAssignment.re
 import { HackathonRepository } from "../../repositories/hackathon.repository.js";
 import { JudgeAssignmentService } from "./judgeAssignment.service.js";
 import { AdminRepository } from "../../repositories/admin.repository.js";
+import { NotificationClient } from "../../clients/notification.client.js";
 
 const judgeAssignmentRepository = new JudgeAssignmentRepository();
 
@@ -14,5 +15,6 @@ export const judgeAssignmentService = new JudgeAssignmentService(
   judgeAssignmentRepository,
   hackathonRepository,
   adminRepository,
-  logger
+  logger,
+  new NotificationClient(logger)
 );

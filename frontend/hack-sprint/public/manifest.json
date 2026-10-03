@@ -1,7 +1,7 @@
 {
   "name": "HackSprint",
   "short_name": "HackSprint",
-  "description": "A Centralized Hackathon & Skill-Building Platform",
+  "description": "A Centralized Event & Skill-Building Platform",
   "start_url": "/",
   "id": "/",
   "display": "standalone",

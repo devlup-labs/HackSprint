@@ -353,7 +353,7 @@ const AdminSubmissionDetail = () => {
         <main style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
           {phases.length === 0 && (
             <div className="hu-card">
-              <EmptyState message="No submission phases configured for this hackathon." />
+              <EmptyState message="No submission phases configured for this event." />
             </div>
           )}
 

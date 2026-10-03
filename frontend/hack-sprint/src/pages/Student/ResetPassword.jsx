@@ -3,6 +3,7 @@ import { AuthAPI } from "../../api/auth.api";
 import toast from "react-hot-toast";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 
+import "../Styles/AllHackathons.css";
 const EyeOpen = () => (
   <svg
     width="16"
@@ -87,59 +88,59 @@ function ResetPassword() {
           .rp-bg::before {
             content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
             background-image:
-              linear-gradient(rgba(95,255,96,.033) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(95,255,96,.033) 1px, transparent 1px);
+              linear-gradient(rgba(var(--hk-accent-rgb),.033) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(var(--hk-accent-rgb),.033) 1px, transparent 1px);
             background-size: 40px 40px;
           }
           .rp-bg::after {
             content: ''; position: fixed; z-index: 0; pointer-events: none;
             width: 500px; height: 500px;
-            background: radial-gradient(circle, rgba(95,255,96,.07) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(var(--hk-accent-rgb),.07) 0%, transparent 70%);
             top: 50%; left: 50%; transform: translate(-50%, -50%);
           }
           .rp-card::before, .rp-card::after {
             content: ''; position: absolute;
             width: 12px; height: 12px; border-style: solid;
-            border-color: rgba(255,80,80,.6);
+            border-color: rgba(var(--hk-red-rgb),.6);
           }
           .rp-card::before { top:-1px; left:-1px; border-width:2px 0 0 2px; }
           .rp-card::after  { bottom:-1px; right:-1px; border-width:0 2px 2px 0; }
         `}</style>
-        <div className="rp-root rp-bg min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4">
-          <div className="rp-card relative z-10 w-full max-w-[400px] bg-[rgba(10,12,10,0.93)] border border-[rgba(255,80,80,0.2)] rounded-[4px] p-8 backdrop-blur-xl shadow-[0_0_40px_rgba(255,80,80,0.07)] flex flex-col items-center text-center">
+        <div className="rp-root rp-bg min-h-screen bg-[var(--hk-bg)] flex items-center justify-center px-4">
+          <div className="rp-card relative z-10 w-full max-w-[400px] bg-[rgba(var(--hk-card-bg),0.93)] border border-[rgba(var(--hk-red-rgb),0.2)] rounded-[4px] p-8 backdrop-blur-xl shadow-[0_0_40px_rgba(var(--hk-red-rgb),0.07)] flex flex-col items-center text-center">
             <svg
               width="44"
               height="44"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#ff5050"
+              stroke="rgb(var(--hk-red-rgb))"
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
               className="mb-5"
-              style={{ filter: "drop-shadow(0 0 8px rgba(255,80,80,0.4))" }}
+              style={{ filter: "drop-shadow(0 0 8px rgba(var(--hk-red-rgb),0.4))" }}
             >
               <circle cx="12" cy="12" r="10" />
               <line x1="15" y1="9" x2="9" y2="15" />
               <line x1="9" y1="9" x2="15" y2="15" />
             </svg>
-            <div className="rp-root inline-block text-[0.58rem] tracking-[0.18em] uppercase text-[#ff5050] border border-[rgba(255,80,80,0.25)] px-[0.65rem] py-[0.18rem] rounded-[2px] mb-4">
+            <div className="rp-root inline-block text-[0.58rem] tracking-[0.18em] uppercase text-[rgb(var(--hk-red-rgb))] border border-[rgba(var(--hk-red-rgb),0.25)] px-[0.65rem] py-[0.18rem] rounded-[2px] mb-4">
               invalid link
             </div>
-            <h1 className="rp-syne font-extrabold text-white text-[2rem] leading-[1.05] mb-2">
-              Link <span className="text-[#ff5050]">Expired.</span>
+            <h1 className="rp-syne font-extrabold text-[var(--hk-text)] text-[2rem] leading-[1.05] mb-2">
+              Link <span className="text-[rgb(var(--hk-red-rgb))]">Expired.</span>
             </h1>
-            <p className="rp-root text-[0.63rem] tracking-[0.05em] text-[rgba(180,220,180,0.4)] mb-6 leading-relaxed">
+            <p className="rp-root text-[0.63rem] tracking-[0.05em] text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-text-rgb),0.4)] mb-6 leading-relaxed">
               This reset link is invalid or has expired. Please request a new
               one.
             </p>
             <Link
               to="/account/forgot-password"
-              className="rp-root text-[0.68rem] font-semibold tracking-[0.12em] uppercase bg-[#ff5050] text-[#0a0a0a] px-5 py-[0.6rem] rounded-[3px] hover:bg-[#ff7070] transition-all"
+              className="rp-root text-[0.68rem] font-semibold tracking-[0.12em] uppercase bg-[rgb(var(--hk-red-rgb))] text-[var(--hk-bg)] px-5 py-[0.6rem] rounded-[3px] hover:bg-[rgb(var(--hk-red-rgb))] transition-all"
             >
               Request New Link →
             </Link>
-            <p className="rp-root mt-6 text-[0.56rem] tracking-[0.06em] text-[rgba(95,255,96,0.35)] text-center">
+            <p className="rp-root mt-6 text-[0.56rem] tracking-[0.06em] text-[rgba(var(--hk-accent-rgb),0.65)] dark:text-[rgba(var(--hk-accent-rgb),0.35)] text-center">
               HACKSPRINT · ENCRYPTED · {new Date().getFullYear()}
             </p>
           </div>
@@ -157,41 +158,41 @@ function ResetPassword() {
         .rp-bg::before {
           content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
           background-image:
-            linear-gradient(rgba(95,255,96,.033) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(95,255,96,.033) 1px, transparent 1px);
+            linear-gradient(rgba(var(--hk-accent-rgb),.033) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(var(--hk-accent-rgb),.033) 1px, transparent 1px);
           background-size: 40px 40px;
         }
         .rp-bg::after {
           content: ''; position: fixed; z-index: 0; pointer-events: none;
           width: 500px; height: 500px;
-          background: radial-gradient(circle, rgba(95,255,96,.07) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(var(--hk-accent-rgb),.07) 0%, transparent 70%);
           top: 50%; left: 50%; transform: translate(-50%, -50%);
         }
         .rp-card::before, .rp-card::after {
           content: ''; position: absolute;
           width: 12px; height: 12px; border-style: solid;
-          border-color: rgba(95,255,96,.6);
+          border-color: rgba(var(--hk-accent-rgb),.6);
         }
         .rp-card::before { top:-1px; left:-1px; border-width:2px 0 0 2px; }
         .rp-card::after  { bottom:-1px; right:-1px; border-width:0 2px 2px 0; }
 
         .rp-input {
           width: 100%;
-          background: rgba(95,255,96,0.03);
-          border: 1px solid rgba(95,255,96,0.15);
+          background: rgba(var(--hk-accent-rgb),0.03);
+          border: 1px solid rgba(var(--hk-accent-rgb),0.15);
           border-radius: 3px;
           padding: 0.55rem 2.2rem 0.55rem 0.75rem;
-          color: rgba(220,255,220,0.85);
+          color: var(--hk-text);
           font-family: 'JetBrains Mono', monospace;
           font-size: 0.68rem;
           letter-spacing: 0.05em;
           outline: none;
           transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .rp-input::placeholder { color: rgba(95,255,96,0.22); }
+        .rp-input::placeholder { color: rgba(var(--hk-accent-rgb),calc(0.22 + var(--hk-fade-boost))); }
         .rp-input:focus {
-          border-color: rgba(95,255,96,0.45);
-          box-shadow: 0 0 0 2px rgba(95,255,96,0.06);
+          border-color: rgba(var(--hk-accent-rgb),0.45);
+          box-shadow: 0 0 0 2px rgba(var(--hk-accent-rgb),0.06);
         }
 
         .rp-label {
@@ -200,14 +201,14 @@ function ResetPassword() {
           font-size: 0.56rem;
           letter-spacing: 0.14em;
           text-transform: uppercase;
-          color: rgba(95,255,96,0.45);
+          color: rgba(var(--hk-accent-rgb),calc(0.45 + var(--hk-fade-boost)));
           margin-bottom: 0.3rem;
         }
 
         .rp-btn {
           width: 100%;
-          background: #5fff60;
-          color: #0a0a0a;
+          background: var(--hk-accent-solid);
+          color: var(--hk-bg);
           font-family: 'JetBrains Mono', monospace;
           font-size: 0.68rem;
           font-weight: 600;
@@ -219,7 +220,7 @@ function ResetPassword() {
           cursor: pointer;
           transition: background 0.18s, transform 0.12s;
         }
-        .rp-btn:hover:not(:disabled) { background: #7fff80; transform: translateY(-1px); }
+        .rp-btn:hover:not(:disabled) { background: var(--hk-accent-solid); transform: translateY(-1px); }
         .rp-btn:active:not(:disabled) { transform: translateY(0); }
         .rp-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -232,12 +233,12 @@ function ResetPassword() {
           border: none;
           padding: 0;
           cursor: pointer;
-          color: rgba(95,255,96,0.35);
+          color: rgba(var(--hk-accent-rgb),calc(0.35 + var(--hk-fade-boost)));
           display: flex;
           align-items: center;
           transition: color 0.18s;
         }
-        .rp-eye:hover { color: rgba(95,255,96,0.7); }
+        .rp-eye:hover { color: rgba(var(--hk-accent-rgb),calc(0.7 + var(--hk-fade-boost))); }
 
         @keyframes rp-float {
           0%, 100% { transform: translateY(0); }
@@ -246,21 +247,21 @@ function ResetPassword() {
         .rp-icon { animation: rp-float 3s ease-in-out infinite; }
       `}</style>
 
-      <div className="rp-root rp-bg min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4">
-        <div className="rp-card relative z-10 w-full max-w-[400px] bg-[rgba(10,12,10,0.93)] border border-[rgba(95,255,96,0.18)] rounded-[4px] p-8 backdrop-blur-xl shadow-[0_0_40px_rgba(95,255,96,0.08)]">
-          <div className="rp-root inline-block text-[0.58rem] tracking-[0.18em] uppercase text-[#5fff60] border border-[rgba(95,255,96,0.25)] px-[0.65rem] py-[0.18rem] rounded-[2px] mb-4">
+      <div className="rp-root rp-bg min-h-screen bg-[var(--hk-bg)] flex items-center justify-center px-4">
+        <div className="rp-card relative z-10 w-full max-w-[400px] bg-[rgba(var(--hk-card-bg),0.93)] border border-[rgba(var(--hk-card-border-rgb),0.29)] dark:border-[rgba(var(--hk-card-border-rgb),0.18)] rounded-[4px] p-8 backdrop-blur-xl shadow-[0_0_40px_rgba(var(--hk-accent-rgb),0.08)]">
+          <div className="rp-root inline-block text-[0.58rem] tracking-[0.18em] uppercase text-[var(--hk-accent-solid)] border border-[rgba(var(--hk-card-border-rgb),0.4)] dark:border-[rgba(var(--hk-card-border-rgb),0.25)] px-[0.65rem] py-[0.18rem] rounded-[2px] mb-4">
             set new password
           </div>
 
           <h1
-            className="rp-syne font-extrabold text-white leading-[1.05] tracking-tight mb-1"
+            className="rp-syne font-extrabold text-[var(--hk-text)] leading-[1.05] tracking-tight mb-1"
             style={{ fontSize: "clamp(1.8rem,5vw,2.5rem)" }}
           >
             Reset
             <br />
-            <span className="text-[#5fff60]">Password.</span>
+            <span className="text-[var(--hk-accent-solid)]">Password.</span>
           </h1>
-          <p className="rp-root text-[0.62rem] tracking-[0.06em] text-[rgba(95,255,96,0.38)] mb-8 leading-relaxed">
+          <p className="rp-root text-[0.62rem] tracking-[0.06em] text-[rgba(var(--hk-accent-rgb),0.68)] dark:text-[rgba(var(--hk-accent-rgb),0.38)] mb-8 leading-relaxed">
             Choose a strong new password for your account.
           </p>
 
@@ -323,8 +324,8 @@ function ResetPassword() {
                     style={{
                       color:
                         newPassword === confirmPassword
-                          ? "rgba(95,255,96,0.6)"
-                          : "rgba(255,80,80,0.7)",
+                          ? "rgba(var(--hk-accent-rgb),0.6)"
+                          : "rgba(var(--hk-red-rgb),0.7)",
                     }}
                   >
                     {newPassword === confirmPassword
@@ -340,17 +341,17 @@ function ResetPassword() {
             </div>
           </form>
 
-          <p className="rp-root mt-6 text-[0.65rem] tracking-[0.04em] text-[rgba(180,220,180,0.4)] text-center">
+          <p className="rp-root mt-6 text-[0.65rem] tracking-[0.04em] text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-text-rgb),0.4)] text-center">
             Remember it now?{" "}
             <Link
               to="/account/login"
-              className="text-[#5fff60] hover:text-[#7fff80] transition-colors underline underline-offset-2"
+              className="text-[var(--hk-accent-solid)] hover:text-[var(--hk-accent-solid)] transition-colors underline underline-offset-2"
             >
               Login
             </Link>
           </p>
 
-          <p className="rp-root mt-5 text-[0.56rem] tracking-[0.06em] text-[rgba(95,255,96,0.35)] text-center">
+          <p className="rp-root mt-5 text-[0.56rem] tracking-[0.06em] text-[rgba(var(--hk-accent-rgb),0.65)] dark:text-[rgba(var(--hk-accent-rgb),0.35)] text-center">
             HACKSPRINT · ENCRYPTED · {new Date().getFullYear()}
           </p>
         </div>

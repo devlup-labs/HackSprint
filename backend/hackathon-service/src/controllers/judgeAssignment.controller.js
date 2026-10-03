@@ -14,7 +14,7 @@ export const assignJudge = async (req, res, next) => {
 
     return res.status(201).json({
       success: true,
-      message: "Judge assigned successfully",
+      message: "Invitation sent. They become a judge once they accept.",
       assignment,
     });
   } catch (error) {
@@ -69,6 +69,44 @@ export const getAssignedHackathons = async (req, res, next) => {
       success: true,
       hackathons,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMyJudgeInvitations = async (req, res, next) => {
+  try {
+    const invitations = await judgeAssignmentService.getMyInvitations(req.admin._id);
+
+    return res.status(200).json({ success: true, invitations });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const acceptJudgeInvitation = async (req, res, next) => {
+  try {
+    const result = await judgeAssignmentService.respondToInvitation({
+      invitationId: req.params.invitationId,
+      judgeId: req.admin._id,
+      accept: true,
+    });
+
+    return res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const declineJudgeInvitation = async (req, res, next) => {
+  try {
+    const result = await judgeAssignmentService.respondToInvitation({
+      invitationId: req.params.invitationId,
+      judgeId: req.admin._id,
+      accept: false,
+    });
+
+    return res.status(200).json(result);
   } catch (error) {
     next(error);
   }

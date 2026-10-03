@@ -74,6 +74,7 @@ export class NotificationService {
     pushQueue
       .add("send-push", {
         userId,
+        notificationId: String(notification._id),
         title: notification.title,
         message: notification.message,
         actionUrl: notification.actionUrl,

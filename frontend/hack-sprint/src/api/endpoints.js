@@ -1,16 +1,21 @@
 export const API = {
   AUTH: "/api/auth",
-  ADMIN_AUTH: "/api/hackathons/admin/auth",
+  ADMIN_AUTH: "/api/admin/auth",
   PROFILE: "/api/auth/profile",
+  CONNECTIONS: "/api/auth/connections",
+  MESSAGES: "/api/auth/messages",
+  SKILLS: "/api/auth/skills",
+  DAILY: "/api/auth/daily",
   HACKATHON: "/api/hackathons",
   REGISTRATION: "/api/hackathons",
   TEAM: "/api/hackathons/teams",
   SUBMISSION: "/api/hackathons",
   VOTING: "/api/hackathons",
   DISCUSSION: "/api/hackathons/api/discussions",
-  ADMIN: "/api/hackathons/platform/admin",
+  ADMIN: "/api/admin",
   JUDGE: "/api/hackathons/platform/admin",
   MEDIA: "/api/media",
   NOTIFICATION: "/api/notifications",
-  CHATBOT: "/api/chatbot"
+  CHATBOT: "/api/chatbot",
+  ADMIN_PUBLIC: "/api/admin/public"
 };

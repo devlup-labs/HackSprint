@@ -1,15 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@700;800&display=swap');
 
 :root {
-  --hf-green: #5fff60;
-  --hf-green-faint: rgba(95, 255, 96, 0.12);
-  --hf-bg-card: rgba(10, 12, 10, 0.88);
-  --hf-border: rgba(95, 255, 96, 0.13);
-  --hf-border-hover: rgba(95, 255, 96, 0.38);
-  --hf-text: #e8ffe8;
-  --hf-text-muted: rgba(180, 220, 180, 0.5);
-  --hf-red: #ff6060;
-  --hf-amber: #ffb84d;
   --hf-font-mono: "JetBrains Mono", monospace;
   --hf-font-display: "Syne", sans-serif;
 }
@@ -36,7 +27,7 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--hf-green);
-  border: 1px solid rgba(95, 255, 96, 0.25);
+  border: 1px solid rgba(var(--ac-rgb), 0.25);
   padding: 0.2rem 0.6rem;
   border-radius: 2px;
   margin-bottom: 0.75rem;
@@ -46,7 +37,7 @@
   font-family: var(--hf-font-display);
   font-size: 1rem;
   font-weight: 800;
-  color: #fff;
+  color: var(--strong);
   margin-bottom: 0.75rem;
 }
 
@@ -81,13 +72,13 @@
 
 .hf-hint {
   font-size: 0.6rem;
-  color: rgba(180, 220, 180, 0.3);
+  color: rgba(var(--tx-rgb), calc(0.3 + var(--fade-boost)));
   line-height: 1.5;
 }
 
 .hf-input {
   width: 100%;
-  background: rgba(18, 22, 18, 0.7);
+  background: rgba(var(--cd-rgb), 0.7);
   border: 1px solid var(--hf-border);
   border-radius: 3px;
   padding: 0.55rem 0.75rem;
@@ -96,10 +87,10 @@
   font-size: 0.75rem;
   outline: none;
   transition: border-color 0.15s;
-  color-scheme: dark;
+  color-scheme: light;
 }
 .hf-input::placeholder {
-  color: rgba(120, 160, 120, 0.4);
+  color: rgba(var(--tx-rgb), calc(0.4 + var(--fade-boost)));
 }
 .hf-input:focus {
   border-color: var(--hf-border-hover);
@@ -109,7 +100,7 @@
   min-height: 4.5rem;
 }
 select.hf-input option {
-  background: #0e0e0e;
+  background: var(--bg);
   color: var(--hf-text);
 }
 
@@ -127,12 +118,12 @@ select.hf-input option {
   padding: 0.25rem 0.55rem;
   border-radius: 2px;
   background: var(--hf-green-faint);
-  border: 1px solid rgba(95, 255, 96, 0.25);
+  border: 1px solid rgba(var(--ac-rgb), 0.25);
   color: var(--hf-green);
 }
 .hf-chip button {
   display: flex;
-  color: rgba(95, 255, 96, 0.6);
+  color: rgba(var(--ac-rgb), calc(0.6 + var(--fade-boost)));
   cursor: pointer;
 }
 .hf-chip button:hover {
@@ -151,14 +142,14 @@ select.hf-input option {
   align-items: center;
   justify-content: center;
   background: var(--hf-green-faint);
-  border: 1px solid rgba(95, 255, 96, 0.25);
+  border: 1px solid rgba(var(--ac-rgb), 0.25);
   border-radius: 3px;
   color: var(--hf-green);
   cursor: pointer;
   transition: all 0.15s;
 }
 .hf-add-btn:hover {
-  background: rgba(95, 255, 96, 0.2);
+  background: rgba(var(--ac-rgb), 0.2);
 }
 
 .hf-add-full {
@@ -172,15 +163,15 @@ select.hf-input option {
   font-size: 0.62rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  background: rgba(95, 255, 96, 0.06);
-  border: 1px dashed rgba(95, 255, 96, 0.25);
+  background: rgba(var(--ac-rgb), 0.06);
+  border: 1px dashed rgba(var(--ac-rgb), 0.25);
   border-radius: 3px;
   color: var(--hf-green);
   cursor: pointer;
   transition: all 0.15s;
 }
 .hf-add-full:hover {
-  background: rgba(95, 255, 96, 0.12);
+  background: rgba(var(--ac-rgb), 0.12);
 }
 
 .hf-sr-only {
@@ -198,16 +189,16 @@ select.hf-input option {
   justify-content: center;
   gap: 0.4rem;
   height: 8rem;
-  border: 2px dashed rgba(95, 255, 96, 0.18);
+  border: 2px dashed rgba(var(--ac-rgb), 0.18);
   border-radius: 4px;
-  color: rgba(95, 255, 96, 0.3);
+  color: rgba(var(--ac-rgb), calc(0.3 + var(--fade-boost)));
   font-size: 0.62rem;
   cursor: pointer;
   transition: all 0.15s;
 }
 .hf-dropzone:hover {
-  border-color: rgba(95, 255, 96, 0.4);
-  color: rgba(95, 255, 96, 0.55);
+  border-color: rgba(var(--ac-rgb), 0.4);
+  color: rgba(var(--ac-rgb), calc(0.55 + var(--fade-boost)));
 }
 
 .hf-image-preview {
@@ -245,7 +236,7 @@ select.hf-input option {
   border-radius: 3px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.08);
-  color: #fff;
+  color: var(--strong);
   cursor: pointer;
 }
 
@@ -275,9 +266,9 @@ select.hf-input option {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 60, 60, 0.85);
+  background: rgba(var(--rd-rgb), 0.85);
   border-radius: 50%;
-  color: #fff;
+  color: var(--strong);
   cursor: pointer;
 }
 .hf-gallery-add {
@@ -285,13 +276,13 @@ select.hf-input option {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px dashed rgba(95, 255, 96, 0.25);
+  border: 1px dashed rgba(var(--ac-rgb), 0.25);
   border-radius: 3px;
-  color: rgba(95, 255, 96, 0.4);
+  color: rgba(var(--ac-rgb), calc(0.4 + var(--fade-boost)));
   cursor: pointer;
 }
 .hf-gallery-add:hover {
-  border-color: rgba(95, 255, 96, 0.5);
+  border-color: rgba(var(--ac-rgb), 0.5);
   color: var(--hf-green);
 }
 
@@ -307,8 +298,8 @@ select.hf-input option {
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.55rem 0.7rem;
-  background: rgba(20, 22, 20, 0.5);
-  border: 1px solid rgba(95, 255, 96, 0.08);
+  background: rgba(var(--cd-rgb), 0.5);
+  border: 1px solid rgba(var(--ac-rgb), 0.08);
   border-radius: 3px;
 }
 .hf-list-item-title {
@@ -340,7 +331,7 @@ select.hf-input option {
   align-items: center;
   justify-content: center;
   border-radius: 3px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(var(--tx-rgb), 0.06);
 }
 .hf-list-item button:hover {
   color: var(--hf-red);
@@ -357,13 +348,13 @@ select.hf-input option {
   padding: 0.1rem 0.4rem;
   margin-left: 0.4rem;
   border-radius: 2px;
-  background: rgba(96, 200, 255, 0.1);
+  background: rgba(var(--bl-rgb), 0.1);
   color: #60c8ff;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 .hf-tag-inline--req {
-  background: rgba(255, 184, 77, 0.1);
+  background: rgba(var(--am-rgb), 0.1);
   color: var(--hf-amber);
 }
 
@@ -412,7 +403,7 @@ select.hf-input option {
   display: none;
 }
 .hf-radio-pill--active {
-  border-color: rgba(95, 255, 96, 0.4);
+  border-color: rgba(var(--ac-rgb), 0.4);
   background: var(--hf-green-faint);
   color: var(--hf-green);
 }
@@ -452,7 +443,7 @@ select.hf-input option {
 .hf-slider {
   position: absolute;
   inset: 0;
-  background: rgba(120, 160, 120, 0.2);
+  background: rgba(var(--tx-rgb), 0.2);
   border-radius: 999px;
   transition: 0.2s;
   cursor: pointer;
@@ -479,8 +470,8 @@ select.hf-input option {
   position: relative;
   padding: 0.9rem;
   margin-bottom: 0.75rem;
-  background: rgba(20, 22, 20, 0.4);
-  border: 1px solid rgba(95, 255, 96, 0.1);
+  background: rgba(var(--cd-rgb), 0.4);
+  border: 1px solid rgba(var(--ac-rgb), 0.1);
   border-radius: 3px;
 }
 .hf-phase-head {
@@ -511,9 +502,9 @@ select.hf-input option {
 }
 .hf-nested {
   padding: 0.75rem;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(var(--tx-rgb), 0.05);
   border-radius: 3px;
-  border: 1px solid rgba(95, 255, 96, 0.06);
+  border: 1px solid rgba(var(--ac-rgb), 0.06);
 }
 
 .hf-submit-btn {

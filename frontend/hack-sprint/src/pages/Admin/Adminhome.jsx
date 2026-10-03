@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Calendar,
@@ -12,13 +12,12 @@ import {
   UploadCloud,
   Gavel,
   Sparkles,
-  Plus,
-  Minus,
-  GitBranch,
   X,
   Check,
   RefreshCw,
 } from "lucide-react";
+import "../Styles/AllHackathons.css";
+import "../Styles/Home.css";
 
 const Styles = () => (
   <style>{`
@@ -30,14 +29,14 @@ const Styles = () => (
     .oh-bg::before {
       content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
       background-image:
-        linear-gradient(rgba(95,255,96,.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(95,255,96,.03) 1px, transparent 1px);
+        linear-gradient(rgba(var(--hk-accent-rgb),.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(var(--hk-accent-rgb),.03) 1px, transparent 1px);
       background-size: 44px 44px;
     }
     .oh-bg::after {
       content:''; position:fixed; pointer-events:none; z-index:0;
       width:700px; height:700px;
-      background: radial-gradient(circle, rgba(95,255,96,.07) 0%, transparent 65%);
+      background: radial-gradient(circle, rgba(var(--hk-accent-rgb),.07) 0%, transparent 65%);
       top: -100px; left: 50%; transform: translateX(-50%);
     }
 
@@ -45,13 +44,13 @@ const Styles = () => (
     .oh-card::before, .oh-card::after {
       content:''; position:absolute;
       width:10px; height:10px; border-style:solid;
-      border-color: rgba(95,255,96,.4);
+      border-color: rgba(var(--hk-accent-rgb),.4);
       transition: border-color .2s;
     }
     .oh-card::before { top:-1px; left:-1px; border-width:2px 0 0 2px; }
     .oh-card::after  { bottom:-1px; right:-1px; border-width:0 2px 2px 0; }
     .oh-card:hover::before,
-    .oh-card:hover::after { border-color: rgba(95,255,96,.75); }
+    .oh-card:hover::after { border-color: rgba(var(--hk-accent-rgb),.75); }
 
     /* hero word-by-word reveal */
     @keyframes oh-word {
@@ -79,15 +78,15 @@ const Styles = () => (
     .oh-ring { animation: oh-spin-slow 18s linear infinite; }
 
     /* cta glow + animated gradient border */
-    .oh-cta:hover { box-shadow: 0 0 28px rgba(95,255,96,.35); }
+    .oh-cta:hover { box-shadow: 0 0 28px rgba(var(--hk-accent-rgb),.35); }
     @keyframes oh-border-spin { to { --oh-angle: 360deg; } }
     @property --oh-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
     .oh-gradient-border {
       position: relative;
       border: 1px solid transparent;
       background:
-        linear-gradient(#0a0a0a,#0a0a0a) padding-box,
-        conic-gradient(from var(--oh-angle), rgba(95,255,96,0.05), rgba(95,255,96,0.9), rgba(95,255,96,0.05) 40%) border-box;
+        linear-gradient(var(--hk-bg),var(--hk-bg)) padding-box,
+        conic-gradient(from var(--oh-angle), rgba(var(--hk-accent-rgb),0.05), rgba(var(--hk-accent-rgb),0.9), rgba(var(--hk-accent-rgb),0.05) 40%) border-box;
       animation: oh-border-spin 4s linear infinite;
     }
 
@@ -109,7 +108,7 @@ const Styles = () => (
     .oh-packet { animation: oh-packet 3.2s linear infinite; }
 
     /* mock table row "live" highlight sweep */
-    @keyframes oh-row-glow { 0%,100%{ background-color: rgba(95,255,96,0.02);} 50%{ background-color: rgba(95,255,96,0.07);} }
+    @keyframes oh-row-glow { 0%,100%{ background-color: rgba(var(--hk-accent-rgb),0.02);} 50%{ background-color: rgba(var(--hk-accent-rgb),0.07);} }
     .oh-row-live { animation: oh-row-glow 2.4s ease-in-out infinite; }
 
     /* live indicator blink */
@@ -165,222 +164,6 @@ const useTilt = () => {
 };
 
 /* ─────────────────────────────────────────────────────────────────────────
-   Sticky in-page section nav (desktop only)
-───────────────────────────────────────────────────────────────────────── */
-const sectionList = [
-  { id: "flow-preview", label: "Flow" },
-  { id: "breakdown", label: "Breakdown" },
-  { id: "compare", label: "Compare" },
-  { id: "why-organize", label: "Why Us" },
-];
-
-const SectionNav = () => {
-  const [active, setActive] = useState(sectionList[0].id);
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) setActive(e.target.id);
-        });
-      },
-      { threshold: 0.5 }
-    );
-    sectionList.forEach(({ id }) => {
-      const el = document.getElementById(id);
-      if (el) obs.observe(el);
-    });
-    return () => obs.disconnect();
-  }, []);
-
-  return (
-    <div className="hidden xl:flex fixed right-6 top-1/2 -translate-y-1/2 z-40 flex-col items-end gap-4">
-      {sectionList.map((s) => (
-        <button
-          key={s.id}
-          onClick={() => document.getElementById(s.id)?.scrollIntoView({ behavior: "smooth" })}
-          className="oh-navdot group flex items-center gap-2.5 cursor-pointer"
-        >
-          <span
-            className={`font-jb text-[0.55rem] tracking-[0.12em] uppercase transition-all duration-300 ${
-              active === s.id
-                ? "text-[#5fff60] opacity-100"
-                : "text-[rgba(180,220,180,0.35)] opacity-0 group-hover:opacity-100"
-            }`}
-          >
-            {s.label}
-          </span>
-          <span
-            className={`rounded-full transition-all duration-300 ${
-              active === s.id
-                ? "w-2.5 h-2.5 bg-[#5fff60] shadow-[0_0_10px_rgba(95,255,96,0.7)]"
-                : "w-1.5 h-1.5 bg-[rgba(95,255,96,0.25)] group-hover:bg-[rgba(95,255,96,0.5)]"
-            }`}
-          />
-        </button>
-      ))}
-    </div>
-  );
-};
-
-/* ─────────────────────────────────────────────────────────────────────────
-   Flow-diagram "product mockup" — styled like a real tool screenshot:
-   window chrome, working zoom controls, animated data-flow connector, and
-   a small live-feeling table underneath.
-───────────────────────────────────────────────────────────────────────── */
-const flowNodes = [
-  { icon: Sparkles, label: "Draft", sub: "New hackathon" },
-  { icon: ShieldCheck, label: "Approve", sub: "Controller review" },
-  { icon: Users, label: "Register", sub: "Teams form up" },
-  { icon: UploadCloud, label: "Submit", sub: "Projects come in" },
-  { icon: Gavel, label: "Judge", sub: "Score & vote" },
-  { icon: Trophy, label: "Results", sub: "Leaderboard live" },
-];
-
-const mockRows = [
-  { team: "Prompt Engineers", phase: "Judging", status: "Scored", pts: "812" },
-  { team: "CipherKins", phase: "Submission", status: "Submitted", pts: "—" },
-  { team: "VoidSet", phase: "Judging", status: "Scored", pts: "764" },
-];
-
-const FlowDiagramMockup = () => {
-  const [zoom, setZoom] = useState(1);
-  const wrapRef = useRef(null);
-
-  useEffect(() => {
-    if (wrapRef.current) wrapRef.current.classList.add("oh-zoom-visible");
-  }, []);
-
-  return (
-    <section id="flow-preview" className="relative z-10 py-20 px-5">
-      <div className="max-w-[1100px] mx-auto">
-        <div className="text-center mb-12">
-          <div className="font-jb inline-flex items-center gap-1.5 text-[0.6rem] tracking-[0.2em] uppercase text-[#5fff60] border border-[rgba(95,255,96,0.22)] px-3 py-1 rounded-[2px] mb-4">
-            <GitBranch size={11} /> Live Preview
-          </div>
-          <h2
-            className="font-syne font-extrabold text-white tracking-tight leading-none"
-            style={{ fontSize: "clamp(2.2rem,5vw,3.6rem)" }}
-          >
-            See Your Hackathon <span className="text-[#5fff60]">Flow</span>
-          </h2>
-          <p className="font-jb text-[0.75rem] text-[rgba(180,220,180,0.48)] mt-4 max-w-lg mx-auto leading-relaxed">
-            Every hackathon runs through this exact pipeline — this is what it
-            looks like end to end.
-          </p>
-        </div>
-
-        <div
-          ref={wrapRef}
-          className="oh-zoom relative rounded-[6px] border border-[rgba(95,255,96,0.15)] bg-[rgba(8,10,8,0.95)] shadow-[0_20px_60px_rgba(0,0,0,0.5)] overflow-hidden"
-        >
-          {/* toolbar */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(95,255,96,0.08)] bg-[rgba(95,255,96,0.02)]">
-            <div className="flex items-center gap-3">
-              <div className="flex gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[rgba(255,100,100,0.5)]" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[rgba(255,184,77,0.5)]" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[rgba(95,255,96,0.5)]" />
-              </div>
-              <span className="font-jb text-[0.62rem] text-[rgba(180,220,180,0.4)] tracking-[0.04em]">
-                organizer / hackathon-flow
-              </span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="font-jb inline-flex items-center gap-1.5 text-[0.55rem] tracking-[0.1em] uppercase text-[#5fff60]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#5fff60] oh-blink-dot" /> Live
-              </span>
-              <div className="flex items-center gap-1 border border-[rgba(95,255,96,0.15)] rounded-[3px] overflow-hidden">
-                <button
-                  onClick={() => setZoom((z) => Math.max(z - 0.15, 0.7))}
-                  className="w-6 h-6 flex items-center justify-center text-[rgba(95,255,96,0.55)] hover:bg-[rgba(95,255,96,0.1)] hover:text-[#5fff60] transition-colors cursor-pointer"
-                  aria-label="Zoom out"
-                >
-                  <Minus size={11} />
-                </button>
-                <span className="font-jb text-[0.55rem] text-[rgba(180,220,180,0.4)] w-9 text-center">
-                  {Math.round(zoom * 100)}%
-                </span>
-                <button
-                  onClick={() => setZoom((z) => Math.min(z + 0.15, 1.3))}
-                  className="w-6 h-6 flex items-center justify-center text-[rgba(95,255,96,0.55)] hover:bg-[rgba(95,255,96,0.1)] hover:text-[#5fff60] transition-colors cursor-pointer"
-                  aria-label="Zoom in"
-                >
-                  <Plus size={11} />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* canvas */}
-          <div className="relative px-6 sm:px-10 py-16 overflow-x-auto">
-            <div
-              className="relative min-w-[720px] transition-transform duration-300 ease-out"
-              style={{ transform: `scale(${zoom})`, transformOrigin: "center" }}
-            >
-              <div className="absolute top-[27px] left-[8%] right-[8%] h-px bg-[rgba(95,255,96,0.12)]" />
-              <div className="absolute top-[24px] left-[8%] right-[8%] h-[6px] overflow-hidden pointer-events-none">
-                {[0, 1, 2].map((i) => (
-                  <span
-                    key={i}
-                    className="oh-packet absolute top-[1.5px] h-[3px] w-10 rounded-full bg-gradient-to-r from-transparent via-[#5fff60] to-transparent"
-                    style={{ animationDelay: `${i * 1.05}s` }}
-                  />
-                ))}
-              </div>
-
-              <div className="relative grid grid-cols-6 gap-3">
-                {flowNodes.map((n, i) => {
-                  const Icon = n.icon;
-                  return (
-                    <div key={i} className="flex flex-col items-center text-center">
-                      <div className="w-14 h-14 rounded-[3px] bg-[#0a0a0a] border-2 border-[rgba(95,255,96,0.25)] flex items-center justify-center mb-3 shadow-[0_0_16px_rgba(95,255,96,0.1)]">
-                        <Icon size={20} className="text-[#5fff60]" />
-                      </div>
-                      <div className="font-syne font-extrabold text-white text-[0.75rem] tracking-tight">
-                        {n.label}
-                      </div>
-                      <div className="font-jb text-[0.55rem] text-[rgba(180,220,180,0.4)] mt-0.5">
-                        {n.sub}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* mock live data table */}
-          <div className="border-t border-[rgba(95,255,96,0.08)] bg-[rgba(95,255,96,0.015)]">
-            <div className="grid grid-cols-4 gap-4 px-6 py-2.5 border-b border-[rgba(95,255,96,0.06)]">
-              {["Team", "Phase", "Status", "Score"].map((h) => (
-                <span key={h} className="font-jb text-[0.5rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.3)]">
-                  {h}
-                </span>
-              ))}
-            </div>
-            {mockRows.map((r, i) => (
-              <div
-                key={i}
-                className={`oh-row-live grid grid-cols-4 gap-4 px-6 py-2.5 ${
-                  i !== mockRows.length - 1 ? "border-b border-[rgba(95,255,96,0.04)]" : ""
-                }`}
-                style={{ animationDelay: `${i * 0.6}s` }}
-              >
-                <span className="font-jb text-[0.65rem] text-white truncate">{r.team}</span>
-                <span className="font-jb text-[0.65rem] text-[rgba(180,220,180,0.5)]">{r.phase}</span>
-                <span className="font-jb text-[0.65rem] text-[rgba(95,255,96,0.65)]">{r.status}</span>
-                <span className="font-jb text-[0.65rem] text-[rgba(255,184,77,0.75)]">{r.pts}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-/* ─────────────────────────────────────────────────────────────────────────
    Detailed interactive pipeline breakdown
 ───────────────────────────────────────────────────────────────────────── */
 const workflowSteps = [
@@ -401,7 +184,7 @@ const workflowSteps = [
     details: [
       "Drafts stay private until you submit for approval",
       "Controllers approve or reject with a reason",
-      "Approved hackathons go public and open registration",
+      "Approved events go public and open registration",
     ],
   },
   {
@@ -409,7 +192,7 @@ const workflowSteps = [
     title: "Registration & Teams",
     desc: "Students register and form teams with invite codes — tracked live.",
     details: [
-      "Solo or team participation, your call per hackathon",
+      "Solo or team participation, your call per event",
       "Invite-code team joining with leader & member roles",
       "Live participant and team overview dashboard",
     ],
@@ -458,31 +241,21 @@ const nodePositions = workflowSteps.map((_, i) => {
 });
 
 const WorkflowPipeline = () => {
-  const [selected, setSelected] = useState(0);
-  const [expandedMobile, setExpandedMobile] = useState(null);
-
   useZoomReveal(".oh-loop-zoom");
 
-  const step = workflowSteps[selected];
-  const StepIcon = step.icon;
-  const toggleMobile = (i) => setExpandedMobile((prev) => (prev === i ? null : i));
-
   return (
-    <section id="breakdown" className="relative z-10 py-28">
+    <section id="breakdown" className="relative z-10 py-20">
       <div className="max-w-[1100px] mx-auto px-4">
         <div className="text-center mb-14">
-          <div className="font-jb inline-flex items-center gap-1.5 text-[0.6rem] tracking-[0.2em] uppercase text-[#5fff60] border border-[rgba(95,255,96,0.22)] px-3 py-1 rounded-[2px] mb-4">
-            <RefreshCw size={11} /> A Repeating Cycle
-          </div>
           <h2
-            className="font-syne font-extrabold text-white tracking-tight leading-none"
+            className="font-syne font-extrabold text-[var(--hk-text)] tracking-tight leading-none"
             style={{ fontSize: "clamp(2.4rem,5vw,4rem)" }}
           >
-            From Draft to <span className="text-[#5fff60]">Results</span>
+            From Draft to <span className="text-[var(--hk-accent-solid)]">Results</span>
           </h2>
-          <p className="font-jb text-[0.75rem] text-[rgba(180,220,180,0.48)] mt-4 tracking-[0.05em] max-w-lg mx-auto">
-            Every hackathon runs this exact loop — click a stage to see what
-            happens there.
+          <p className="font-jb text-[0.75rem] text-[rgba(var(--hk-text-rgb),0.83)] dark:text-[rgba(var(--hk-text-rgb),0.48)] mt-4 tracking-[0.05em] max-w-lg mx-auto">
+            Every event runs this exact loop, from first draft to
+            published results.
           </p>
         </div>
 
@@ -495,7 +268,7 @@ const WorkflowPipeline = () => {
                 cy="50"
                 r={LOOP_RADIUS}
                 fill="none"
-                stroke="rgba(95,255,96,0.12)"
+                stroke="rgba(var(--hk-accent-rgb),0.12)"
                 strokeWidth="0.4"
               />
             </svg>
@@ -504,7 +277,7 @@ const WorkflowPipeline = () => {
             {[0, 1, 2, 3].map((i) => (
               <div key={i} className="absolute inset-0 oh-orbit" style={{ animationDelay: `${i * -2.25}s` }}>
                 <span
-                  className="absolute w-2.5 h-2.5 rounded-full bg-[#5fff60] shadow-[0_0_10px_rgba(95,255,96,0.8)]"
+                  className="absolute w-2.5 h-2.5 rounded-full bg-[var(--hk-accent-solid)] shadow-[0_0_10px_rgba(var(--hk-accent-rgb),0.8)]"
                   style={{ left: "50%", top: `${50 - LOOP_RADIUS}%`, transform: "translate(-50%,-50%)" }}
                 />
               </div>
@@ -513,9 +286,9 @@ const WorkflowPipeline = () => {
             {/* center hub */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="flex flex-col items-center gap-2 max-w-[38%] text-center">
-                <RefreshCw size={20} className="oh-ring text-[rgba(95,255,96,0.35)]" style={{ animationDuration: "6s" }} />
-                <span className="font-jb text-[0.5rem] tracking-[0.12em] uppercase text-[rgba(180,220,180,0.35)] leading-relaxed">
-                  Repeats every hackathon
+                <RefreshCw size={20} className="oh-ring text-[rgba(var(--hk-accent-rgb),0.65)] dark:text-[rgba(var(--hk-accent-rgb),0.35)]" style={{ animationDuration: "6s" }} />
+                <span className="font-jb text-[0.5rem] tracking-[0.12em] uppercase text-[rgba(var(--hk-text-rgb),0.7)] dark:text-[rgba(var(--hk-text-rgb),0.35)] leading-relaxed">
+                  Repeats every event
                 </span>
               </div>
             </div>
@@ -524,96 +297,48 @@ const WorkflowPipeline = () => {
             {workflowSteps.map((s, i) => {
               const Icon = s.icon;
               const pos = nodePositions[i];
-              const isSelected = selected === i;
               return (
-                <button
+                <div
                   key={i}
-                  onClick={() => setSelected(i)}
-                  className="absolute flex flex-col items-center text-center cursor-pointer group"
+                  className="absolute flex flex-col items-center text-center"
                   style={{ left: `${pos.left}%`, top: `${pos.top}%`, transform: "translate(-50%,-50%)" }}
                 >
-                  <div
-                    className={`w-16 h-16 rounded-full bg-[#0a0a0a] border-2 flex items-center justify-center transition-all duration-300 ${
-                      isSelected
-                        ? "border-[#5fff60] shadow-[0_0_24px_rgba(95,255,96,0.4)] scale-110"
-                        : "border-[rgba(95,255,96,0.22)] group-hover:border-[rgba(95,255,96,0.5)]"
-                    }`}
-                  >
-                    <Icon size={22} className={isSelected ? "text-[#5fff60]" : "text-[rgba(95,255,96,0.45)]"} />
+                  <div className="w-16 h-16 rounded-full bg-[var(--hk-bg)] border-2 border-[rgba(var(--hk-accent-rgb),0.4)] flex items-center justify-center">
+                    <Icon size={22} className="text-[var(--hk-accent-solid)]" />
                   </div>
-                  <span
-                    className={`font-syne font-extrabold text-[0.72rem] tracking-tight mt-2 transition-colors whitespace-nowrap ${
-                      isSelected ? "text-[#5fff60]" : "text-white"
-                    }`}
-                  >
+                  <span className="font-syne font-extrabold text-[0.72rem] tracking-tight mt-2 whitespace-nowrap text-[var(--hk-text)]">
                     {s.title}
                   </span>
-                </button>
+                </div>
               );
             })}
-          </div>
-
-          {/* detail panel for the selected stage */}
-          <div className="oh-pop max-w-xl mx-auto mt-10" key={selected}>
-            <div className="oh-card relative bg-[rgba(10,12,10,0.9)] border border-[rgba(95,255,96,0.18)] rounded-[4px] p-7 text-center">
-              <div className="flex items-center justify-center gap-3 mb-3">
-                <div className="w-9 h-9 rounded-[3px] bg-[rgba(95,255,96,0.08)] border border-[rgba(95,255,96,0.2)] flex items-center justify-center flex-shrink-0">
-                  <StepIcon size={16} className="text-[#5fff60]" />
-                </div>
-                <h3 className="font-syne font-extrabold text-white text-[1.1rem] tracking-tight">{step.title}</h3>
-              </div>
-              <p className="font-jb text-[0.72rem] text-[rgba(180,220,180,0.5)] leading-relaxed mb-5">{step.desc}</p>
-              <div className="flex flex-col gap-2 text-left max-w-sm mx-auto">
-                {step.details.map((d, di) => (
-                  <div key={di} className="font-jb text-[0.64rem] text-[rgba(180,220,180,0.55)] leading-snug flex gap-2">
-                    <span className="text-[#5fff60] flex-shrink-0">›</span>
-                    {d}
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
 
         {/* Mobile: vertical list that loops back at the end */}
         <div className="md:hidden relative pl-8">
-          <div className="absolute left-3 top-0 bottom-6 w-px bg-[rgba(95,255,96,0.1)]" />
+          <div className="absolute left-3 top-0 bottom-6 w-px bg-[rgba(var(--hk-accent-rgb),0.1)]" />
           <div className="flex flex-col gap-7">
             {workflowSteps.map((s, i) => {
               const Icon = s.icon;
-              const isExpanded = expandedMobile === i;
               return (
                 <div key={i} className="oh-zoom oh-loop-zoom relative" style={{ transitionDelay: `${i * 0.06}s` }}>
-                  <div className="flex gap-5 cursor-pointer" onClick={() => toggleMobile(i)}>
-                    <div className="absolute -left-8 w-8 h-8 rounded-full bg-[#0a0a0a] border-2 border-[rgba(95,255,96,0.25)] flex items-center justify-center flex-shrink-0">
-                      <Icon size={14} className="text-[#5fff60]" />
+                  <div className="flex gap-5">
+                    <div className="absolute -left-8 w-8 h-8 rounded-full bg-[var(--hk-bg)] border-2 border-[rgba(var(--hk-card-border-rgb),0.4)] dark:border-[rgba(var(--hk-card-border-rgb),0.25)] flex items-center justify-center flex-shrink-0">
+                      <Icon size={14} className="text-[var(--hk-accent-solid)]" />
                     </div>
-                    <div className="oh-card relative ml-4 p-5 w-full bg-[rgba(10,12,10,0.88)] border border-[rgba(95,255,96,0.1)] rounded-[4px]">
-                      <h3 className="font-syne text-[1.05rem] font-extrabold text-white mb-2">{s.title}</h3>
-                      <p className="font-jb text-[0.7rem] text-[rgba(180,220,180,0.48)] leading-relaxed">{s.desc}</p>
-                      <div
-                        className={`overflow-hidden transition-all duration-300 ${
-                          isExpanded ? "max-h-48 opacity-100 mt-3" : "max-h-0 opacity-0"
-                        }`}
-                      >
-                        <div className="flex flex-col gap-1.5 pt-3 border-t border-[rgba(95,255,96,0.08)]">
-                          {s.details.map((d, di) => (
-                            <div key={di} className="font-jb text-[0.62rem] text-[rgba(180,220,180,0.55)] leading-snug flex gap-1.5">
-                              <span className="text-[#5fff60] flex-shrink-0">›</span>
-                              {d}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+                    <div className="relative ml-4 p-5 w-full bg-[rgba(var(--hk-card-bg),0.88)] border border-[rgba(var(--hk-card-border-rgb),0.16)] dark:border-[rgba(var(--hk-card-border-rgb),0.1)] rounded-[4px]">
+                      <h3 className="font-syne text-[1.05rem] font-extrabold text-[var(--hk-text)] mb-2">{s.title}</h3>
+                      <p className="font-jb text-[0.7rem] text-[rgba(var(--hk-text-rgb),0.83)] dark:text-[rgba(var(--hk-text-rgb),0.48)] leading-relaxed">{s.desc}</p>
                     </div>
                   </div>
                 </div>
               );
             })}
             <div className="relative flex items-center gap-3 pl-4">
-              <RefreshCw size={14} className="text-[rgba(95,255,96,0.4)] flex-shrink-0" />
-              <span className="font-jb text-[0.62rem] text-[rgba(180,220,180,0.4)] italic">
-                …and loops back to Configure for the next hackathon.
+              <RefreshCw size={14} className="text-[rgba(var(--hk-accent-rgb),0.7)] dark:text-[rgba(var(--hk-accent-rgb),0.4)] flex-shrink-0" />
+              <span className="font-jb text-[0.62rem] text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-text-rgb),0.4)] italic">
+                …and loops back to Configure for the next event.
               </span>
             </div>
           </div>
@@ -623,9 +348,6 @@ const WorkflowPipeline = () => {
   );
 };
 
-/* ─────────────────────────────────────────────────────────────────────────
-   Before / After comparison — storytelling contrast section
-───────────────────────────────────────────────────────────────────────── */
 const withoutList = [
   "Registrations scattered across Google Forms",
   "Team formation happening over DMs and group chats",
@@ -645,13 +367,13 @@ const CompareCard = ({ title, tone, items }) => {
     <div
       className={`oh-card relative flex-1 rounded-[4px] p-7 backdrop-blur-sm ${
         isBad
-          ? "bg-[rgba(255,60,60,0.03)] border border-[rgba(255,96,96,0.15)]"
-          : "bg-[rgba(95,255,96,0.03)] border border-[rgba(95,255,96,0.18)]"
+          ? "bg-[rgba(var(--hk-red-rgb),0.03)] border border-[rgba(var(--hk-red-rgb),0.15)]"
+          : "bg-[rgba(var(--hk-accent-rgb),0.03)] border border-[rgba(var(--hk-card-border-rgb),0.29)] dark:border-[rgba(var(--hk-card-border-rgb),0.18)]"
       }`}
     >
       <div
         className={`font-jb inline-flex items-center gap-1.5 text-[0.58rem] tracking-[0.14em] uppercase mb-5 px-2.5 py-1 rounded-[2px] ${
-          isBad ? "bg-[rgba(255,96,96,0.08)] text-[#ff9090]" : "bg-[rgba(95,255,96,0.08)] text-[#5fff60]"
+          isBad ? "bg-[rgba(var(--hk-red-rgb),0.08)] text-[rgb(var(--hk-red-rgb))]" : "bg-[rgba(var(--hk-accent-rgb),0.08)] text-[var(--hk-accent-solid)]"
         }`}
       >
         {title}
@@ -662,9 +384,9 @@ const CompareCard = ({ title, tone, items }) => {
             {isBad ? (
               <X size={14} className="text-[rgba(255,120,120,0.6)] mt-0.5 flex-shrink-0" />
             ) : (
-              <Check size={14} className="text-[#5fff60] mt-0.5 flex-shrink-0" />
+              <Check size={14} className="text-[var(--hk-accent-solid)] mt-0.5 flex-shrink-0" />
             )}
-            <span className="font-jb text-[0.72rem] text-[rgba(180,220,180,0.6)] leading-relaxed">{it}</span>
+            <span className="font-jb text-[0.72rem] text-[rgba(var(--hk-text-rgb),0.95)] dark:text-[rgba(var(--hk-text-rgb),0.6)] leading-relaxed">{it}</span>
           </div>
         ))}
       </div>
@@ -677,14 +399,14 @@ const CompareSection = () => {
   useZoomReveal(".oh-slide-r", "oh-slide-visible");
 
   return (
-    <section id="compare" className="relative z-10 py-28 px-5">
+    <section id="compare" className="relative z-10 py-20 px-5">
       <div className="max-w-[1000px] mx-auto">
         <div className="text-center mb-14">
           <h2
-            className="font-syne font-extrabold text-white tracking-tight leading-none"
+            className="font-syne font-extrabold text-[var(--hk-text)] tracking-tight leading-none"
             style={{ fontSize: "clamp(2.2rem,5vw,3.6rem)" }}
           >
-            Running It <span className="text-[#5fff60]">vs. Winging It</span>
+            Running It <span className="text-[var(--hk-accent-solid)]">vs. Winging It</span>
           </h2>
         </div>
         <div className="flex flex-col md:flex-row gap-5 items-stretch">
@@ -700,9 +422,6 @@ const CompareSection = () => {
   );
 };
 
-/* ─────────────────────────────────────────────────────────────────────────
-   Benefits — now with cursor-tilt cards
-───────────────────────────────────────────────────────────────────────── */
 const benefits = [
   {
     icon: Users,
@@ -712,11 +431,11 @@ const benefits = [
     tag: "AUDIENCE",
     span: "md:col-span-2 md:row-span-2",
     featured: true,
-    accent: "rgba(96,200,255,0.7)",
-    border: "rgba(96,200,255,0.18)",
-    hoverBorder: "rgba(96,200,255,0.45)",
-    tagBg: "rgba(96,200,255,0.08)",
-    tagColor: "#60c8ff",
+    accent: "rgba(var(--hk-blue-rgb),0.7)",
+    border: "rgba(var(--hk-blue-rgb),0.18)",
+    hoverBorder: "rgba(var(--hk-blue-rgb),0.45)",
+    tagBg: "rgba(var(--hk-blue-rgb),0.08)",
+    tagColor: "rgb(var(--hk-blue-rgb))",
   },
   {
     icon: Building,
@@ -728,7 +447,7 @@ const benefits = [
     border: "rgba(180,120,255,0.18)",
     hoverBorder: "rgba(180,120,255,0.45)",
     tagBg: "rgba(180,120,255,0.08)",
-    tagColor: "#b478ff",
+    tagColor: "rgb(var(--hk-purple-rgb))",
   },
   {
     icon: Target,
@@ -736,11 +455,11 @@ const benefits = [
     desc: "Amplify your brand and showcase winning projects to the world.",
     tag: "IMPACT",
     span: "",
-    accent: "rgba(255,184,77,0.7)",
-    border: "rgba(255,184,77,0.18)",
-    hoverBorder: "rgba(255,184,77,0.45)",
-    tagBg: "rgba(255,184,77,0.08)",
-    tagColor: "#ffb84d",
+    accent: "rgba(var(--hk-amber-rgb),0.7)",
+    border: "rgba(var(--hk-amber-rgb),0.18)",
+    hoverBorder: "rgba(var(--hk-amber-rgb),0.45)",
+    tagBg: "rgba(var(--hk-amber-rgb),0.08)",
+    tagColor: "rgb(var(--hk-amber-rgb))",
   },
   {
     icon: Code,
@@ -749,11 +468,11 @@ const benefits = [
     highlight: "Judge assignment · weighted scoring · one dashboard",
     tag: "SUPPORT",
     span: "md:col-span-2",
-    accent: "rgba(95,255,96,0.7)",
-    border: "rgba(95,255,96,0.18)",
-    hoverBorder: "rgba(95,255,96,0.45)",
-    tagBg: "rgba(95,255,96,0.08)",
-    tagColor: "#5fff60",
+    accent: "rgba(var(--hk-accent-rgb),0.7)",
+    border: "rgba(var(--hk-accent-rgb),0.18)",
+    hoverBorder: "rgba(var(--hk-accent-rgb),0.45)",
+    tagBg: "rgba(var(--hk-accent-rgb),0.08)",
+    tagColor: "var(--hk-accent-solid)",
   },
 ];
 
@@ -770,7 +489,7 @@ const BenefitCard = ({ b, i }) => {
         ref={ref}
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
-        className="relative overflow-hidden p-7 rounded-[4px] bg-[rgba(10,12,10,0.88)] backdrop-blur-sm h-full flex flex-col gap-4 transition-transform duration-150 will-change-transform"
+        className="relative overflow-hidden p-7 rounded-[4px] bg-[rgba(var(--hk-card-bg),0.88)] backdrop-blur-sm h-full flex flex-col gap-4 transition-transform duration-150 will-change-transform"
         style={{ border: `1px solid ${b.border}` }}
         onMouseEnter={(e) => (e.currentTarget.style.borderColor = b.hoverBorder)}
         onMouseLeaveCapture={(e) => (e.currentTarget.style.borderColor = b.border)}
@@ -807,14 +526,14 @@ const BenefitCard = ({ b, i }) => {
         </div>
 
         <h3
-          className={`relative font-syne font-extrabold text-white tracking-tight ${
+          className={`relative font-syne font-extrabold text-[var(--hk-text)] tracking-tight ${
             b.featured ? "text-[1.5rem]" : "text-[1.1rem]"
           }`}
         >
           {b.title}
         </h3>
         <p
-          className={`relative font-jb text-[rgba(180,220,180,0.48)] leading-relaxed flex-1 ${
+          className={`relative font-jb text-[rgba(var(--hk-text-rgb),0.83)] dark:text-[rgba(var(--hk-text-rgb),0.48)] leading-relaxed flex-1 ${
             b.featured ? "text-[0.78rem] max-w-md" : "text-[0.68rem]"
           }`}
         >
@@ -822,7 +541,7 @@ const BenefitCard = ({ b, i }) => {
         </p>
 
         {b.highlight && (
-          <div className="relative font-jb text-[0.6rem] tracking-[0.03em] flex items-center gap-2 pt-3 border-t border-[rgba(95,255,96,0.08)]" style={{ color: b.tagColor }}>
+          <div className="relative font-jb text-[0.6rem] tracking-[0.03em] flex items-center gap-2 pt-3 border-t border-[rgba(var(--hk-card-border-rgb),0.14)] dark:border-[rgba(var(--hk-card-border-rgb),0.08)]" style={{ color: b.tagColor }}>
             <span className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: b.tagColor }} />
             {b.highlight}
           </div>
@@ -836,23 +555,20 @@ const Benefits = () => {
   useZoomReveal(".oh-benefit-zoom");
 
   return (
-    <section id="why-organize" className="relative z-10 py-28 px-4 md:px-5">
+    <section id="why-organize" className="relative z-10 py-20 px-4 md:px-5">
       <div className="max-w-[1200px] mx-auto">
         <div className="text-center mb-15 md:mb-20">
-          <div className="font-jb inline-block text-[0.6rem] tracking-[0.2em] uppercase text-[#5fff60] border border-[rgba(95,255,96,0.22)] px-3 py-1 rounded-[2px] mb-4">
-            Built For Organizers
-          </div>
           <h2
-            className="font-syne font-extrabold text-white tracking-tight leading-none
+            className="font-syne font-extrabold text-[var(--hk-text)] tracking-tight leading-none
     text-[2rem] sm:text-4xl md:text-5xl lg:text-6xl xl:text-[4rem]"
           >
-            Why Organize <span className="text-[#5fff60]">Here?</span>
+            Why Organize <span className="text-[var(--hk-accent-solid)]">Here?</span>
           </h2>
           <p
             className="font-jb text-[0.75rem] sm:text-[0.8rem] md:text-[0.85rem]
-    text-[rgba(180,220,180,0.48)] mt-4 tracking-[0.05em] max-w-md mx-auto"
+    text-[rgba(var(--hk-text-rgb),0.83)] dark:text-[rgba(var(--hk-text-rgb),0.48)] mt-4 tracking-[0.05em] max-w-md mx-auto"
           >
-            Powerful tools to maximise your hackathon's impact
+            Powerful tools to maximise your event's impact
           </p>
         </div>
 
@@ -869,136 +585,43 @@ const Benefits = () => {
 /* ─────────────────────────────────────────────────────────────────────────
    Main page
 ───────────────────────────────────────────────────────────────────────── */
-const heroWords = ["Organize", "Hackathons", "with", "Ease"];
-
 export default function OrganizerHome() {
   const navigate = useNavigate();
   const isAdmin = !!localStorage.getItem("adminToken");
 
-  const heroGlowRef = useRef(null);
-  const heroLayer1Ref = useRef(null);
-  const heroLayer2Ref = useRef(null);
-  const mouseOffset = useRef({ x: 0, y: 0 });
-  const scrollState = useRef({ scale: 1, opacity: 1 });
-
-  const applyHeroTransform = () => {
-    if (!heroGlowRef.current) return;
-    const { x, y } = mouseOffset.current;
-    const { scale, opacity } = scrollState.current;
-    heroGlowRef.current.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
-    heroGlowRef.current.style.opacity = opacity;
-  };
-
-  useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY;
-      scrollState.current = {
-        scale: 1 + Math.min(y / 900, 0.6),
-        opacity: Math.max(1 - y / 500, 0),
-      };
-      applyHeroTransform();
-
-      if (heroLayer1Ref.current) heroLayer1Ref.current.style.transform = `translateY(${y * 0.15}px)`;
-      if (heroLayer2Ref.current) heroLayer2Ref.current.style.transform = `translateY(${y * 0.3}px)`;
-    };
-
-    const onMouseMove = (e) => {
-      mouseOffset.current = {
-        x: (e.clientX / window.innerWidth - 0.5) * 24,
-        y: (e.clientY / window.innerHeight - 0.5) * 24,
-      };
-      applyHeroTransform();
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("mousemove", onMouseMove, { passive: true });
-    onScroll();
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("mousemove", onMouseMove);
-    };
-  }, []);
-
   return (
     <>
       <Styles />
-      <SectionNav />
-      <div className="oh-bg font-jb min-h-screen bg-[#0a0a0a] text-[#e8ffe8] overflow-hidden">
+      <div className="oh-bg font-jb min-h-screen bg-[var(--hk-bg)] text-[var(--hk-text)] overflow-hidden">
         {/* ── Hero ── */}
-        <section className="relative z-10 pt-35 pb-14 text-center overflow-hidden">
-          <div ref={heroLayer1Ref} className="pointer-events-none">
-            <div className="pointer-events-none absolute top-[-120px] left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(95,255,96,0.09)_0%,transparent_70%)]" />
-          </div>
-          <div ref={heroLayer2Ref} className="pointer-events-none">
-            <div className="pointer-events-none absolute top-[60px] left-[-10%] w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(95,255,96,0.04)_0%,transparent_70%)]" />
-            <div className="pointer-events-none absolute top-[60px] right-[-10%] w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(95,255,96,0.04)_0%,transparent_70%)]" />
-          </div>
-
-          <div ref={heroGlowRef} className="absolute inset-0 pointer-events-none" style={{ transformOrigin: "center" }}>
-            <div className="oh-ring pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full border border-[rgba(95,255,96,0.04)]" />
-            <div
-              className="oh-ring pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full border border-[rgba(95,255,96,0.035)]"
-              style={{ animationDuration: "25s", animationDirection: "reverse" }}
-            />
-          </div>
-
-          <div className="relative z-10 w-full max-w-7xl mx-auto">
-            <h1
-              className="font-syne font-extrabold leading-[0.95] tracking-[-0.04em] text-white mb-6
-  text-[2.5rem] sm:text-5xl md:text-6xl lg:text-7xl xl:text-[6rem]"
-              style={{ perspective: "600px" }}
-            >
-              {heroWords.map((w, i) => (
-                <React.Fragment key={i}>
-                  <span
-                    className={`oh-word ${w === "Ease" ? "text-[#5fff60]" : ""}`}
-                    style={{ animationDelay: `${0.15 + i * 0.12}s` }}
-                  >
-                    {w}
-                  </span>
-                  {i < heroWords.length - 1 ? " " : ""}
-                  {(i === 0 || i === 2) && <br />}
-                </React.Fragment>
-              ))}
+        <section className="relative z-10 min-h-[calc(100vh-56px)] flex flex-col items-center justify-center py-20 px-5 text-center overflow-hidden">
+          <div className="hm-bracket relative z-10 max-w-[1000px] mx-auto">
+            <h1 className="hm-a2 font-syne font-extrabold leading-[1.05] tracking-tight text-[var(--hk-text)] mb-4 text-[2.4rem] sm:text-5xl md:text-6xl lg:text-7xl">
+              Organize<span className="hm-gradient-text"> here</span>
             </h1>
 
-            <p
-              className="oh-reveal-3 font-jb text-[0.7rem] sm:text-[0.75rem] md:text-[0.8rem] lg:text-[0.85rem]
-  text-[rgba(180,220,180,0.5)] leading-relaxed mb-10 max-w-[680px] mx-auto tracking-[0.02em]"
-            >
-              Launch, manage, and scale your hackathons on our platform. Connect
-              with innovators, showcase challenges, and drive impactful
-              solutions effortlessly.
+            <p className="hm-a4 font-sans text-[clamp(0.9rem,1.2vw,1.05rem)] text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-text-rgb),0.6)] leading-relaxed max-w-[600px] mx-auto mb-10">
+              Launch, manage, and scale your events on HackSprint: phases,
+              teams, submissions, judging, and results, all in one place.
             </p>
 
-            <div className="oh-reveal-4 flex flex-wrap items-center justify-center gap-3">
-              <div className="oh-gradient-border rounded-[4px]">
-                <button
-                  onClick={() => navigate(isAdmin ? "/admin" : "/adminlogin")}
-                  className="oh-cta font-jb inline-flex items-center gap-[0.5rem] text-[0.7rem] tracking-[0.12em] uppercase px-8 py-[0.85rem] rounded-[3px] cursor-pointer transition-all duration-200 bg-[#5fff60] text-[#050905] font-bold hover:bg-[#7fff80]"
-                >
-                  {isAdmin ? "Dashboard" : "Get Started"}
-                  <ArrowRight size={14} />
-                </button>
-              </div>
+            <div className="hm-a5 flex flex-wrap items-center justify-center gap-3">
               <button
-                onClick={() => document.getElementById("flow-preview")?.scrollIntoView({ behavior: "smooth" })}
-                className="font-jb inline-flex items-center gap-[0.5rem] text-[0.7rem] tracking-[0.12em] uppercase px-8 py-[0.85rem] rounded-[3px] border cursor-pointer transition-all duration-150 bg-transparent border-[rgba(95,255,96,0.2)] text-[rgba(95,255,96,0.6)] hover:border-[rgba(95,255,96,0.45)] hover:text-[#5fff60]"
+                onClick={() => navigate(isAdmin ? "/admin" : "/adminlogin")}
+                className="inline-flex items-center gap-2 font-sans text-sm font-semibold px-7 py-3 rounded-xl cursor-pointer transition-all duration-200 bg-[var(--hk-accent-solid)] text-[var(--hk-accent-solid-text)] hover:opacity-90 shadow-sm"
               >
-                See the flow
+                {isAdmin ? "Dashboard" : "Get Started"} <ArrowRight size={16} />
               </button>
-            </div>
-
-            <div className="oh-pulse mt-14 flex flex-col items-center gap-[0.4rem]">
-              <span className="font-jb text-[0.52rem] tracking-[0.2em] uppercase text-[rgba(95,255,96,0.25)]">
-                Scroll to explore
-              </span>
-              <div className="w-px h-8 bg-gradient-to-b from-[rgba(95,255,96,0.3)] to-transparent" />
+              <button
+                onClick={() => document.getElementById("breakdown")?.scrollIntoView({ behavior: "smooth" })}
+                className="inline-flex items-center gap-2 font-sans text-sm font-semibold px-7 py-3 rounded-xl cursor-pointer transition-all duration-150 bg-transparent border border-[rgba(var(--hk-card-border-rgb),0.25)] text-[var(--hk-text)] hover:bg-[rgba(var(--hk-accent-rgb),0.08)]"
+              >
+                See how it works
+              </button>
             </div>
           </div>
         </section>
 
-        <FlowDiagramMockup />
         <WorkflowPipeline />
         <CompareSection />
         <Benefits />

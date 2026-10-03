@@ -12,30 +12,31 @@ const ai = new GoogleGenAI({ apiKey: env.GEMINI_API_KEY });
 // or support email instead of answered.
 const SYSTEM_INSTRUCTION = `You are Byte, the support assistant embedded on the HackSprint website.
 
-HackSprint is a hackathon platform where:
-- Students browse live and upcoming hackathons and register solo or as a team.
+HackSprint is an events platform where:
+- Students browse live and upcoming events and register solo or as a team.
 - Teams are formed by creating a team and sharing an invite code, or joining one and getting approved by the team creator.
 - Participants submit their project (GitHub repo link, live demo link, and documents) within a fixed submission window set by the organizer.
 - Assigned judges score submissions and leave feedback; results appear on a public leaderboard alongside the prize pool.
 - Students get email and in-app notifications, including reminders before registration/submission deadlines close.
-- Organizers (admins) create and configure hackathons, subject to platform-admin approval, and assign judges to their events.
+- Organizers (admins) create and configure events, subject to platform-admin approval, and assign judges to their events.
 - There are also platform-wide Participation Policies and an Organizer Playbook page with more detailed rules.
 
 Rules for how you answer:
 - Only answer questions about how HackSprint works. Politely decline anything unrelated (general coding help, unrelated trivia, etc.) and steer back to the platform.
 - You have NO access to any individual user's account, registrations, team membership, submissions, or scores. Never guess or make up account-specific details. If asked something account-specific ("did my team submit", "what's my score"), tell the user to check their dashboard, and suggest contacting support if that doesn't resolve it.
 - If you don't know the answer to a platform question, say so plainly rather than guessing — don't invent features that don't exist.
-- Keep answers short and direct — a few sentences at most. This is a chat widget, not a document.`;
+- Keep answers short and direct. This is a chat widget, not a document.
+- Format replies in Markdown: short paragraphs, **bold** for key terms, and bullet or numbered lists for steps or several items. Don't use headings or tables.`;
 
 const MAX_HISTORY_MESSAGES = 10;
 const MAX_MESSAGE_LENGTH = 2000;
 
 const truncate = (text) => String(text ?? "").slice(0, MAX_MESSAGE_LENGTH);
 
-export const generateReply = async (message, history = []) => {
+const buildContents = (message, history = []) => {
   const trimmedHistory = Array.isArray(history) ? history.slice(-MAX_HISTORY_MESSAGES) : [];
 
-  const contents = [
+  return [
     ...trimmedHistory
       .filter((m) => m && (m.role === "user" || m.role === "bot") && m.text)
       .map((m) => ({
@@ -44,6 +45,54 @@ export const generateReply = async (message, history = []) => {
       })),
     { role: "user", parts: [{ text: truncate(message) }] },
   ];
+};
+
+const logFailure = (err) =>
+  logger.error(
+    { message: err?.message, code: err?.code, status: err?.status || err?.response?.status },
+    "Gemini API call failed"
+  );
+
+const RETRYABLE = new Set([429, 503]);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// Yields text chunks as Gemini produces them. A transient 503/429 is retried
+// once, but only while nothing has been sent yet — after the first chunk a
+// retry would repeat text the client already shows.
+export async function* streamReply(message, history = []) {
+  const contents = buildContents(message, history);
+  for (let attempt = 0; attempt < 2; attempt++) {
+    let started = false;
+    try {
+      const stream = await ai.models.generateContentStream({
+        model: env.GEMINI_MODEL,
+        contents,
+        config: { systemInstruction: SYSTEM_INSTRUCTION, maxOutputTokens: 600, temperature: 0.4 },
+      });
+      for await (const chunk of stream) {
+        const text = chunk.text;
+        if (text) {
+          started = true;
+          yield text;
+        }
+      }
+      if (!started) throw new AppError("Empty response from chat model", 502);
+      return;
+    } catch (err) {
+      if (err instanceof AppError) throw err;
+      const status = err?.status || err?.response?.status;
+      if (!started && attempt === 0 && RETRYABLE.has(status)) {
+        await sleep(900);
+        continue;
+      }
+      logFailure(err);
+      throw new AppError("Chat model request failed", 502);
+    }
+  }
+}
+
+export const generateReply = async (message, history = []) => {
+  const contents = buildContents(message, history);
 
   try {
     const response = await ai.models.generateContent({

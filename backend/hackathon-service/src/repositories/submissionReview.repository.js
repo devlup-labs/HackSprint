@@ -29,6 +29,16 @@ export class SubmissionReviewRepository {
       .lean();
   }
 
+  // This judge's own reviews of the given submissions (score only).
+  async getMyScoresForSubmissions(judgeId, submissionIds) {
+    return SubmissionReviewModel.find({
+      judge: judgeId,
+      submission: { $in: submissionIds },
+    })
+      .select("submission score")
+      .lean();
+  }
+
   async getReviewsForSubmissions(submissionIds) {
     return SubmissionReviewModel.find({
       submission: { $in: submissionIds },

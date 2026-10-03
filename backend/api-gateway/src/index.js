@@ -2,11 +2,14 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
-import rateLimit from "express-rate-limit";
 import compression from "compression";
 import { env } from "./config/env.js";
-import { authProxy } from "./routes/auth.proxy.js";
+import { userProxy } from "./routes/user.proxy.js";
 import { hackathonProxy } from "./routes/hackathon.proxy.js";
+import { adminProxy } from "./routes/admin.proxy.js";
+import { gatewayIdentity } from "./middlewares/identity.middleware.js";
+import { createLimiters } from "./middlewares/rateLimit.middleware.js";
+import { connectRedis } from "./config/redis.js";
 import { mediaProxy } from "./routes/media.proxy.js";
 import { notificationProxy } from "./routes/notification.proxy.js";
 import { chatbotProxy } from "./routes/chatbot.proxy.js";
@@ -50,18 +53,12 @@ app.use(metricsMiddleware);
 app.use(requestIdMiddleware);
 app.use(morgan(env.NODE_ENV === "production" ? "combined" : "dev"));
 
-app.use(
-  rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: env.NODE_ENV === "production" ? 500 : 2000,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: {
-      success: false,
-      message: "Too many requests, please try again later.",
-    },
-  })
-);
+await connectRedis();
+const { ipLimiter, userLimiter, mediaLimiter } = createLimiters();
+
+app.use(gatewayIdentity);
+app.use(ipLimiter);
+app.use(userLimiter);
 app.get("/metrics", metricsHandler);
 app.get("/health", (req, res) => {
   res.status(200).json({
@@ -81,7 +78,7 @@ app.get("/", (req, res) => {
 });
 app.get("/ping-auth", async (req, res) => {
   try {
-    const response = await fetch(`${env.AUTH_SERVICE_URL}/`);
+    const response = await fetch(`${env.USER_SERVICE_URL}/`);
     const data = await response.json();
     res.json(data);
   } catch (error) {
@@ -90,9 +87,10 @@ app.get("/ping-auth", async (req, res) => {
   }
 });
 
-app.use("/api/auth", authProxy);
+app.use("/api/auth", userProxy);
 app.use("/api/hackathons", hackathonProxy);
-app.use("/api/media", mediaProxy);
+app.use("/api/admin", adminProxy);
+app.use("/api/media", mediaLimiter, mediaProxy);
 app.use("/api/notifications", notificationProxy);
 app.use("/api/chatbot", chatbotProxy);
 

@@ -8,6 +8,7 @@ import { SubmissionRepository } from "../repositories/submission.repository.js";
 import { NotificationClient } from "../clients/notification.client.js";
 import { mapWithConcurrency } from "../utils/concurrency.js";
 import { Sentry } from "../config/sentry.js";
+import { runExclusive } from "../utils/clusterLock.js";
 
 const hackathonRepository = new HackathonRepository();
 const userRepository = new UserRepository();
@@ -151,7 +152,7 @@ export const runPhaseReminderSweep = async () => {
 
 export const startPhaseReminderJob = () => {
   cron.schedule("0 * * * *", () => {
-    runPhaseReminderSweep().catch((error) => {
+    runExclusive("phase-reminders", 120, runPhaseReminderSweep).catch((error) => {
       logger.error({ err: error }, "Phase reminder sweep failed");
       Sentry.captureException(error);
     });

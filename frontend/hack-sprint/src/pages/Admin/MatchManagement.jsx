@@ -1,3 +1,4 @@
+import { confirmAction, chooseOption } from "../../utils/dialogs.js";
 import React, { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import {
@@ -139,10 +140,12 @@ const MatchManagement = ({ hackathon, phases, teams, isJudgeViewer }) => {
 
     let winner;
     if (scoreA === scoreB) {
-      const aWins = window.confirm(
-        `Scores are tied (${scoreA}-${scoreB}) — pick a winner.\n\nOK = ${match.teamA.name} wins\nCancel = ${match.teamB.name} wins`
-      );
-      winner = aWins ? match.teamA._id : match.teamB._id;
+      winner = await chooseOption({
+        title: `Tied ${scoreA}–${scoreB}`,
+        message: "Pick the winner to complete this match.",
+        options: [{ value: match.teamA._id, label: `${match.teamA.name} wins` }, { value: match.teamB._id, label: `${match.teamB.name} wins` }],
+      });
+      if (!winner) return;
     }
 
     try {
@@ -191,7 +194,7 @@ const MatchManagement = ({ hackathon, phases, teams, isJudgeViewer }) => {
   };
 
   const handleDelete = async (matchId) => {
-    if (!window.confirm("Delete this match? This can't be undone.")) return;
+    if (!(await confirmAction({ title: "Delete this match?", message: "This can't be undone.", confirmLabel: "Delete", danger: true }))) return;
     try {
       await MatchAPI.deleteMatch(hackathon._id, matchId);
       toast.success("Match deleted");
@@ -204,7 +207,7 @@ const MatchManagement = ({ hackathon, phases, teams, isJudgeViewer }) => {
   if (phases.length === 0) {
     return (
       <div className="hu-card">
-        <EmptyState message="No rounds configured yet — add as many Match Round phases as this event needs from Edit Hackathon." />
+        <EmptyState message="No rounds configured yet — add as many Match Round phases as this event needs from Edit Event." />
       </div>
     );
   }

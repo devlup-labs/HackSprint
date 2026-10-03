@@ -1,14 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { ProfileAPI } from "../api/profile.api.js";
 import {
   ChevronRight,
+  ChevronLeft,
   Users,
+  User,
   Plus,
   KeyRound,
   Copy,
   Check,
   X,
+  Calendar,
+  Trophy,
+  MapPin,
+  ShieldCheck,
+  Sparkles,
 } from "lucide-react";
 import { HackathonAPI } from "../api/hackathon.api.js";
 import { RegistrationAPI } from "../api/registration.api.js";
@@ -19,91 +27,127 @@ import {
   buildInitialValues,
   validateFields,
 } from "../utils/dynamicFields.js";
+import "../pages/Styles/AllHackathons.css";
+
+const mono = "font-[family-name:'JetBrains_Mono',monospace]";
+const syne = "font-[family-name:'Syne',sans-serif]";
 
 const inp = [
-  "font-[family-name:'JetBrains_Mono',monospace]",
-  "w-full bg-[rgba(18,22,18,0.7)] border border-[rgba(95,255,96,0.15)]",
-  "rounded-[3px] px-3 py-2.5 text-[0.72rem] text-[#e8ffe8]",
-  "placeholder-[rgba(95,255,96,0.28)]",
-  "focus:outline-none focus:border-[rgba(95,255,96,0.45)]",
-  "focus:shadow-[0_0_0_2px_rgba(95,255,96,0.07)]",
-  "transition-all [color-scheme:dark]",
+  mono,
+  "w-full bg-[rgba(var(--hk-input-bg),0.7)]",
+  "border border-[rgba(var(--hk-card-border-rgb),0.2)] dark:border-[rgba(var(--hk-card-border-rgb),0.15)]",
+  "rounded-[4px] px-3.5 py-3 text-[0.78rem] text-[var(--hk-text)]",
+  "placeholder-[rgba(var(--hk-text-rgb),0.45)] dark:placeholder-[rgba(var(--hk-accent-rgb),0.28)]",
+  "focus:outline-none focus:border-[rgba(var(--hk-accent-rgb),0.6)]",
+  "focus:shadow-[0_0_0_3px_rgba(var(--hk-accent-rgb),0.1)]",
+  "transition-all [color-scheme:light] dark:[color-scheme:dark]",
 ].join(" ");
 
-const Field = ({ label, required, children }) => (
-  <div className="flex flex-col gap-1.5 mb-5">
-    <label className="font-[family-name:'JetBrains_Mono',monospace] text-[0.58rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.55)]">
+const Field = ({ label, required, hint, children }) => (
+  <div className="flex flex-col gap-1.5">
+    <label
+      className={`${mono} text-[0.6rem] tracking-[0.12em] uppercase text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-accent-rgb),0.6)]`}
+    >
       {label}
-      {required && <span className="text-[#ff9090] ml-1">*</span>}
+      {required && <span className="text-[rgb(var(--hk-red-rgb))] ml-1">*</span>}
     </label>
     {children}
+    {hint && (
+      <p className={`${mono} text-[0.6rem] leading-relaxed text-[rgba(var(--hk-text-rgb),0.65)] dark:text-[rgba(var(--hk-text-rgb),0.4)]`}>
+        {hint}
+      </p>
+    )}
   </div>
 );
 
-const PrimaryBtn = ({
-  children,
-  disabled,
-  type = "button",
-  onClick,
-  className = "",
-}) => (
+const PrimaryBtn = ({ children, disabled, type = "button", onClick, className = "" }) => (
   <button
     type={type}
     disabled={disabled}
     onClick={onClick}
-    className={`font-[family-name:'JetBrains_Mono',monospace] inline-flex items-center justify-center gap-2
-      text-[0.65rem] tracking-[0.1em] uppercase px-6 py-3 rounded-[3px] border cursor-pointer
+    className={`${mono} inline-flex items-center justify-center gap-2
+      text-[0.68rem] tracking-[0.1em] uppercase px-7 py-3.5 rounded-[4px] border cursor-pointer
       transition-all duration-150
-      bg-[#5fff60] border-[#5fff60] text-[#050905] font-bold
-      hover:bg-[#7fff80] hover:shadow-[0_0_20px_rgba(95,255,96,0.3)]
+      bg-[var(--hk-accent-solid)] border-[var(--hk-accent-solid)] text-[var(--hk-accent-solid-text)] font-bold
+      hover:brightness-110 hover:shadow-[0_6px_24px_rgba(var(--hk-accent-rgb),0.3)]
       disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none ${className}`}
   >
     {children}
   </button>
 );
 
-const SubTabBtn = ({ active, onClick, children }) => (
+const GhostBtn = ({ children, onClick, disabled, className = "" }) => (
   <button
     type="button"
     onClick={onClick}
-    className={`font-[family-name:'JetBrains_Mono',monospace] flex-1 inline-flex items-center justify-center gap-1.5
-      text-[0.6rem] tracking-[0.08em] uppercase px-3 py-2 rounded-[2px] cursor-pointer transition-all duration-150
-      ${
-        active
-          ? "bg-[rgba(95,255,96,0.12)] text-[#5fff60] border border-[rgba(95,255,96,0.3)]"
-          : "text-[rgba(95,255,96,0.45)] hover:text-[rgba(95,255,96,0.7)]"
-      }`}
+    disabled={disabled}
+    className={`${mono} inline-flex items-center justify-center gap-2 text-[0.65rem] tracking-[0.1em] uppercase px-5 py-3.5 rounded-[4px] border cursor-pointer transition-all duration-150
+      bg-transparent border-[rgba(var(--hk-card-border-rgb),0.3)] dark:border-[rgba(var(--hk-card-border-rgb),0.25)] text-[rgba(var(--hk-text-rgb),0.85)] dark:text-[rgba(var(--hk-text-rgb),0.7)]
+      hover:border-[rgba(var(--hk-accent-rgb),0.5)] hover:text-[var(--hk-accent-solid)] disabled:opacity-40 disabled:cursor-not-allowed ${className}`}
   >
     {children}
   </button>
 );
 
-const StepIndicator = ({ steps, current }) => {
-  const currentIndex = steps.indexOf(current);
-  return (
-    <div className="flex items-center justify-center gap-2 mb-4">
-      {steps.map((s, i) => (
-        <React.Fragment key={s}>
-          <div
-            className={`w-2 h-2 rounded-full transition-all ${
-              i <= currentIndex ? "bg-[#5fff60]" : "bg-[rgba(95,255,96,0.15)]"
-            }`}
-          />
-          {i < steps.length - 1 && (
-            <div
-              className={`w-8 h-px transition-all ${
-                i < currentIndex ? "bg-[#5fff60]" : "bg-[rgba(95,255,96,0.15)]"
-              }`}
-            />
-          )}
-        </React.Fragment>
-      ))}
-      <span className="font-[family-name:'JetBrains_Mono',monospace] text-[0.55rem] tracking-[0.1em] uppercase text-[rgba(95,255,96,0.4)] ml-2">
-        Step {currentIndex + 1} of {steps.length}
-      </span>
+const Corners = () => (
+  <>
+    <span className="absolute top-[-1px] left-[-1px] w-3 h-3 border-t-2 border-l-2 border-[rgba(var(--hk-accent-rgb),0.5)]" />
+    <span className="absolute bottom-[-1px] right-[-1px] w-3 h-3 border-b-2 border-r-2 border-[rgba(var(--hk-accent-rgb),0.5)]" />
+  </>
+);
+
+// One clear choice per card instead of a pair of small tabs — "create" and
+// "join" are genuinely different decisions, so each gets room to explain
+// itself.
+const ChoiceCard = ({ active, onClick, icon: Icon, title, description }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={`relative text-left rounded-[4px] border p-4 cursor-pointer transition-all duration-150 ${
+      active
+        ? "border-[rgba(var(--hk-accent-rgb),0.7)] bg-[rgba(var(--hk-accent-rgb),0.08)] shadow-[0_0_0_3px_rgba(var(--hk-accent-rgb),0.08)]"
+        : "border-[rgba(var(--hk-card-border-rgb),0.2)] dark:border-[rgba(var(--hk-card-border-rgb),0.14)] bg-[rgba(var(--hk-card-bg),0.6)] hover:border-[rgba(var(--hk-accent-rgb),0.4)]"
+    }`}
+  >
+    <div className="flex items-start gap-3">
+      <div
+        className={`w-9 h-9 rounded-[4px] border flex items-center justify-center flex-shrink-0 ${
+          active
+            ? "bg-[var(--hk-accent-solid)] border-[var(--hk-accent-solid)] text-[var(--hk-accent-solid-text)]"
+            : "bg-[rgba(var(--hk-accent-rgb),0.07)] border-[rgba(var(--hk-accent-rgb),0.25)] text-[var(--hk-accent-solid)]"
+        }`}
+      >
+        <Icon size={16} />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className={`${syne} font-extrabold text-[var(--hk-text)] text-sm tracking-tight mb-0.5`}>
+          {title}
+        </div>
+        <p className={`${mono} text-[0.62rem] leading-relaxed text-[rgba(var(--hk-text-rgb),0.7)] dark:text-[rgba(var(--hk-text-rgb),0.5)]`}>
+          {description}
+        </p>
+      </div>
+      {active && <Check size={15} className="text-[var(--hk-accent-solid)] flex-shrink-0 mt-0.5" />}
     </div>
-  );
-};
+  </button>
+);
+
+const InfoRow = ({ icon: Icon, label, children }) => (
+  <div className="flex items-start gap-3">
+    <div className="w-7 h-7 rounded-[3px] bg-[rgba(var(--hk-accent-rgb),0.08)] border border-[rgba(var(--hk-accent-rgb),0.2)] flex items-center justify-center flex-shrink-0">
+      <Icon size={13} className="text-[var(--hk-accent-solid)]" />
+    </div>
+    <div className="min-w-0">
+      <div className={`${mono} text-[0.52rem] tracking-[0.14em] uppercase text-[rgba(var(--hk-text-rgb),0.6)] dark:text-[rgba(var(--hk-text-rgb),0.38)]`}>
+        {label}
+      </div>
+      <div className={`${mono} text-[0.72rem] text-[var(--hk-text)] leading-snug`}>{children}</div>
+    </div>
+  </div>
+);
+
+const shortDate = (d) =>
+  new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
 const TeamInfoModal = ({ details, onClose }) => {
   const [copied, setCopied] = useState(false);
@@ -115,40 +159,36 @@ const TeamInfoModal = ({ details, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-      <div className="relative w-full max-w-md bg-[rgba(8,10,8,0.98)] border border-[rgba(95,255,96,0.22)] rounded-[4px] p-8 shadow-[0_0_40px_rgba(95,255,96,0.08)]">
-        <span className="absolute top-[-1px] left-[-1px] w-3 h-3 border-t-2 border-l-2 border-[rgba(95,255,96,0.55)]" />
-        <span className="absolute bottom-[-1px] right-[-1px] w-3 h-3 border-b-2 border-r-2 border-[rgba(95,255,96,0.55)]" />
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[rgba(95,255,96,0.35)] to-transparent" />
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+      <div className="relative w-full max-w-md bg-[rgb(var(--hk-card-bg))] border border-[rgba(var(--hk-card-border-rgb),0.3)] dark:border-[rgba(var(--hk-accent-rgb),0.22)] rounded-[4px] p-8 shadow-[0_20px_60px_rgba(0,0,0,0.25)] dark:shadow-[0_0_40px_rgba(var(--hk-accent-rgb),0.08)]">
+        <Corners />
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[rgba(var(--hk-accent-rgb),0.5)] to-transparent" />
 
-        <h2 className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-xl tracking-tight mb-1">
-          Team Created!
+        <h2 className={`${syne} font-extrabold text-[var(--hk-text)] text-2xl tracking-tight mb-1`}>
+          Team created
         </h2>
-        <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.65rem] text-[rgba(180,220,180,0.55)] mb-6 leading-relaxed">
-          Share the code below so teammates can join.
+        <p className={`${mono} text-[0.68rem] text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-text-rgb),0.55)] mb-6 leading-relaxed`}>
+          Share this code with your teammates — they&apos;ll enter it to request to join, and you approve them from your team page.
         </p>
 
-        <div className="flex flex-col gap-4 mb-7">
-          <div>
-            <div className="font-[family-name:'JetBrains_Mono',monospace] text-[0.52rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.45)] mb-1.5">
-              Invite Code
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="flex-1 bg-[rgba(95,255,96,0.05)] border border-[rgba(95,255,96,0.15)] rounded-[3px] px-3 py-2 text-[#5fff60] truncate font-[family-name:'JetBrains_Mono',monospace] text-sm tracking-widest">
-                {details.code}
-              </div>
-              <button
-                onClick={copy}
-                className="w-9 h-9 flex items-center justify-center rounded-[3px] border border-[rgba(95,255,96,0.2)] bg-[rgba(95,255,96,0.06)] text-[rgba(95,255,96,0.6)] hover:text-[#5fff60] hover:border-[rgba(95,255,96,0.38)] transition-all cursor-pointer flex-shrink-0"
-              >
-                {copied ? <Check size={14} /> : <Copy size={14} />}
-              </button>
-            </div>
+        <div className={`${mono} text-[0.55rem] tracking-[0.14em] uppercase text-[rgba(var(--hk-text-rgb),0.65)] dark:text-[rgba(var(--hk-accent-rgb),0.5)] mb-1.5`}>
+          Invite code
+        </div>
+        <div className="flex items-stretch gap-2 mb-7">
+          <div className={`${mono} flex-1 bg-[rgba(var(--hk-accent-rgb),0.07)] border border-[rgba(var(--hk-accent-rgb),0.3)] rounded-[4px] px-4 py-3 text-[var(--hk-accent-solid)] truncate text-lg tracking-[0.25em] text-center font-semibold`}>
+            {details.code}
           </div>
+          <button
+            onClick={copy}
+            title="Copy code"
+            className="w-12 flex items-center justify-center rounded-[4px] border border-[rgba(var(--hk-accent-rgb),0.3)] bg-[rgba(var(--hk-accent-rgb),0.07)] text-[var(--hk-accent-solid)] hover:bg-[rgba(var(--hk-accent-rgb),0.14)] transition-all cursor-pointer flex-shrink-0"
+          >
+            {copied ? <Check size={16} /> : <Copy size={16} />}
+          </button>
         </div>
 
         <PrimaryBtn onClick={onClose} className="w-full">
-          Proceed to Team Page <ChevronRight size={14} />
+          Go to team page <ChevronRight size={14} />
         </PrimaryBtn>
       </div>
     </div>
@@ -201,11 +241,24 @@ export const RegistrationForm = ({ onSubmit = () => {} }) => {
           }
         } catch (err) {
           if (err.response?.status !== 404) throw err;
-          // not registered yet — stay on the register step
+          // Not registered yet. Registering needs a complete profile, so send
+          // people to fill it in now rather than after they've typed the form.
+          try {
+            const profileRes = await ProfileAPI.getMyProfile();
+            if (!cancelled && profileRes.data.profile.isProfileComplete === false) {
+              toast.error("Complete your profile to register for events", {
+                id: "profile-incomplete",
+              });
+              navigate("/dashboard?completeProfile=1", { replace: true });
+              return;
+            }
+          } catch {
+            // The server enforces this on submit, so a failed check here is fine.
+          }
         }
       } catch (err) {
         toast.error(
-          err.response?.data?.message || "Failed to load hackathon details"
+          err.response?.data?.message || "Failed to load event details"
         );
       } finally {
         if (!cancelled) setLoading(false);
@@ -215,7 +268,7 @@ export const RegistrationForm = ({ onSubmit = () => {} }) => {
     return () => {
       cancelled = true;
     };
-  }, [slug]);
+  }, [slug, navigate]);
 
   const handleFieldChange = (fieldName, value) => {
     setRegValues((prev) => ({ ...prev, [fieldName]: value }));
@@ -308,22 +361,46 @@ export const RegistrationForm = ({ onSubmit = () => {} }) => {
   if (loading) return null;
   if (!hackathon) return null;
 
+  const isTeamEvent = hackathon.participationType === "TEAM";
+  const registrationPhase = (hackathon.phases || []).find(
+    (p) => p.phaseType === "REGISTRATION"
+  );
+  const prizeTotal = (hackathon.prizes || []).reduce((s, p) => s + (p.amount || 0), 0);
+
+  const heading = {
+    register: {
+      eyebrow: "Registration",
+      title: "Register for this event",
+      sub: "Fill in the details below to secure your spot.",
+    },
+    team: {
+      eyebrow: "Team setup",
+      title: "Join or create a team",
+      sub: "This event is team-based — start your own team or join one with an invite code.",
+    },
+    done: {
+      eyebrow: pendingTeam ? "Request sent" : "Confirmed",
+      title: pendingTeam ? "Waiting for the team leader" : "You're all set",
+      sub: "",
+    },
+  }[step];
+
   return (
     <>
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4 py-10 relative overflow-hidden font-[family-name:'JetBrains_Mono',monospace]">
+      <div className="min-h-screen bg-[var(--hk-bg)] px-4 py-10 sm:py-14 relative overflow-hidden">
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(95,255,96,.026) 1px,transparent 1px),linear-gradient(90deg,rgba(95,255,96,.026) 1px,transparent 1px)",
+              "linear-gradient(rgba(var(--hk-accent-rgb),.03) 1px,transparent 1px),linear-gradient(90deg,rgba(var(--hk-accent-rgb),.03) 1px,transparent 1px)",
             backgroundSize: "44px 44px",
           }}
         />
         <div
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full pointer-events-none"
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[420px] rounded-full pointer-events-none"
           style={{
             background:
-              "radial-gradient(ellipse,rgba(95,255,96,.06) 0%,transparent 65%)",
+              "radial-gradient(ellipse,rgba(var(--hk-accent-rgb),.09) 0%,transparent 65%)",
           }}
         />
 
@@ -339,180 +416,248 @@ export const RegistrationForm = ({ onSubmit = () => {} }) => {
           />
         )}
 
-        <div className="relative z-10 w-full max-w-3xl bg-[rgba(10,12,10,0.92)] border border-[rgba(95,255,96,0.12)] rounded-[4px] px-6 sm:px-10 py-9 backdrop-blur-sm shadow-[0_0_40px_rgba(0,0,0,0.5)]">
-          <span className="absolute top-[-1px] left-[-1px] w-3 h-3 border-t-2 border-l-2 border-[rgba(95,255,96,0.45)]" />
-          <span className="absolute bottom-[-1px] right-[-1px] w-3 h-3 border-b-2 border-r-2 border-[rgba(95,255,96,0.45)]" />
-
-          <div className="text-center mb-7 pb-6 border-b border-[rgba(95,255,96,0.08)]">
-            <div className="font-[family-name:'JetBrains_Mono',monospace] text-[0.55rem] tracking-[0.2em] uppercase text-[rgba(95,255,96,0.45)] mb-2">
-              HackSprint
-            </div>
-            <StepIndicator
-              steps={hackathon.participationType === "TEAM" ? ["register", "team", "done"] : ["register", "done"]}
-              current={step}
-            />
-            <h1 className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-2xl sm:text-3xl md:text-4xl tracking-tight">
-              {step === "register"
-                ? "Hackathon Registration"
-                : step === "team"
-                ? "Join or Create a Team"
-                : "You're All Set"}
-            </h1>
-          </div>
-
-          {step === "register" && (
-            <form onSubmit={handleRegister}>
-              {regFields.length > 0 ? (
-                <DynamicFieldsForm
-                  fields={regFields}
-                  values={regValues}
-                  onChange={handleFieldChange}
-                  errors={regErrors}
-                  resourceType="resource"
-                  hackathonId={hackathon._id}
-                />
-              ) : (
-                <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.7rem] text-[rgba(180,220,180,0.55)] mb-2">
-                  No additional details are required — just confirm your
-                  registration to continue.
-                </p>
+        <div className="relative z-10 max-w-5xl mx-auto">
+          <div className="grid lg:grid-cols-[300px_1fr] gap-5 items-start">
+            {/* ── Hackathon summary ── */}
+            <aside className="relative lg:sticky lg:top-0 bg-[rgba(var(--hk-card-bg),0.92)] border border-[rgba(var(--hk-card-border-rgb),0.2)] dark:border-[rgba(var(--hk-card-border-rgb),0.14)] rounded-[4px] overflow-hidden backdrop-blur-sm">
+              <Corners />
+              {hackathon.image?.url && (
+                <div className="relative h-36 overflow-hidden">
+                  <img
+                    src={hackathon.image.url}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[rgba(var(--hk-card-bg),0.95)] via-transparent to-transparent" />
+                </div>
               )}
-              <div className="mt-6 flex justify-center sm:justify-end">
-                <PrimaryBtn type="submit" disabled={submitting}>
-                  {submitting ? (
-                    "Registering…"
-                  ) : (
-                    <>
-                      <span>Register</span>
-                      <ChevronRight size={14} />
-                    </>
+              <div className="p-5 flex flex-col gap-4">
+                <div>
+                  <div className={`${mono} text-[0.52rem] tracking-[0.2em] uppercase text-[rgba(var(--hk-accent-rgb),0.85)] dark:text-[rgba(var(--hk-accent-rgb),0.6)] mb-1.5`}>
+                    HackSprint
+                  </div>
+                  <h2 className={`${syne} font-extrabold text-[var(--hk-text)] text-lg leading-tight tracking-tight`}>
+                    {hackathon.title}
+                  </h2>
+                  {hackathon.subTitle && (
+                    <p className={`${mono} text-[0.65rem] text-[rgba(var(--hk-text-rgb),0.7)] dark:text-[rgba(var(--hk-text-rgb),0.5)] mt-1.5 leading-relaxed`}>
+                      {hackathon.subTitle}
+                    </p>
                   )}
-                </PrimaryBtn>
-              </div>
-            </form>
-          )}
+                </div>
 
-          {step === "team" && (
-            <div>
-              <div className="flex gap-1 mb-7 p-1 bg-[rgba(95,255,96,0.04)] border border-[rgba(95,255,96,0.1)] rounded-[3px]">
-                <SubTabBtn
-                  active={teamOption === "create"}
-                  onClick={() => setTeamOption("create")}
-                >
-                  <Plus size={11} /> Create Team
-                </SubTabBtn>
-                <SubTabBtn
-                  active={teamOption === "join"}
-                  onClick={() => setTeamOption("join")}
-                >
-                  <KeyRound size={11} /> Join with Code
-                </SubTabBtn>
-              </div>
+                <div className="h-px bg-[rgba(var(--hk-card-border-rgb),0.15)] dark:bg-[rgba(var(--hk-accent-rgb),0.08)]" />
 
-              {teamOption === "create" && (
-                <form onSubmit={handleCreateTeam}>
-                  <Field label="Team Name" required>
-                    <input
-                      type="text"
-                      value={teamName}
-                      onChange={(e) => setTeamName(e.target.value)}
-                      className={inp}
-                      required
-                    />
-                  </Field>
-                  <div className="mt-6 flex justify-center sm:justify-end">
-                    <PrimaryBtn type="submit" disabled={submitting}>
-                      {submitting ? (
-                        "Creating…"
-                      ) : (
-                        <>
-                          <Users size={13} />
-                          <span>Create Team</span>
-                          <ChevronRight size={14} />
-                        </>
-                      )}
-                    </PrimaryBtn>
-                  </div>
-                </form>
-              )}
-
-              {teamOption === "join" && (
-                <form onSubmit={handleJoinTeam}>
-                  <div className="max-w-md mx-auto">
-                    <Field label="Team Invite Code" required>
-                      <input
-                        type="text"
-                        placeholder="Enter team code (e.g. ABC123XY)"
-                        value={joinCode}
-                        onChange={(e) => setJoinCode(e.target.value)}
-                        className={inp}
-                        required
-                      />
-                    </Field>
-                  </div>
-                  <div className="mt-6 flex justify-center sm:justify-end">
-                    <PrimaryBtn
-                      type="submit"
-                      disabled={submitting || !joinCode.trim()}
-                    >
-                      {submitting ? (
-                        "Sending…"
-                      ) : (
-                        <>
-                          <span>Request to Join</span>
-                          <ChevronRight size={14} />
-                        </>
-                      )}
-                    </PrimaryBtn>
-                  </div>
-                </form>
-              )}
-            </div>
-          )}
-
-          {step === "done" && pendingTeam && (
-            <div className="text-center py-6">
-              <div className="mx-auto mb-4 w-14 h-14 rounded-full bg-[rgba(255,184,77,0.1)] border border-[rgba(255,184,77,0.3)] flex items-center justify-center">
-                <KeyRound size={24} className="text-[#ffb84d]" />
-              </div>
-              <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.75rem] text-[rgba(220,240,220,0.85)] mb-1">
-                Request sent{pendingTeam.name ? ` to "${pendingTeam.name}"` : ""}.
-              </p>
-              <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.65rem] text-[rgba(180,220,180,0.5)] mb-6">
-                Waiting for the team leader to respond.
-              </p>
-              <div className="flex items-center justify-center gap-3">
-                {pendingTeam.id && (
-                  <button
-                    onClick={handleCancelRequest}
-                    disabled={cancelling}
-                    className="font-[family-name:'JetBrains_Mono',monospace] inline-flex items-center justify-center gap-2 text-[0.65rem] tracking-[0.1em] uppercase px-5 py-3 rounded-[3px] border cursor-pointer transition-all duration-150 bg-transparent border-[rgba(255,100,100,0.3)] text-[rgba(255,140,140,0.85)] hover:bg-[rgba(255,60,60,0.08)] disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    <X size={13} /> {cancelling ? "Cancelling…" : "Cancel Request"}
-                  </button>
+                <InfoRow icon={isTeamEvent ? Users : User} label="Format">
+                  {isTeamEvent
+                    ? `Team · up to ${hackathon.maxTeamSize || "N"} members`
+                    : "Individual"}
+                </InfoRow>
+                {registrationPhase && (
+                  <InfoRow icon={Calendar} label="Registration closes">
+                    {shortDate(registrationPhase.endDate)}
+                  </InfoRow>
                 )}
-                <PrimaryBtn onClick={() => navigate(`/hackathon/${slug}`)}>
-                  Back to Hackathon <ChevronRight size={14} />
-                </PrimaryBtn>
+                {prizeTotal > 0 && (
+                  <InfoRow icon={Trophy} label="Prize pool">
+                    ₹{prizeTotal.toLocaleString("en-IN")}
+                  </InfoRow>
+                )}
+                {hackathon.venue && (
+                  <InfoRow icon={MapPin} label="Venue">
+                    {hackathon.venue}
+                  </InfoRow>
+                )}
               </div>
-            </div>
-          )}
+            </aside>
 
-          {step === "done" && !pendingTeam && (
-            <div className="text-center py-6">
-              <div className="mx-auto mb-4 w-14 h-14 rounded-full bg-[rgba(95,255,96,0.1)] border border-[rgba(95,255,96,0.3)] flex items-center justify-center">
-                <Check size={24} className="text-[#5fff60]" />
-              </div>
-              <p className="font-[family-name:'JetBrains_Mono',monospace] text-[0.75rem] text-[rgba(220,240,220,0.85)] mb-6">
-                {hackathon.participationType === "TEAM"
-                  ? "You're registered and part of a team for this hackathon."
-                  : "You're registered for this hackathon."}
-              </p>
-              <PrimaryBtn onClick={() => navigate(`/hackathon/${slug}`)}>
-                Back to Hackathon <ChevronRight size={14} />
-              </PrimaryBtn>
-            </div>
-          )}
+            {/* ── Main card ── */}
+            <main className="relative bg-[rgba(var(--hk-card-bg),0.92)] border border-[rgba(var(--hk-card-border-rgb),0.2)] dark:border-[rgba(var(--hk-card-border-rgb),0.14)] rounded-[4px] px-6 sm:px-9 py-8 backdrop-blur-sm shadow-[0_12px_40px_rgba(0,0,0,0.06)] dark:shadow-[0_0_40px_rgba(0,0,0,0.5)]">
+              <Corners />
+
+              <header className="mb-7 pb-6 border-b border-[rgba(var(--hk-card-border-rgb),0.15)] dark:border-[rgba(var(--hk-accent-rgb),0.08)]">
+                <div className={`${mono} text-[0.58rem] tracking-[0.2em] uppercase text-[rgba(var(--hk-accent-rgb),0.9)] dark:text-[rgba(var(--hk-accent-rgb),0.6)] mb-2`}>
+                  {heading.eyebrow}
+                </div>
+                <h1 className={`${syne} font-extrabold text-[var(--hk-text)] text-2xl sm:text-3xl tracking-tight leading-tight`}>
+                  {heading.title}
+                </h1>
+                {heading.sub && (
+                  <p className={`${mono} text-[0.72rem] text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-text-rgb),0.5)] mt-2 leading-relaxed`}>
+                    {heading.sub}
+                  </p>
+                )}
+              </header>
+
+              {step === "register" && (
+                <form onSubmit={handleRegister}>
+                  {regFields.length > 0 ? (
+                    <DynamicFieldsForm
+                      fields={regFields}
+                      values={regValues}
+                      onChange={handleFieldChange}
+                      errors={regErrors}
+                      resourceType="resource"
+                      hackathonId={hackathon._id}
+                    />
+                  ) : (
+                    <div className="flex items-start gap-3 p-4 rounded-[4px] border border-[rgba(var(--hk-accent-rgb),0.25)] bg-[rgba(var(--hk-accent-rgb),0.06)]">
+                      <ShieldCheck size={18} className="text-[var(--hk-accent-solid)] flex-shrink-0 mt-0.5" />
+                      <p className={`${mono} text-[0.72rem] text-[var(--hk-text)] leading-relaxed`}>
+                        No extra details are needed for this event — confirm below to complete your registration.
+                      </p>
+                    </div>
+                  )}
+                  <div className="mt-8 pt-6 border-t border-[rgba(var(--hk-card-border-rgb),0.15)] dark:border-[rgba(var(--hk-accent-rgb),0.08)] flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <GhostBtn onClick={() => navigate(`/hackathon/${slug}`)} className="w-full sm:w-auto">
+                      Cancel
+                    </GhostBtn>
+                    <PrimaryBtn type="submit" disabled={submitting} className="w-full sm:w-auto">
+                      {submitting ? (
+                        "Registering…"
+                      ) : (
+                        <>
+                          <span>{isTeamEvent ? "Register & continue" : "Complete registration"}</span>
+                          <ChevronRight size={14} />
+                        </>
+                      )}
+                    </PrimaryBtn>
+                  </div>
+                </form>
+              )}
+
+              {step === "team" && (
+                <div className="flex flex-col gap-6">
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <ChoiceCard
+                      active={teamOption === "create"}
+                      onClick={() => setTeamOption("create")}
+                      icon={Plus}
+                      title="Create a team"
+                      description={`Start a new team and invite up to ${
+                        hackathon.maxTeamSize ? hackathon.maxTeamSize - 1 : "your"
+                      } teammates with a code. You'll be the leader.`}
+                    />
+                    <ChoiceCard
+                      active={teamOption === "join"}
+                      onClick={() => setTeamOption("join")}
+                      icon={KeyRound}
+                      title="Join with a code"
+                      description="Got an invite code from a teammate? Request to join — the leader approves you."
+                    />
+                  </div>
+
+                  {teamOption === "create" && (
+                    <form onSubmit={handleCreateTeam} className="flex flex-col gap-6">
+                      <Field
+                        label="Team name"
+                        required
+                        hint="Pick something your teammates will recognise — this is what judges and organizers see."
+                      >
+                        <input
+                          type="text"
+                          value={teamName}
+                          onChange={(e) => setTeamName(e.target.value)}
+                          placeholder="e.g. Byte Builders"
+                          maxLength={40}
+                          className={inp}
+                          required
+                        />
+                      </Field>
+                      <div className="flex justify-end">
+                        <PrimaryBtn type="submit" disabled={submitting || !teamName.trim()} className="w-full sm:w-auto">
+                          {submitting ? (
+                            "Creating…"
+                          ) : (
+                            <>
+                              <Users size={14} />
+                              <span>Create team</span>
+                              <ChevronRight size={14} />
+                            </>
+                          )}
+                        </PrimaryBtn>
+                      </div>
+                    </form>
+                  )}
+
+                  {teamOption === "join" && (
+                    <form onSubmit={handleJoinTeam} className="flex flex-col gap-6">
+                      <Field
+                        label="Team invite code"
+                        required
+                        hint="Ask your team leader for the code. They'll get a notification and need to approve your request."
+                      >
+                        <input
+                          type="text"
+                          placeholder="ABC123XY"
+                          value={joinCode}
+                          onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                          className={`${inp} text-center text-lg tracking-[0.3em] font-semibold py-4`}
+                          required
+                        />
+                      </Field>
+                      <div className="flex justify-end">
+                        <PrimaryBtn type="submit" disabled={submitting || !joinCode.trim()} className="w-full sm:w-auto">
+                          {submitting ? (
+                            "Sending…"
+                          ) : (
+                            <>
+                              <span>Request to join</span>
+                              <ChevronRight size={14} />
+                            </>
+                          )}
+                        </PrimaryBtn>
+                      </div>
+                    </form>
+                  )}
+                </div>
+              )}
+
+              {step === "done" && pendingTeam && (
+                <div className="text-center py-4">
+                  <div className="mx-auto mb-5 w-16 h-16 rounded-full bg-[rgba(var(--hk-amber-rgb),0.12)] border border-[rgba(var(--hk-amber-rgb),0.4)] flex items-center justify-center">
+                    <KeyRound size={26} className="text-[rgb(var(--hk-amber-rgb))]" />
+                  </div>
+                  <p className={`${mono} text-[0.82rem] text-[var(--hk-text)] mb-1.5`}>
+                    Request sent{pendingTeam.name ? ` to "${pendingTeam.name}"` : ""}.
+                  </p>
+                  <p className={`${mono} text-[0.68rem] text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-text-rgb),0.5)] mb-7`}>
+                    You&apos;ll be notified as soon as the team leader responds.
+                  </p>
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    {pendingTeam.id && (
+                      <button
+                        onClick={handleCancelRequest}
+                        disabled={cancelling}
+                        className={`${mono} inline-flex items-center justify-center gap-2 text-[0.65rem] tracking-[0.1em] uppercase px-5 py-3.5 rounded-[4px] border cursor-pointer transition-all duration-150 bg-transparent border-[rgba(var(--hk-red-rgb),0.4)] text-[rgb(var(--hk-red-rgb))] hover:bg-[rgba(var(--hk-red-rgb),0.08)] disabled:opacity-40 disabled:cursor-not-allowed w-full sm:w-auto`}
+                      >
+                        <X size={13} /> {cancelling ? "Cancelling…" : "Cancel request"}
+                      </button>
+                    )}
+                    <PrimaryBtn onClick={() => navigate(`/hackathon/${slug}`)} className="w-full sm:w-auto">
+                      Back to hackathon <ChevronRight size={14} />
+                    </PrimaryBtn>
+                  </div>
+                </div>
+              )}
+
+              {step === "done" && !pendingTeam && (
+                <div className="text-center py-4">
+                  <div className="mx-auto mb-5 w-16 h-16 rounded-full bg-[rgba(var(--hk-accent-rgb),0.12)] border border-[rgba(var(--hk-accent-rgb),0.4)] flex items-center justify-center">
+                    <Check size={28} className="text-[var(--hk-accent-solid)]" />
+                  </div>
+                  <p className={`${mono} text-[0.82rem] text-[var(--hk-text)] mb-7 max-w-md mx-auto leading-relaxed`}>
+                    {isTeamEvent
+                      ? "You're registered and part of a team for this event."
+                      : "You're registered for this event. Good luck!"}
+                  </p>
+                  <PrimaryBtn onClick={() => navigate(`/hackathon/${slug}`)} className="w-full sm:w-auto">
+                    Back to hackathon <ChevronRight size={14} />
+                  </PrimaryBtn>
+                </div>
+              )}
+            </main>
+          </div>
         </div>
       </div>
     </>

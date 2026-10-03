@@ -3,17 +3,14 @@ import {
   Send,
   X,
   Minimize2,
-  Bot,
   ChevronRight,
   AlertCircle,
   ListChecks,
   Zap,
 } from "lucide-react";
 import { ChatbotAPI } from "../api/chatbot.api.js";
-
-const mono = "font-[family-name:'JetBrains_Mono',monospace]";
-const syne = "font-[family-name:'Syne',sans-serif]";
-
+import BotAvatar from "./BotAvatar.jsx";
+import ChatMarkdown from "./ChatMarkdown.jsx";
 
 const formatTime = (date) =>
   date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -23,7 +20,7 @@ const TypingDots = () => (
     {[0, 150, 300].map((d) => (
       <span
         key={d}
-        className="w-1.5 h-1.5 rounded-full bg-[#5fff60] inline-block animate-bounce opacity-70"
+        className="w-1.5 h-1.5 rounded-full bg-primary inline-block animate-bounce opacity-70"
         style={{ animationDelay: `${d}ms` }}
       />
     ))}
@@ -42,18 +39,17 @@ const BotBubble = ({ msg, onSuggestionClick }) => {
   return (
     <div className="msg-in flex flex-col gap-2 items-start">
       <div className="flex items-end gap-2 flex-row w-full">
-        <div className="w-6 h-6 rounded-full bg-[rgba(95,255,96,0.1)] border border-[rgba(95,255,96,0.22)] flex items-center justify-center flex-shrink-0 mb-4">
-          <Bot size={11} className="text-[#5fff60]" />
+        <div className="w-6 h-6 rounded-full bg-gradient-to-b from-[#13211b] to-[#08110d] ring-1 ring-primary/45 flex items-center justify-center flex-shrink-0 mb-4">
+          <BotAvatar size={17} />
         </div>
         <div className="flex flex-col gap-0.5 items-start max-w-[85%]">
-          <div className="bg-[rgba(95,255,96,0.06)] border border-[rgba(95,255,96,0.14)] rounded-[3px] rounded-tl-none px-3 py-2.5">
-            <p className="text-[0.68rem] text-[rgba(232,255,232,0.85)] leading-relaxed whitespace-pre-line">
-              {msg.text}
-            </p>
+          <div className="bg-secondary rounded-2xl rounded-tl-md px-3 py-2.5">
+            <div className="text-foreground">
+              <ChatMarkdown text={msg.text} />
+              {msg.streaming && <span className="inline-block w-1.5 h-3.5 ml-0.5 align-middle bg-primary/70 animate-pulse" />}
+            </div>
           </div>
-          <span className="text-[0.47rem] tracking-[0.06em] text-[rgba(95,255,96,0.25)] px-0.5">
-            {formatTime(msg.time)}
-          </span>
+          <span className="text-xs text-muted-foreground px-0.5">{formatTime(msg.time)}</span>
         </div>
       </div>
 
@@ -63,13 +59,13 @@ const BotBubble = ({ msg, onSuggestionClick }) => {
             <button
               key={label}
               onClick={() => onSuggestionClick(label)}
-              className="msg-in flex items-center justify-between gap-2 text-left px-2.5 py-2 rounded-[3px] border border-[rgba(95,255,96,0.15)] bg-[rgba(95,255,96,0.04)] text-[0.62rem] text-[rgba(180,220,180,0.75)] hover:border-[rgba(95,255,96,0.35)] hover:bg-[rgba(95,255,96,0.09)] hover:text-[#5fff60] transition-all cursor-pointer"
+              className="msg-in flex items-center justify-between gap-2 text-left px-3 py-2 rounded-xl border border-border bg-card text-xs text-muted-foreground hover:border-primary/30 hover:text-primary transition-all cursor-pointer"
             >
               <span className="flex items-center gap-2">
-                <Icon size={11} className="text-[#5fff60] flex-shrink-0" />
+                <Icon size={13} className="text-primary flex-shrink-0" />
                 {label}
               </span>
-              <ChevronRight size={11} className="flex-shrink-0 opacity-50" />
+              <ChevronRight size={13} className="flex-shrink-0 opacity-50" />
             </button>
           ))}
         </div>
@@ -81,14 +77,10 @@ const BotBubble = ({ msg, onSuggestionClick }) => {
 const UserBubble = ({ msg }) => (
   <div className="msg-in flex items-end gap-2 flex-row-reverse">
     <div className="flex flex-col gap-0.5 items-end max-w-[80%]">
-      <div className="bg-[rgba(95,255,96,0.15)] border border-[rgba(95,255,96,0.28)] rounded-[3px] rounded-tr-none px-3 py-2">
-        <p className="text-[0.68rem] text-[rgba(232,255,232,0.9)] leading-relaxed whitespace-pre-line">
-          {msg.text}
-        </p>
+      <div className="bg-primary rounded-2xl rounded-tr-md px-3 py-2">
+        <p className="text-sm text-primary-foreground leading-relaxed whitespace-pre-line">{msg.text}</p>
       </div>
-      <span className="text-[0.47rem] tracking-[0.06em] text-[rgba(95,255,96,0.25)] px-0.5">
-        {formatTime(msg.time)}
-      </span>
+      <span className="text-xs text-muted-foreground px-0.5">{formatTime(msg.time)}</span>
     </div>
   </div>
 );
@@ -108,6 +100,7 @@ const Chatbot = () => {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   const endRef = useRef(null);
   const inputRef = useRef(null);
@@ -142,7 +135,7 @@ const Chatbot = () => {
 
   const sendMessage = async (text) => {
     const msg = (text ?? input).trim();
-    if (!msg || loading) return;
+    if (!msg || loading || busy) return;
 
     setMessages((prev) => [
       ...prev,
@@ -150,18 +143,37 @@ const Chatbot = () => {
     ]);
     setInput("");
     setLoading(true);
+    setBusy(true);
+
+    // History is the conversation so far; the new user message is sent
+    // separately, so it is not duplicated here.
+    const history = messages.filter((m) => !m.error);
+    let started = false;
 
     try {
-      const res = await ChatbotAPI.sendMessage(msg, messages);
-      const data = res.data;
-      const reply =
-        data?.success && data?.reply
-          ? data.reply
-          : "Something went wrong. Please try again.";
-      setMessages((prev) => [
-        ...prev,
-        { role: "bot", text: reply, time: new Date() },
-      ]);
+      await ChatbotAPI.streamMessage(msg, history, {
+        onDelta: (delta) => {
+          if (!started) {
+            started = true;
+            // First chunk: swap the typing dots for a growing bot bubble.
+            setLoading(false);
+            setMessages((prev) => [...prev, { role: "bot", text: delta, time: new Date(), streaming: true }]);
+          } else {
+            setMessages((prev) => {
+              const next = [...prev];
+              const last = next[next.length - 1];
+              next[next.length - 1] = { ...last, text: last.text + delta };
+              return next;
+            });
+          }
+        },
+      });
+      if (!started) throw new Error("Empty reply");
+      setMessages((prev) => {
+        const next = [...prev];
+        next[next.length - 1] = { ...next[next.length - 1], streaming: false };
+        return next;
+      });
     } catch (err) {
       // Logged rather than swallowed — a generic user-facing message can
       // mean a bad API key, a 429 from the chat rate limit, a CORS/network
@@ -169,17 +181,26 @@ const Chatbot = () => {
       // tell which from the UI alone otherwise.
       console.error("[Chatbot] sendMessage failed:", err);
 
-      const status = err?.response?.status;
+      const status = err?.status;
       const text =
         status === 429
-          ? "⚠️ I'm getting a lot of messages right now — try again in a minute."
+          ? "⚠️ I'm getting a lot of messages right now, try again in a minute."
           : status
           ? "⚠️ Something went wrong on my end. Please try again shortly."
           : "⚠️ Couldn't reach the server. Check your connection and try again.";
 
-      setMessages((prev) => [...prev, { role: "bot", text, time: new Date() }]);
+      setMessages((prev) => {
+        // A reply that broke off mid-stream keeps what arrived and gets the
+        // error note appended; otherwise the error is its own message.
+        const last = prev[prev.length - 1];
+        if (started && last?.streaming) {
+          return [...prev.slice(0, -1), { ...last, streaming: false, text: `${last.text}\n\n${text}` }];
+        }
+        return [...prev, { role: "bot", text, time: new Date(), error: true }];
+      });
     } finally {
       setLoading(false);
+      setBusy(false);
     }
   };
 
@@ -197,73 +218,60 @@ const Chatbot = () => {
         @keyframes msg-in { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
         .cb-open { animation: cb-in  .22s cubic-bezier(.25,.46,.45,.94) forwards; }
         .msg-in  { animation: msg-in .18s cubic-bezier(.25,.46,.45,.94) forwards; }
-        .cb-scan::before {
-          content:''; position:absolute; top:0; left:0; right:0; height:1px;
-          background:linear-gradient(90deg,transparent,rgba(95,255,96,0.35),transparent);
-        }
       `}</style>
 
       {!open && (
         <button
           onClick={handleOpen}
           title={`Chat with ${BOT_NAME}`}
-          className="fixed bottom-4 md:bottom-6 right-4 md:right-6 z-[9999] w-14 h-14 rounded-full bg-[#5fff60] border-2 border-[#5fff60] flex items-center justify-center shadow-[0_0_24px_rgba(95,255,96,0.45)] hover:bg-[#7fff80] hover:shadow-[0_0_32px_rgba(95,255,96,0.6)] transition-all cursor-pointer"
+          className="fixed bottom-4 md:bottom-6 right-4 md:right-6 z-[9999] w-14 h-14 rounded-full bg-gradient-to-b from-[#13211b] to-[#08110d] ring-2 ring-primary/70 flex items-center justify-center shadow-lg hover:scale-105 hover:ring-primary transition-all cursor-pointer"
         >
-          <Bot size={22} className="text-[#050905]" />
+          <BotAvatar size={38} />
           {pulse && (
-            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#ff6060] border-2 border-[#0a0a0a] animate-pulse" />
+            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-destructive border-2 border-background animate-pulse" />
           )}
         </button>
       )}
 
       {open && (
-        <div
-          className={`cb-open fixed bottom-6 right-6 z-[9999] w-[340px] sm:w-[390px] ${mono}`}
-        >
-          <div className="cb-scan relative bg-[rgba(8,10,8,0.98)] border border-[rgba(95,255,96,0.22)] rounded-[4px] shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden">
-            <span className="absolute top-[-1px] left-[-1px] w-3 h-3 border-t-2 border-l-2 border-[rgba(95,255,96,0.6)]" />
-            <span className="absolute bottom-[-1px] right-[-1px] w-3 h-3 border-b-2 border-r-2 border-[rgba(95,255,96,0.6)]" />
-
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(95,255,96,0.1)] bg-[rgba(6,8,6,0.8)]">
+        <div className="cb-open fixed bottom-6 right-6 z-[9999] w-[340px] sm:w-[390px]">
+          <div className="relative bg-card border border-border rounded-lg shadow-xl overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-secondary/40">
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-full bg-[rgba(95,255,96,0.12)] border border-[rgba(95,255,96,0.28)] flex items-center justify-center">
-                  <Bot size={14} className="text-[#5fff60]" />
+                <div className="w-9 h-9 rounded-full bg-gradient-to-b from-[#13211b] to-[#08110d] ring-1 ring-primary/55 flex items-center justify-center">
+                  <BotAvatar size={26} />
                 </div>
                 <div>
-                  <div
-                    className={`${syne} font-extrabold text-white text-[0.8rem] tracking-tight leading-none`}
-                  >
+                  <div className="font-display font-bold text-foreground text-sm leading-none">
                     {BOT_NAME}
                   </div>
-                  <div className="flex items-center gap-1 mt-0.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#5fff60] animate-pulse" />
-                    <span className="text-[0.5rem] tracking-[0.1em] uppercase text-[rgba(95,255,96,0.5)]">
-                      AI assistant · online
-                    </span>
+                  <div className="flex items-center gap-1 mt-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                    <span className="text-xs text-muted-foreground">AI assistant, online</span>
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={() => setMini((m) => !m)}
-                  className="w-6 h-6 flex items-center justify-center rounded-[2px] border border-[rgba(95,255,96,0.15)] text-[rgba(95,255,96,0.4)] hover:text-[#5fff60] hover:border-[rgba(95,255,96,0.32)] transition-all cursor-pointer"
+                  className="w-7 h-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-all cursor-pointer"
                 >
-                  <Minimize2 size={11} />
+                  <Minimize2 size={13} />
                 </button>
                 <button
                   onClick={() => {
                     setOpen(false);
                     setPulse(false);
                   }}
-                  className="w-6 h-6 flex items-center justify-center rounded-[2px] border border-[rgba(95,255,96,0.15)] text-[rgba(95,255,96,0.4)] hover:text-[#ff9090] hover:border-[rgba(255,96,96,0.3)] transition-all cursor-pointer"
+                  className="w-7 h-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-destructive hover:bg-secondary transition-all cursor-pointer"
                 >
-                  <X size={11} />
+                  <X size={13} />
                 </button>
               </div>
             </div>
 
             {!mini && (
-              <div className="cb-scroll overflow-y-auto h-[320px] px-4 py-4 flex flex-col gap-3">
+              <div className="overflow-y-auto h-[320px] px-4 py-4 flex flex-col gap-3">
                 {messages.map((msg, i) =>
                   msg.role === "bot" ? (
                     <BotBubble key={i} msg={msg} onSuggestionClick={sendMessage} />
@@ -274,10 +282,10 @@ const Chatbot = () => {
 
                 {loading && (
                   <div className="msg-in flex items-end gap-2">
-                    <div className="w-6 h-6 rounded-full bg-[rgba(95,255,96,0.1)] border border-[rgba(95,255,96,0.22)] flex items-center justify-center flex-shrink-0">
-                      <Bot size={11} className="text-[#5fff60]" />
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-b from-[#13211b] to-[#08110d] ring-1 ring-primary/45 flex items-center justify-center flex-shrink-0">
+                      <BotAvatar size={17} />
                     </div>
-                    <div className="bg-[rgba(95,255,96,0.06)] border border-[rgba(95,255,96,0.14)] rounded-[3px] rounded-tl-none">
+                    <div className="bg-secondary rounded-2xl rounded-tl-md">
                       <TypingDots />
                     </div>
                   </div>
@@ -288,8 +296,8 @@ const Chatbot = () => {
             )}
 
             {!mini && (
-              <div className="px-4 py-3 border-t border-[rgba(95,255,96,0.08)] bg-[rgba(6,8,6,0.6)]">
-                <div className="flex items-center gap-2 px-3 py-2 bg-[rgba(18,22,18,0.7)] border border-[rgba(95,255,96,0.15)] rounded-[3px] focus-within:border-[rgba(95,255,96,0.35)] transition-colors">
+              <div className="px-4 py-3 border-t border-border">
+                <div className="flex items-center gap-2 px-3.5 py-2 bg-secondary border border-border rounded-full focus-within:border-primary/40 transition-colors">
                   <input
                     ref={inputRef}
                     type="text"
@@ -297,18 +305,18 @@ const Chatbot = () => {
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="Type a message…"
-                    disabled={loading}
-                    className="flex-1 bg-transparent text-[0.65rem] text-[rgba(232,255,232,0.85)] placeholder-[rgba(95,255,96,0.25)] outline-none disabled:opacity-50"
+                    disabled={loading || busy}
+                    className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none disabled:opacity-50"
                   />
                   <button
                     onClick={() => sendMessage()}
-                    disabled={!input.trim() || loading}
-                    className="w-5 h-5 flex items-center justify-center text-[rgba(95,255,96,0.4)] hover:text-[#5fff60] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                    disabled={!input.trim() || loading || busy}
+                    className="w-6 h-6 flex items-center justify-center text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
                   >
-                    <Send size={11} />
+                    <Send size={13} />
                   </button>
                 </div>
-                <p className="text-[0.48rem] tracking-[0.08em] uppercase text-[rgba(95,255,96,0.2)] text-center mt-2">
+                <p className="text-xs text-muted-foreground text-center mt-2">
                   Powered by HackSprint · DevLup Labs
                 </p>
               </div>

@@ -8,6 +8,49 @@
   font-family: 'Syne', sans-serif;
 }
 
+/* ── Page-scoped theme variables — dark values are the exact original
+   hardcoded constants (so dark mode never drifts from how this page
+   already looked), light values are new. RGB triplets (not full rgba)
+   so existing rgba(var(--hk-accent-rgb), X) opacity levels are untouched. ── */
+:root {
+  --hk-bg: #faf9f6;
+  --hk-bg-rgb: 250, 249, 246;
+  --hk-card-bg: 255, 255, 255;
+  --hk-card-border-rgb: 20, 20, 20;
+  --hk-text: #141419;
+  --hk-text-rgb: 20, 20, 20;
+  --hk-accent-rgb: 22, 163, 74;
+  --hk-accent-solid: #16a34a;
+  --hk-accent-solid-text: #ffffff;
+  --hk-blue-rgb: 37, 99, 235;
+  --hk-red-rgb: 220, 38, 38;
+  --hk-amber-rgb: 217, 119, 6;
+  --hk-purple-rgb: 147, 51, 234;
+  --hk-input-bg: 244, 244, 242;
+  --hk-placeholder-rgb: 20, 20, 20;
+  /* added to the alpha of faint text in CSS blocks — low-opacity text that
+     reads fine on near-black washes out on white */
+  --hk-fade-boost: 0.4;
+}
+
+.dark {
+  --hk-bg: #0a0a0a;
+  --hk-bg-rgb: 10, 10, 10;
+  --hk-card-bg: 10, 12, 10;
+  --hk-card-border-rgb: 95, 255, 96;
+  --hk-text: #e8ffe8;
+  --hk-text-rgb: 180, 220, 180;
+  --hk-accent-rgb: 95, 255, 96;
+  --hk-accent-solid: #5fff60;
+  --hk-accent-solid-text: #050905;
+  --hk-blue-rgb: 96, 200, 255;
+  --hk-red-rgb: 255, 96, 96;
+  --hk-amber-rgb: 255, 184, 77;
+  --hk-purple-rgb: 190, 120, 255;
+  --hk-input-bg: 10, 12, 10;
+  --hk-placeholder-rgb: 95, 255, 96;
+  --hk-fade-boost: 0;
+}
 
 .hk-bg::before {
   content: '';
@@ -16,8 +59,8 @@
   z-index: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(95, 255, 96, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(95, 255, 96, 0.025) 1px, transparent 1px);
+    linear-gradient(rgba(var(--hk-accent-rgb), 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--hk-accent-rgb), 0.025) 1px, transparent 1px);
   background-size: 44px 44px;
 }
 
@@ -28,7 +71,7 @@
   pointer-events: none;
   width: 700px;
   height: 700px;
-  background: radial-gradient(circle, rgba(95, 255, 96, 0.055) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(var(--hk-accent-rgb), 0.055) 0%, transparent 65%);
   top: -80px;
   left: 50%;
   transform: translateX(-50%);
@@ -51,9 +94,9 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(95, 255, 96, 0.04) 40%,
-    rgba(95, 255, 96, 0.08) 50%,
-    rgba(95, 255, 96, 0.04) 60%,
+    rgba(var(--hk-accent-rgb), 0.04) 40%,
+    rgba(var(--hk-accent-rgb), 0.08) 50%,
+    rgba(var(--hk-accent-rgb), 0.04) 60%,
     transparent 100%
   );
   animation: hk-shimmer 1.7s infinite;
@@ -94,7 +137,7 @@
 
 
 .hk-progress {
-  box-shadow: 0 0 8px rgba(95, 255, 96, 0.5);
+  box-shadow: 0 0 8px rgba(var(--hk-accent-rgb), 0.5);
 }
 
 
@@ -105,7 +148,7 @@
   width: 10px;
   height: 10px;
   border-style: solid;
-  border-color: rgba(95, 255, 96, 0.3);
+  border-color: rgba(var(--hk-accent-rgb), 0.3);
   transition: border-color 0.2s;
   z-index: 10;
 }
@@ -124,5 +167,44 @@
 
 .hk-card:hover::before,
 .hk-card:hover::after {
-  border-color: rgba(95, 255, 96, 0.7);
+  border-color: rgba(var(--hk-accent-rgb), 0.7);
 }
+
+/* ── Admin area (dashboard, user list, hackathon form) legacy tokens ── */
+:root {
+  --ac-rgb: 22, 163, 74; --am-rgb: 180, 83, 9; --bl-rgb: 37, 99, 235;
+  --rd-rgb: 220, 38, 38; --gy-rgb: 90, 100, 90; --tx-rgb: 20, 20, 20;
+  --cd-rgb: 255, 255, 255; --strong: #141419; --gy-text: #5b665b; --rd-text: #b91c1c;
+  --fade-boost: 0.4;
+  --inset-shadow: rgba(0, 0, 0, 0.08);
+  --green: #16a34a; --green-dim: rgba(22, 163, 74, 0.75); --green-faint: rgba(22, 163, 74, 0.1);
+  --green-glow: rgba(22, 163, 74, 0.15); --bg: #faf9f6; --bg-card: rgba(255, 255, 255, 0.92);
+  --bg-hover: rgba(22, 163, 74, 0.05); --border: rgba(20, 20, 20, 0.14); --border-hover: rgba(22, 163, 74, 0.5);
+  --text: #141419; --text-muted: rgba(20, 20, 20, 0.68); --text-dim: rgba(20, 20, 20, 0.5);
+  --red: #dc2626; --red-faint: rgba(220, 38, 38, 0.1); --amber: #b45309; --amber-faint: rgba(217, 119, 6, 0.12);
+  --blue: #2563eb; --blue-faint: rgba(37, 99, 235, 0.1);
+  --font-mono: "JetBrains Mono", monospace; --font-display: "Syne", sans-serif;
+  --hf-green: #16a34a; --hf-green-faint: rgba(22, 163, 74, 0.12); --hf-bg-card: rgba(255, 255, 255, 0.92);
+  --hf-border: rgba(20, 20, 20, 0.14); --hf-border-hover: rgba(22, 163, 74, 0.5); --hf-text: #141419;
+  --hf-text-muted: rgba(20, 20, 20, 0.68); --hf-red: #dc2626; --hf-amber: #b45309;
+}
+.dark {
+  --ac-rgb: 95, 255, 96; --am-rgb: 255, 184, 77; --bl-rgb: 96, 200, 255;
+  --rd-rgb: 255, 60, 60; --gy-rgb: 140, 160, 140; --tx-rgb: 180, 220, 180;
+  --cd-rgb: 10, 12, 10; --strong: #fff; --gy-text: #8ca08c; --rd-text: #ff9090;
+  --fade-boost: 0;
+  --inset-shadow: rgba(0, 0, 0, 0.35);
+  --green: #5fff60; --green-dim: rgba(95, 255, 96, 0.45); --green-faint: rgba(95, 255, 96, 0.12);
+  --green-glow: rgba(95, 255, 96, 0.18); --bg: #0a0a0a; --bg-card: rgba(10, 12, 10, 0.88);
+  --bg-hover: rgba(95, 255, 96, 0.04); --border: rgba(95, 255, 96, 0.13); --border-hover: rgba(95, 255, 96, 0.38);
+  --text: #e8ffe8; --text-muted: rgba(180, 220, 180, 0.5); --text-dim: rgba(120, 160, 120, 0.38);
+  --red: #ff6060; --red-faint: rgba(255, 60, 60, 0.12); --amber: #ffb84d; --amber-faint: rgba(255, 184, 77, 0.12);
+  --blue: #60c8ff; --blue-faint: rgba(96, 200, 255, 0.12);
+  --hf-green: #5fff60; --hf-green-faint: rgba(95, 255, 96, 0.12); --hf-bg-card: rgba(10, 12, 10, 0.88);
+  --hf-border: rgba(95, 255, 96, 0.13); --hf-border-hover: rgba(95, 255, 96, 0.38); --hf-text: #e8ffe8;
+  --hf-text-muted: rgba(180, 220, 180, 0.5); --hf-red: #ff6060; --hf-amber: #ffb84d;
+}
+
+/* native pickers (date/time/select arrows) follow the theme */
+.dark input, .dark select, .dark textarea { color-scheme: dark; }
+.dark .ad-input, .dark .hf-input, .dark .mm-input, .dark .mm-select { color-scheme: dark; }

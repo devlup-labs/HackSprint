@@ -35,6 +35,12 @@ export const errorHandler = (
         ? "Internal Server Error"
         : err.message,
 
+    // Stable machine-readable code (e.g. PROFILE_INCOMPLETE) + structured
+    // detail for errors that define them; string-only so Mongo's numeric
+    // driver codes never leak through.
+    ...(typeof err.code === "string" && { code: err.code }),
+    ...(err.details && { details: err.details }),
+
     ...(process.env.NODE_ENV !==
       "production" && {
       stack: err.stack,

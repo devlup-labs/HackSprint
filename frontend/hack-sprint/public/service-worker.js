@@ -90,13 +90,14 @@ self.addEventListener("push", (event) => {
     payload = { title: "HackSprint", body: event.data.text() };
   }
 
-  const { title = "HackSprint", body = "", url = "/" } = payload;
+  const { title = "HackSprint", body = "", url = "/", tag } = payload;
 
   event.waitUntil(
     self.registration.showNotification(title, {
       body,
       icon: "/icon-192.png",
       badge: "/icon-192.png",
+      ...(tag ? { tag } : {}),
       data: { url },
     })
   );

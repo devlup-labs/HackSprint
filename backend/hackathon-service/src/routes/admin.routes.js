@@ -6,21 +6,12 @@ import {
   getHackathonJudges,
   removeJudge,
   getAssignedHackathons,
+  getMyJudgeInvitations,
+  acceptJudgeInvitation,
+  declineJudgeInvitation,
 } from "../controllers/judgeAssignment.controller.js";
 
 import { reviewSubmission } from "../controllers/submissionReview.controller.js";
-
-import {
-  getProfile,
-  updateProfile,
-  submitVerificationRequest,
-  getPendingVerificationRequests,
-  approveVerification,
-  rejectVerification,
-  getAllAdmins,
-  deleteAdmin,
-  lookupAdminByEmail,
-} from "../controllers/admin.controller.js";
 
 const router = express.Router();
 
@@ -32,6 +23,9 @@ router.delete(
   removeJudge
 );
 router.get("/judges/assigned-hackathons", adminAuth, getAssignedHackathons);
+router.get("/judges/invitations", adminAuth, getMyJudgeInvitations);
+router.post("/judges/invitations/:invitationId/accept", adminAuth, acceptJudgeInvitation);
+router.post("/judges/invitations/:invitationId/decline", adminAuth, declineJudgeInvitation);
 
 router.post(
   "/judges/submissions/:submissionId/review",
@@ -39,14 +33,5 @@ router.post(
   reviewSubmission
 );
 
-router.get("/profile", adminAuth, getProfile);
-router.patch("/profile", adminAuth, updateProfile);
-router.post("/verification-request", adminAuth, submitVerificationRequest);
-router.get("/verification-requests", adminAuth, getPendingVerificationRequests);
-router.get("/admins/lookup", adminAuth, lookupAdminByEmail);
-router.get("/admins", adminAuth, getAllAdmins);
-router.post("/admins/:adminId/approve", adminAuth, approveVerification);
-router.post("/admins/:adminId/reject", adminAuth, rejectVerification);
-router.delete("/admins/:adminId", adminAuth, deleteAdmin);
 
 export default router;

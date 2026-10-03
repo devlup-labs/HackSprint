@@ -1,3 +1,4 @@
+import { askText } from "../utils/dialogs.js";
 import React, { useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -18,6 +19,7 @@ import {
   Heading3,
 } from "lucide-react";
 import "./RichTextEditor.css";
+import "../pages/Styles/AllHackathons.css";
 
 const ToolBtn = ({ onClick, active, disabled, title, children }) => (
   <button
@@ -56,9 +58,9 @@ export default function RichTextEditor({ value, onChange, placeholder }) {
 
   if (!editor) return null;
 
-  const setLink = () => {
+  const setLink = async () => {
     const prev = editor.getAttributes("link").href;
-    const url = window.prompt("URL", prev || "https://");
+    const url = await askText({ title: "Add a link", label: "URL", initial: prev || "https://", placeholder: "https://", confirmLabel: "Apply" });
     if (url === null) return;
     if (url === "") {
       editor.chain().focus().extendMarkRange("link").unsetLink().run();

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { confirmAction } from "../../utils/dialogs.js";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
@@ -34,6 +35,10 @@ import {
   Linkedin,
   Trash2,
   Gavel,
+  Inbox,
+  LayoutDashboard,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 import { AdminAPI } from "../../api/admin.api.js";
 import { HackathonAPI } from "../../api/hackathon.api.js";
@@ -41,9 +46,15 @@ import { JudgeAPI } from "../../api/judge.api.js";
 import { MediaAPI } from "../../api/media.api.js";
 import { useAuth } from "../../hooks/useAuth.js";
 import HackathonForm from "./HackathonForm.jsx";
+import VerificationForm from "../../components/Admin/VerificationForm.jsx";
+import VerificationDetails from "../../components/Admin/VerificationDetails.jsx";
+import JudgeInvitations from "../../components/Admin/JudgeInvitations.jsx";
+import PlatformUsers from "../../components/Admin/PlatformUsers.jsx";
+import ContactEnquiries from "../../components/Admin/ContactEnquiries.jsx";
 import { getFileMeta, formatBytes } from "../../utils/fileType.js";
 import { createPortal } from "react-dom";
 import "./AdminProfile.css";
+import "../Styles/AllHackathons.css";
 
 // Mirrors the backend's hackathonSchema virtual("lifecycleStatus") exactly,
 // computed live from phases[] instead of trusting the virtual to have
@@ -126,7 +137,7 @@ const ReasonModal = ({ title, subject, label, onConfirm, onCancel, isLoading, co
           <div style={{ flex: 1, minWidth: 0 }}>
             <div className="ad-modal-title">{title}</div>
             <div className="ad-modal-sub">
-              {label} <strong style={{ color: "#fff" }}>"{subject}"</strong>
+              {label} <strong style={{ color: "var(--strong)" }}>"{subject}"</strong>
             </div>
           </div>
           <button onClick={onCancel} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", display: "flex" }}>
@@ -184,7 +195,7 @@ const EditHackathonModal = ({ hackathon, onClose, onSaved }) => {
     setIsSaving(true);
     try {
       const res = await HackathonAPI.updateHackathon(hackathon._id, payload);
-      toast.success("Hackathon updated successfully!");
+      toast.success("Event updated successfully!");
       onSaved(res.data.hackathon);
       onClose();
     } catch (err) {
@@ -202,7 +213,7 @@ const EditHackathonModal = ({ hackathon, onClose, onSaved }) => {
             <Pencil size={16} />
           </div>
           <div>
-            <div className="ad-edit-topbar-title">Edit Hackathon</div>
+            <div className="ad-edit-topbar-title">Edit Event</div>
             <div className="ad-edit-topbar-sub" style={{ maxWidth: 240, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {hackathon.title}
             </div>
@@ -230,13 +241,13 @@ const HackathonCard = ({ hackathon, onEdited, onSubmitForApproval }) => {
 
   const handleDelete = async (e) => {
     e.stopPropagation();
-    if (!window.confirm("Are you sure you want to delete this hackathon?")) return;
+    if (!(await confirmAction({ title: "Delete this event?", message: "It will be permanently removed.", confirmLabel: "Delete", danger: true }))) return;
     try {
       await HackathonAPI.deleteHackathon(hackathon._id);
-      toast.success("Hackathon deleted successfully");
+      toast.success("Event deleted successfully");
       onEdited({ _id: hackathon._id, deleted: true });
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to delete hackathon");
+      toast.error(err.response?.data?.message || "Failed to delete event");
     }
   };
 
@@ -414,7 +425,7 @@ const PendingHackathonCard = ({ hackathon: initialHackathon, onApprove, onReject
     <>
       {showRejectModal && (
         <ReasonModal
-          title="Reject Hackathon"
+          title="Reject Event"
           subject={hackathon.title}
           label="Rejecting"
           onConfirm={handleRejectConfirm}
@@ -464,7 +475,7 @@ const PendingHackathonCard = ({ hackathon: initialHackathon, onApprove, onReject
             {hackathon.status === "REJECTED" && hackathon.rejectionReason && (
               <div className="ad-rejection-block">
                 <div className="ad-sub-label" style={{ color: "rgba(255,100,100,0.6)" }}><XCircle size={11} /> Rejection Reason</div>
-                <div style={{ fontSize: "0.7rem", color: "#ff9090", lineHeight: 1.6 }}>{hackathon.rejectionReason}</div>
+                <div style={{ fontSize: "0.7rem", color: "var(--rd-text)", lineHeight: 1.6 }}>{hackathon.rejectionReason}</div>
               </div>
             )}
             {hackathon.image?.url && (
@@ -574,7 +585,7 @@ const PendingHackathonCard = ({ hackathon: initialHackathon, onApprove, onReject
               )}
               {hackathon.status !== "APPROVED" && (
                 <button onClick={handleApprove} disabled={isApproving} className="ad-action-btn ad-action-btn--approve">
-                  {isApproving ? <><div className="ad-spinner ad-spinner--sm" /> Approving…</> : <><Check size={13} /> {hackathon.status === "REJECTED" ? "Approve Anyway" : "Approve Hackathon"}</>}
+                  {isApproving ? <><div className="ad-spinner ad-spinner--sm" /> Approving…</> : <><Check size={13} /> {hackathon.status === "REJECTED" ? "Approve Anyway" : "Approve Event"}</>}
                 </button>
               )}
             </div>
@@ -599,7 +610,7 @@ const StatCard = ({ label, value, icon: Icon, color = "green", description }) =>
 );
 
 /* ── Profile edit modal ── */
-const ORGANIZER_TYPES = ["INDIVIDUAL", "COLLEGE", "COMPANY", "COMMUNITY", "STARTUP"];
+const ORGANIZER_TYPES = ["INDIVIDUAL", "COLLEGE", "COMPANY", "STARTUP", "STUDIO", "COMMUNITY"];
 
 const ProfileEditModal = ({ admin, onClose, onSaved }) => {
   const [form, setForm] = useState({
@@ -641,7 +652,7 @@ const ProfileEditModal = ({ admin, onClose, onSaved }) => {
           <div className="ad-modal-icon"><Building2 size={20} /></div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div className="ad-modal-title">Organization Profile</div>
-            <div className="ad-modal-sub">Required before you can create hackathons</div>
+            <div className="ad-modal-sub">Required before you can create events</div>
           </div>
           <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", display: "flex" }}><X size={16} /></button>
         </div>
@@ -682,63 +693,6 @@ const ProfileEditModal = ({ admin, onClose, onSaved }) => {
             <button onClick={onClose} disabled={isSaving} className="ad-action-btn ad-action-btn--cancel" style={{ flex: 1, justifyContent: "center" }}>Cancel</button>
             <button onClick={handleSave} disabled={isSaving} className="ad-action-btn ad-action-btn--approve" style={{ flex: 1, justifyContent: "center" }}>
               {isSaving ? <><div className="ad-spinner ad-spinner--sm" /> Saving…</> : <><Save size={13} /> Save Profile</>}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-/* ── Verification submission modal ── */
-const VerificationModal = ({ onClose, onSubmitted }) => {
-  const [file, setFile] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const inputRef = useRef(null);
-
-  const handleSubmit = async () => {
-    if (!file) {
-      toast.error("Please attach a verification document.");
-      return;
-    }
-    setIsSubmitting(true);
-    try {
-      const uploadRes = await MediaAPI.uploadFile(file, "resource", undefined, undefined, true);
-      const { url, key } = uploadRes.data.file;
-      const res = await AdminAPI.submitVerificationRequest({ verificationDocument: { url, key } });
-      toast.success(res.data.message || "Verification request submitted");
-      onSubmitted();
-      onClose();
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to submit verification request.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  return (
-    <div className="ad-modal-overlay">
-      <div className="ad-modal-backdrop" onClick={onClose} />
-      <div className="ad-modal">
-        <div className="ad-modal-topline" />
-        <div className="ad-modal-header">
-          <div className="ad-modal-icon"><Shield size={20} /></div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div className="ad-modal-title">Submit for Verification</div>
-            <div className="ad-modal-sub">Upload a document proving your organization's identity</div>
-          </div>
-          <button onClick={onClose} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", display: "flex" }}><X size={16} /></button>
-        </div>
-        <div className="ad-modal-body">
-          <div className="ad-dropzone" onClick={() => inputRef.current?.click()}>
-            <UploadCloud size={20} style={{ color: "rgba(95,255,96,0.3)" }} />
-            <div className="ad-dropzone-text">{file ? file.name : "Click to upload · PDF, DOC, JPG, PNG"}</div>
-            <input ref={inputRef} type="file" className="sr-only" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onChange={(e) => e.target.files[0] && setFile(e.target.files[0])} />
-          </div>
-          <div style={{ display: "flex", gap: "0.6rem" }}>
-            <button onClick={onClose} disabled={isSubmitting} className="ad-action-btn ad-action-btn--cancel" style={{ flex: 1, justifyContent: "center" }}>Cancel</button>
-            <button onClick={handleSubmit} disabled={isSubmitting || !file} className="ad-action-btn ad-action-btn--approve" style={{ flex: 1, justifyContent: "center" }}>
-              {isSubmitting ? <><div className="ad-spinner ad-spinner--sm" /> Submitting…</> : <>Submit for Review</>}
             </button>
           </div>
         </div>
@@ -809,7 +763,6 @@ const PendingVerificationCard = ({ admin, onApprove, onReject }) => {
         <div className="ad-pending-body" style={{ display: "flex" }}>
           <DetailRow icon={Phone} label="Contact" value={admin.contactNumber} />
           <DetailRow icon={Globe} label="Country" value={admin.country} />
-          {admin.website && <DetailRow icon={Link2} label="Website" value={admin.website} />}
           {admin.linkedin && <DetailRow icon={Linkedin} label="LinkedIn" value={admin.linkedin} />}
           {admin.bio && (
             <div>
@@ -817,11 +770,7 @@ const PendingVerificationCard = ({ admin, onApprove, onReject }) => {
               <p style={{ fontSize: "0.7rem", color: "var(--text-muted)", lineHeight: 1.6 }}>{admin.bio}</p>
             </div>
           )}
-          {admin.verificationDocument?.url && (
-            <a href={admin.verificationDocument.url} target="_blank" rel="noopener noreferrer" className="ad-viewall-btn" style={{ alignSelf: "flex-start" }}>
-              <FileText size={13} /> View Verification Document
-            </a>
-          )}
+          <VerificationDetails admin={admin} />
           <div className="flex flex-col sm:flex-row justify-end gap-2 pt-3" style={{ borderTop: "1px solid rgba(95,255,96,0.07)" }}>
             <button onClick={() => setShowReject(true)} className="ad-action-btn ad-action-btn--reject">
               <XCircle size={13} /> Reject
@@ -839,6 +788,15 @@ const PendingVerificationCard = ({ admin, onApprove, onReject }) => {
 /* ── Verification status card ── */
 const VerificationCard = ({ admin, onSubmit }) => {
   const status = admin.verificationStatus;
+  if (status === "APPROVED" && !(admin.verificationDocuments?.length > 0))
+    return (
+      <div className="ad-info-banner ad-info-banner--pending">
+        <span>
+          <AlertCircle size={13} style={{ display: "inline", marginRight: 4 }} />
+          Verification now needs your organisation details and documents. <button onClick={onSubmit} className="ad-inline-link">Submit them</button> to keep creating events — your existing events are unaffected.
+        </span>
+      </div>
+    );
   if (status === "APPROVED")
     return (
       <div className="ad-info-banner ad-info-banner--approved">
@@ -858,7 +816,7 @@ const VerificationCard = ({ admin, onSubmit }) => {
       {status === "NOT_SUBMITTED" && admin.profileCompleted && (
         <span>
           <AlertCircle size={13} style={{ display: "inline", marginRight: 4 }} />
-          Not verified yet. <button onClick={onSubmit} className="ad-inline-link">Submit for verification</button> to start creating hackathons.
+          Not verified yet. <button onClick={onSubmit} className="ad-inline-link">Submit for verification</button> to start creating events.
         </span>
       )}
       {status === "NOT_SUBMITTED" && !admin.profileCompleted && (
@@ -878,6 +836,7 @@ const AdminProfile = () => {
   const [hackathonsLoading, setHackathonsLoading] = useState(true);
   const [assignedHackathons, setAssignedHackathons] = useState([]);
   const [assignedLoading, setAssignedLoading] = useState(true);
+  const [assignedVersion, setAssignedVersion] = useState(0);
   const [pendingHackathons, setPendingHackathons] = useState([]);
   const [pendingLoading, setPendingLoading] = useState(true);
   const [pendingVerifications, setPendingVerifications] = useState([]);
@@ -885,8 +844,20 @@ const AdminProfile = () => {
   const [allHackathonsPlatform, setAllHackathonsPlatform] = useState([]);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
-  const [showAllAdmins, setShowAllAdmins] = useState(false);
-  const [showAllHackathons, setShowAllHackathons] = useState(false);
+  const [tab, setTab] = useState("overview");
+  const [collapsed, setCollapsed] = useState(() => {
+    try { return localStorage.getItem("adminSidebarCollapsed") === "1"; } catch { return false; }
+  });
+  const toggleCollapsed = () => setCollapsed((c) => {
+    try { localStorage.setItem("adminSidebarCollapsed", c ? "0" : "1"); } catch { /* storage unavailable */ }
+    return !c;
+  });
+  const [newEnquiries, setNewEnquiries] = useState(0);
+
+  useEffect(() => {
+    if (!adminData?.controller) return;
+    AdminAPI.listEnquiries({ status: "NEW", limit: 1 }).then((res) => setNewEnquiries(res.data.newCount || 0)).catch(() => {});
+  }, [adminData?.controller, tab]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -915,7 +886,7 @@ const AdminProfile = () => {
         setMyHackathons(res.data.hackathons || []);
       } catch (err) {
         if (err.code === "ERR_CANCELED") return;
-        toast.error("Could not load your hackathons.");
+        toast.error("Could not load your events.");
       } finally {
         if (!controller.signal.aborted) setHackathonsLoading(false);
       }
@@ -941,7 +912,7 @@ const AdminProfile = () => {
     };
     run();
     return () => controller.abort();
-  }, [adminData]);
+  }, [adminData, assignedVersion]);
 
   useEffect(() => {
     if (!adminData?.controller) {
@@ -977,7 +948,7 @@ const AdminProfile = () => {
   const handleApproveHackathon = async (id) => {
     try {
       await HackathonAPI.approveHackathon(id);
-      toast.success("Hackathon approved!");
+      toast.success("Event approved!");
     } catch (err) {
       toast.error(err.response?.data?.message || "Approval failed.");
       throw err;
@@ -987,7 +958,7 @@ const AdminProfile = () => {
   const handleRejectHackathon = async (id, reason) => {
     try {
       await HackathonAPI.rejectHackathon(id, { reason });
-      toast.success("Hackathon rejected.");
+      toast.success("Event rejected.");
     } catch (err) {
       toast.error(err.response?.data?.message || "Rejection failed.");
       throw err;
@@ -1027,12 +998,7 @@ const AdminProfile = () => {
   };
 
   const handleDeleteAdmin = async (admin) => {
-    if (
-      !window.confirm(
-        `Permanently delete "${admin.organizationName || admin.adminName}"? This cannot be undone.`
-      )
-    )
-      return;
+    if (!(await confirmAction({ title: `Delete ${admin.organizationName || admin.adminName}?`, message: "The organiser account is removed permanently. This can't be undone.", confirmLabel: "Delete account", danger: true }))) return;
     try {
       await AdminAPI.deleteAdmin(admin._id);
       toast.success("Admin deleted.");
@@ -1069,7 +1035,8 @@ const AdminProfile = () => {
   const statAwaitingReview = adminData.controller ? platformPendingApproval.length : pendingApproval.length;
   const statConcluded = adminData.controller ? platformConcludedCount : concludedCount;
 
-  const canCreate = adminData.profileCompleted && adminData.isVerified && adminData.verificationStatus === "APPROVED";
+  const hasDocs = (adminData.verificationDocuments?.length || 0) > 0;
+  const canCreate = adminData.controller || (adminData.profileCompleted && adminData.isVerified && adminData.verificationStatus === "APPROVED" && hasDocs);
 
   const handleCreateClick = () => {
     if (canCreate) {
@@ -1078,13 +1045,13 @@ const AdminProfile = () => {
     }
 
     if (!adminData.profileCompleted) {
-      toast.error("Complete your profile before creating a hackathon.");
+      toast.error("Complete your profile before creating an event.");
       setShowProfileModal(true);
       return;
     }
 
     if (adminData.verificationStatus === "PENDING") {
-      toast.error("Your verification is still under review. You can create hackathons once approved.");
+      toast.error("Your verification is still under review. You can create events once approved.");
       return;
     }
 
@@ -1093,8 +1060,37 @@ const AdminProfile = () => {
       return;
     }
 
-    toast.error("Submit your verification request before creating a hackathon.");
+    if (adminData.verificationStatus === "APPROVED" && !hasDocs) {
+      toast.error("Submit your organiser details and documents to keep creating events.");
+      setShowVerificationModal(true);
+      return;
+    }
+
+    toast.error("Submit your verification request before creating an event.");
   };
+
+  const navGroups = [
+    {
+      label: "Workspace",
+      items: [
+        { id: "overview", label: "Overview", icon: LayoutDashboard },
+        { id: "events", label: "My events", icon: Calendar },
+      ],
+    },
+    ...(adminData.controller
+      ? [{
+          label: "Platform",
+          items: [
+            { id: "verification", label: "Verification", icon: BadgeCheck, count: pendingVerifications.length },
+            { id: "approvals", label: "Event approvals", icon: Clock, count: pendingHackathons.length },
+            { id: "enquiries", label: "Enquiries", icon: Inbox, count: newEnquiries },
+            { id: "users", label: "Platform users", icon: Users },
+            { id: "admins", label: "Admins", icon: Shield },
+            { id: "platform", label: "All events", icon: Globe },
+          ],
+        }]
+      : []),
+  ];
 
   return (
     <div className="ad-root">
@@ -1107,53 +1103,72 @@ const AdminProfile = () => {
         />
       )}
       {showVerificationModal && (
-        <VerificationModal
+        <VerificationForm
+          admin={adminData}
           onClose={() => setShowVerificationModal(false)}
           onSubmitted={() => setAdminData((a) => ({ ...a, verificationStatus: "PENDING" }))}
         />
       )}
-      <div className="relative z-10 max-w-[1100px] mx-auto px-4 sm:px-6 py-8 sm:py-10">
-        <div className="mb-8">
-          <div className="ad-badge">Admin Dashboard</div>
-          <h1 className="ad-page-title">Administrator.</h1>
-          <p className="ad-page-sub">Manage platform · monitor hackathons · oversee community</p>
+      <div className={`relative z-10 ad-shell ${collapsed ? "is-collapsed" : ""}`}>
+        <aside className="ad-side" aria-label="Admin sections">
+          <div className="ad-side-head">
+            <span className="ad-side-title">Admin</span>
+            <button className="ad-side-toggle" onClick={toggleCollapsed} aria-label={collapsed ? "Open sidebar" : "Close sidebar"} title={collapsed ? "Open sidebar" : "Close sidebar"}>
+              {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+            </button>
+          </div>
+          <nav className="ad-side-nav">
+            {navGroups.map((g) => (
+              <div key={g.label} className="ad-side-group">
+                <div className="ad-side-label">{g.label}</div>
+                {g.items.map(({ id, label, icon, count }) => (
+                  <button key={id} onClick={() => setTab(id)} title={collapsed ? label : undefined} className={`ad-side-item ${tab === id ? "is-active" : ""}`} aria-current={tab === id ? "page" : undefined}>
+                    {React.createElement(icon, { size: 17 })}
+                    <span className="ad-side-text">{label}</span>
+                    {count > 0 && <span className="ad-side-count">{count}</span>}
+                  </button>
+                ))}
+              </div>
+            ))}
+          </nav>
+        </aside>
+        <div className="ad-main">
+        <div className="max-w-[1080px] mx-auto px-4 sm:px-8 py-8 sm:py-10">
+        {tab === "overview" && (<>
+        <div className="mb-7 font-sans">
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight dark:text-[var(--hk-accent-solid)]">Overview</h1>
+          <p className="text-sm text-[var(--text-muted)] mt-1.5">Manage the platform, monitor events and oversee the community.</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-4 mb-6">
-          <div className="ad-card p-5">
-            <div className="flex items-center justify-between gap-4 mb-4">
-              <div className="flex items-center gap-4">
-                <div className="ad-profile-avatar">
-                  {adminData.avatar ? <img src={adminData.avatar} alt="" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} /> : <User size={22} style={{ color: "var(--green)" }} />}
-                  <div className="ad-profile-avatar-badge"><Shield size={9} style={{ color: "#050905" }} /></div>
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px] gap-4 mb-6 font-sans">
+          <div className="ad-panel">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-4 min-w-0">
+                <div className="ad-panel-avatar">
+                  {adminData.avatar ? <img src={adminData.avatar} alt="" /> : <User size={24} />}
                 </div>
-                <div>
-                  <div className="ad-profile-name">{adminData.organizationName || adminData.adminName}</div>
-                  <div className="ad-profile-role">{adminData.controller ? "Platform Controller" : "Organizer"}</div>
-                  <div className="ad-profile-email">{adminData.email}</div>
+                <div className="min-w-0">
+                  <div className="text-lg font-semibold truncate">{adminData.organizationName || adminData.adminName}</div>
+                  <div className="text-sm text-[var(--text-muted)] truncate">{adminData.email}</div>
+                  <span className="ad-panel-role">{adminData.controller ? "Platform controller" : "Organizer"}</span>
                 </div>
               </div>
-              <button onClick={() => setShowProfileModal(true)} className="ad-hack-action-btn ad-hack-action-btn--edit" style={{ position: "static" }}>
-                <Pencil size={11} /> {adminData.profileCompleted ? "Edit" : "Complete Profile"}
+              <button onClick={() => setShowProfileModal(true)} className="ad-panel-btn">
+                <Pencil size={14} /> {adminData.profileCompleted ? "Edit profile" : "Complete profile"}
               </button>
             </div>
-            <VerificationCard admin={adminData} onSubmit={() => setShowVerificationModal(true)} />
+            {!adminData.controller && <div className="mt-4"><VerificationCard admin={adminData} onSubmit={() => setShowVerificationModal(true)} /></div>}
           </div>
 
-          <div className="ad-card p-5 flex flex-col gap-3">
+          <div className="ad-panel flex flex-col justify-between gap-4">
             <div>
-              <div style={{ fontFamily: "var(--font-display)", fontSize: "0.95rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.01em" }}>
-                Create Hackathon
-              </div>
-              <p style={{ fontSize: "0.62rem", color: "var(--text-muted)", marginTop: "0.3rem", lineHeight: 1.5 }}>
-                {canCreate ? "Start a new hackathon and invite participants." : "Complete & verify your profile first."}
+              <div className="text-base font-semibold">Create an event</div>
+              <p className="text-sm text-[var(--text-muted)] mt-1">
+                {canCreate ? "Set up a new event and invite participants." : "Complete and verify your profile first."}
               </p>
             </div>
-            <button
-              onClick={handleCreateClick}
-              className={`ad-create-btn ${!canCreate ? "ad-create-btn--locked" : ""}`}
-            >
-              <Plus size={14} /> Create New Event
+            <button onClick={handleCreateClick} className={`ad-panel-btn ad-panel-btn--primary ${!canCreate ? "is-locked" : ""}`}>
+              <Plus size={16} /> New event
             </button>
           </div>
         </div>
@@ -1166,6 +1181,8 @@ const AdminProfile = () => {
             <StatCard label="Concluded" value={statConcluded} icon={BadgeCheck} color="gray" description="Closed" />
           </div>
         )}
+
+        <JudgeInvitations onAccepted={() => setAssignedVersion((v) => v + 1)} />
 
         {(assignedLoading || assignedHackathons.length > 0) && (
           <div className="mb-10">
@@ -1218,7 +1235,9 @@ const AdminProfile = () => {
           </div>
         )}
 
-        {adminData.controller && (
+        </>)}
+
+        {adminData.controller && tab === "verification" && (
           <div className="mb-10">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <div className="ad-section-title"><Clock size={18} style={{ color: "var(--amber)" }} />Pending Verification Requests</div>
@@ -1238,15 +1257,19 @@ const AdminProfile = () => {
           </div>
         )}
 
-        {adminData.controller && (
+        {adminData.controller && tab === "enquiries" && <ContactEnquiries />}
+
+        {adminData.controller && tab === "users" && <PlatformUsers />}
+
+        {adminData.controller && tab === "approvals" && (
           <div className="mb-10">
             <div className="flex flex-wrap items-center gap-2 mb-2">
-              <div className="ad-section-title"><Clock size={18} style={{ color: "var(--amber)" }} />Pending Hackathon Approvals</div>
+              <div className="ad-section-title"><Clock size={18} style={{ color: "var(--amber)" }} />Pending Event Approvals</div>
               {pendingHackathons.length > 0 && <span className="ad-chip ad-chip--amber">{pendingHackathons.length} pending</span>}
             </div>
             <div className="ad-pending-note">Expand any card to review full details. Rejecting requires a written reason.</div>
             {pendingLoading ? (
-              <div className="ad-empty"><div className="ad-spinner" /> Loading hackathons…</div>
+              <div className="ad-empty"><div className="ad-spinner" /> Loading events…</div>
             ) : pendingHackathons.length > 0 ? (
               <div className="flex flex-col gap-3">
                 {pendingHackathons.map((h) => (
@@ -1259,16 +1282,13 @@ const AdminProfile = () => {
           </div>
         )}
 
-        {adminData.controller && (
+        {adminData.controller && tab === "admins" && (
           <div className="mb-10">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <div className="ad-section-title"><Users size={18} style={{ color: "var(--blue)" }} />All Admins</div>
               <span className="ad-chip ad-chip--blue">{allAdmins.length}</span>
-              <button onClick={() => setShowAllAdmins((v) => !v)} className="ad-viewall-btn" style={{ marginLeft: "auto" }}>
-                {showAllAdmins ? "Hide" : "Show All"}
-              </button>
             </div>
-            {showAllAdmins && (
+            {(
               pendingLoading ? (
                 <div className="ad-empty"><div className="ad-spinner" /> Loading…</div>
               ) : allAdmins.length > 0 ? (
@@ -1314,17 +1334,14 @@ const AdminProfile = () => {
           </div>
         )}
 
-        {adminData.controller && (
+        {adminData.controller && tab === "platform" && (
           <div className="mb-10">
             <div className="flex flex-wrap items-center gap-2 mb-2">
-              <div className="ad-section-title"><Globe size={18} style={{ color: "var(--blue)" }} />All Hackathons (Platform)</div>
+              <div className="ad-section-title"><Globe size={18} style={{ color: "var(--blue)" }} />All Events (Platform)</div>
               <span className="ad-chip ad-chip--blue">{allHackathonsPlatform.length}</span>
-              <button onClick={() => setShowAllHackathons((v) => !v)} className="ad-viewall-btn" style={{ marginLeft: "auto" }}>
-                {showAllHackathons ? "Hide" : "Show All"}
-              </button>
             </div>
-            <div className="ad-pending-note">As a controller, you can edit or delete any hackathon on the platform, regardless of who created it.</div>
-            {showAllHackathons && (
+            <div className="ad-pending-note">As a controller, you can edit or delete any event on the platform, regardless of who created it.</div>
+            {(
               pendingLoading ? (
                 <div className="ad-empty"><div className="ad-spinner" /> Loading…</div>
               ) : allHackathonsPlatform.length > 0 ? (
@@ -1342,16 +1359,16 @@ const AdminProfile = () => {
                   ))}
                 </div>
               ) : (
-                <div className="ad-empty"><AlertCircle size={14} /> No hackathons on the platform yet.</div>
+                <div className="ad-empty"><AlertCircle size={14} /> No events on the platform yet.</div>
               )
             )}
           </div>
         )}
 
-        {hackathonsLoading ? (
-          <div className="ad-empty p-6"><div className="ad-spinner" /> Loading your hackathons…</div>
+        {tab === "events" && (hackathonsLoading ? (
+          <div className="ad-empty p-6"><div className="ad-spinner" /> Loading your events…</div>
         ) : myHackathons.length === 0 ? (
-          <div className="ad-empty p-6"><AlertCircle size={14} /> You haven't created any hackathons yet.</div>
+          <div className="ad-empty p-6"><AlertCircle size={14} /> You haven't created any events yet.</div>
         ) : (
           <>
             <HackathonSection title="Drafts" hackathons={drafts} setHackathons={setMyHackathons} icon={FileText} onSubmitForApproval={handleSubmitForApproval} />
@@ -1359,7 +1376,9 @@ const AdminProfile = () => {
             <HackathonSection title="Rejected" hackathons={rejected} setHackathons={setMyHackathons} icon={XCircle} onSubmitForApproval={handleSubmitForApproval} />
             <HackathonSection title="Published" hackathons={published} setHackathons={setMyHackathons} icon={CheckCircle} onSubmitForApproval={handleSubmitForApproval} />
           </>
-        )}
+        ))}
+        </div>
+        </div>
       </div>
     </div>
   );

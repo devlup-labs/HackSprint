@@ -6,6 +6,7 @@ import { getLifecycleStatus } from "../../utils/lifecycleStatus.js";
 import { buildWeightedLeaderboard } from "../../utils/weightedLeaderboard.js";
 import { validateSubmissionData } from "../../utils/validateSubmissionData.js";
 import { getNowUTC } from "../../utils/dateUtils.js";
+import { assertProfileComplete } from "../../utils/profileCompleteness.js";
 
 export class SubmissionService {
   constructor(
@@ -34,7 +35,7 @@ export class SubmissionService {
 
   async getHackathonResults(hackathonId) {
     if (!mongoose.Types.ObjectId.isValid(hackathonId)) {
-      throw new BadRequestError("Invalid hackathon id");
+      throw new BadRequestError("Invalid event id");
     }
 
     const hackathon = await this.hackathonRepository.getResultVisibility(
@@ -42,7 +43,7 @@ export class SubmissionService {
     );
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     if (getLifecycleStatus(hackathon) !== "COMPLETED") {
@@ -74,8 +75,10 @@ export class SubmissionService {
     submissionData,
   }) {
     if (!mongoose.Types.ObjectId.isValid(hackathonId)) {
-      throw new BadRequestError("Invalid hackathon id");
+      throw new BadRequestError("Invalid event id");
     }
+
+    await assertProfileComplete(this.userRepository, userId);
 
     if (!title?.trim()) {
       throw new BadRequestError("Submission title is required.");
@@ -98,7 +101,7 @@ export class SubmissionService {
 
     if (!hackathon) {
       throw new BadRequestError(
-        "Seems like there is no active submission phase for this hackathon"
+        "Seems like there is no active submission phase for this event"
       );
     }
 
@@ -112,7 +115,7 @@ export class SubmissionService {
 
     if (!registration) {
       throw new BadRequestError(
-        "Kindly register for the hackathon before submitting"
+        "Kindly register for the event before submitting"
       );
     }
 
@@ -125,7 +128,7 @@ export class SubmissionService {
     if (hackathon.participationType === "TEAM") {
       if (!registration.team) {
         throw new BadRequestError(
-          "This hackathon requires team participation. Kindly join a team before submitting"
+          "This event requires team participation. Kindly join a team before submitting"
         );
       }
 
@@ -290,7 +293,7 @@ export class SubmissionService {
 
   async getMySubmissions(userId, hackathonId) {
     if (!mongoose.Types.ObjectId.isValid(hackathonId)) {
-      throw new BadRequestError("Invalid hackathon id");
+      throw new BadRequestError("Invalid event id");
     }
 
     const registration =
@@ -306,7 +309,7 @@ export class SubmissionService {
     const hackathon = await this.hackathonRepository.getPhases(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     let submissions;
@@ -410,7 +413,7 @@ export class SubmissionService {
     submissionData,
   }) {
     if (!mongoose.Types.ObjectId.isValid(hackathonId)) {
-      throw new BadRequestError("Invalid hackathon id");
+      throw new BadRequestError("Invalid event id");
     }
 
     const submission = await this.submissionRepository.findById(submissionId);

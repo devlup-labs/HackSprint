@@ -215,7 +215,7 @@ const SectionNav = () => {
    Flow-diagram "product mockup" of the student journey
 ───────────────────────────────────────────────────────────────────────── */
 const flowNodes = [
-  { icon: Search, label: "Discover", sub: "Browse hackathons" },
+  { icon: Search, label: "Discover", sub: "Browse events" },
   { icon: Calendar, label: "Register", sub: "Sign up in minutes" },
   { icon: Users, label: "Team Up", sub: "Solo or squad up" },
   { icon: UploadCloud, label: "Submit", sub: "Ship your project" },
@@ -251,7 +251,7 @@ const FlowDiagramMockup = () => {
             See Your Hackathon <span className="text-[#5fff60]">Journey</span>
           </h2>
           <p className="font-jb text-[0.75rem] text-[rgba(180,220,180,0.48)] mt-4 max-w-lg mx-auto leading-relaxed">
-            Every hackathon you join runs through this exact flow — this is
+            Every event you join runs through this exact flow — this is
             what it looks like end to end.
           </p>
         </div>
@@ -339,7 +339,7 @@ const FlowDiagramMockup = () => {
           {/* mock live listing table */}
           <div className="border-t border-[rgba(95,255,96,0.08)] bg-[rgba(95,255,96,0.015)]">
             <div className="grid grid-cols-3 gap-4 px-6 py-2.5 border-b border-[rgba(95,255,96,0.06)]">
-              {["Hackathon", "Status", "Details"].map((h) => (
+              {["Event", "Status", "Details"].map((h) => (
                 <span key={h} className="font-jb text-[0.5rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.3)]">
                   {h}
                 </span>
@@ -371,89 +371,14 @@ const FlowDiagramMockup = () => {
   );
 };
 
-/* ─────────────────────────────────────────────────────────────────────────
-   Detailed interactive journey breakdown — circular, continuous loop
-───────────────────────────────────────────────────────────────────────── */
-const journeySteps = [
-  {
-    icon: Search,
-    title: "Discover",
-    desc: "Browse live and upcoming hackathons that match your interests and skill level.",
-    details: [
-      "Filter by category, difficulty, and tags",
-      "Wishlist hackathons to get reminded before registration closes",
-      "See prize pools, timelines, and rules up front",
-    ],
-  },
-  {
-    icon: Calendar,
-    title: "Register",
-    desc: "Sign up in minutes with a simple registration form for the hackathon.",
-    details: [
-      "One form per hackathon, no repeated sign-ups",
-      "Solo or team participation depending on the event",
-      "A reminder before the registration window closes",
-    ],
-  },
-  {
-    icon: Users,
-    title: "Team Up",
-    desc: "Create a team and invite others with a code, or join one someone shares with you.",
-    details: [
-      "Invite-code team joining with leader & member roles",
-      "A shared team dashboard showing the whole roster",
-      "See what your team has submitted, not just your own view",
-    ],
-  },
-  {
-    icon: UploadCloud,
-    title: "Build & Submit",
-    desc: "Develop your project and submit GitHub links, docs, videos, or files before the deadline.",
-    details: [
-      "Multi-file submissions — code, docs, demo videos, images",
-      "Edit your submission right up until the deadline",
-      "Clear countdown so you always know how much time is left",
-    ],
-  },
-  {
-    icon: Gavel,
-    title: "Get Scored",
-    desc: "Judges score your submission while the community votes on their favorites.",
-    details: [
-      "Judge scores blended with community votes",
-      "Transparent scoring scale set by the organizer",
-      "Vote for other teams' projects once judging opens",
-    ],
-  },
-  {
-    icon: Trophy,
-    title: "Results",
-    desc: "See the final leaderboard and how your project ranked once results are published.",
-    details: [
-      "A live leaderboard once the organizer publishes it",
-      "Feedback from judges on your submission",
-      "A portfolio-worthy result to show off",
-    ],
-  },
-];
-
-const LOOP_RADIUS = 40;
-const nodePositions = journeySteps.map((_, i) => {
-  const angle = (i * (360 / journeySteps.length) - 90) * (Math.PI / 180);
-  return {
-    left: 50 + LOOP_RADIUS * Math.cos(angle),
-    top: 50 + LOOP_RADIUS * Math.sin(angle),
-  };
-});
-
 const withoutList = [
-  "Hunting across socials for hackathons worth joining",
+  "Hunting across socials for events worth joining",
   "No easy way to find teammates who match your skills",
   "No structured deadline pushing you to actually ship",
   "Work disappears after the event — nothing to show for it",
 ];
 const withList = [
-  "One place listing every live and upcoming hackathon",
+  "One place listing every live and upcoming event",
   "Invite-code teams — build a squad in seconds",
   "Real submission deadlines with a live countdown",
   "A public result and judge feedback to add to your portfolio",
@@ -688,7 +613,7 @@ const Skills = () => {
 /* ─────────────────────────────────────────────────────────────────────────
    Main page
 ───────────────────────────────────────────────────────────────────────── */
-const heroWords = ["Hackathons", "for", "Students"];
+const heroWords = ["Events", "for", "Students"];
 
 export default function StudentHome() {
   const heroGlowRef = useRef(null);
@@ -770,7 +695,7 @@ export default function StudentHome() {
               className="sh-a3 font-jb text-[0.8rem] sm:text-[0.85rem] md:text-[0.9rem]
       text-[rgba(180,220,180,0.48)] leading-relaxed max-w-[520px] mx-auto mb-9 tracking-[0.02em] px-1"
             >
-              Join hackathons, learn new skills, collaborate with peers, and
+              Join events, learn new skills, collaborate with peers, and
               bring your ideas to life. Build real projects, gain mentorship,
               and grow your portfolio.
             </p>

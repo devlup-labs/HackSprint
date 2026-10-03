@@ -11,6 +11,7 @@ import {
   Images,
   Swords,
 } from "lucide-react";
+import "../pages/Styles/AllHackathons.css";
 
 export const SidebarNav = ({
   activeSection,
@@ -49,12 +50,12 @@ export const SidebarNav = ({
         <div
           className="
           h-full px-3 py-3 lg:px-4 lg:py-5
-          bg-[rgba(8,10,8,0.92)] backdrop-blur-xl
-          border-b border-[rgba(95,255,96,0.08)]
-          lg:border-b-0 lg:border-r lg:border-[rgba(95,255,96,0.08)]
+          bg-[rgba(var(--hk-bg-rgb),0.92)] backdrop-blur-xl
+          border-b border-[rgba(var(--hk-card-border-rgb),0.14)] dark:border-[rgba(var(--hk-card-border-rgb),0.08)]
+          lg:border-b-0 lg:border-r lg:border-[rgba(var(--hk-card-border-rgb),0.14)] dark:lg:border-[rgba(var(--hk-card-border-rgb),0.08)]
         "
         >
-          <div className="hidden lg:block font-[family-name:'JetBrains_Mono',monospace] text-[0.52rem] tracking-[0.2em] uppercase text-[rgba(95,255,96,0.38)] border-l-2 border-[rgba(95,255,96,0.28)] pl-2 mb-4">
+          <div className="hidden lg:block font-[family-name:'JetBrains_Mono',monospace] text-[0.52rem] tracking-[0.2em] uppercase text-[rgba(var(--hk-accent-rgb),0.38)] border-l-2 border-[rgba(var(--hk-accent-rgb),0.28)] pl-2 mb-4">
             Navigation
           </div>
 
@@ -83,8 +84,8 @@ export const SidebarNav = ({
                       whitespace-nowrap
                       ${
                         active
-                          ? "bg-[rgba(95,255,96,0.1)] border-[rgba(95,255,96,0.28)] text-[#5fff60]"
-                          : "bg-transparent border-transparent text-[rgba(180,220,180,0.42)] hover:bg-[rgba(95,255,96,0.05)] hover:border-[rgba(95,255,96,0.14)] hover:text-[rgba(180,220,180,0.75)]"
+                          ? "bg-[rgba(var(--hk-accent-rgb),0.1)] border-[rgba(var(--hk-accent-rgb),0.28)] text-[var(--hk-accent-solid)]"
+                          : "bg-transparent border-transparent text-[rgba(var(--hk-text-rgb),0.42)] hover:bg-[rgba(var(--hk-accent-rgb),0.05)] hover:border-[rgba(var(--hk-accent-rgb),0.14)] hover:text-[rgba(var(--hk-text-rgb),0.75)]"
                       }
                     `}
                   >
@@ -92,15 +93,15 @@ export const SidebarNav = ({
                       size={13}
                       className={`flex-shrink-0 transition-colors ${
                         active
-                          ? "text-[#5fff60]"
-                          : "text-[rgba(95,255,96,0.3)] group-hover:text-[rgba(95,255,96,0.6)]"
+                          ? "text-[var(--hk-accent-solid)]"
+                          : "text-[rgba(var(--hk-accent-rgb),0.3)] group-hover:text-[rgba(var(--hk-accent-rgb),0.6)]"
                       }`}
                     />
 
                     <span>{section.label}</span>
 
                     {active && (
-                      <span className="hidden lg:block ml-auto w-1.5 h-1.5 rounded-full bg-[#5fff60] animate-pulse flex-shrink-0" />
+                      <span className="hidden lg:block ml-auto w-1.5 h-1.5 rounded-full bg-[var(--hk-accent-solid)] animate-pulse flex-shrink-0" />
                     )}
                   </button>
                 </li>

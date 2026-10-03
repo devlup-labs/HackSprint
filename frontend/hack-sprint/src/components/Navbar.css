@@ -1,27 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@700;800&display=swap");
 
 .nb-root {
-  font-family: "JetBrains Mono", monospace;
+  font-family: "Plus Jakarta Sans", sans-serif;
 }
 .nb-syne {
   font-family: "Syne", sans-serif;
-}
-
-/* bottom scanline */
-.nb-nav::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(95, 255, 96, 0.28),
-    transparent
-  );
-  pointer-events: none;
 }
 
 /* profile dropdown slide-in */
@@ -55,16 +38,6 @@
 }
 
 /* nav link active underline */
-.nb-link-active::after {
-  content: "";
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: #5fff60;
-}
-
 /* coin badge pulse */
 @keyframes nb-coin {
   0%,

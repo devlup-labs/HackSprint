@@ -35,12 +35,12 @@ const getCountdownTarget = (hackathon) => {
 /* ── Skeleton ── */
 const Skeleton = ({ className }) => (
   <div
-    className={`relative overflow-hidden bg-[rgba(95,255,96,0.04)] rounded-[3px] hk-shimmer ${className}`}
+    className={`relative overflow-hidden bg-[rgba(var(--hk-accent-rgb),0.04)] rounded-[3px] hk-shimmer ${className}`}
   />
 );
 
 const HackathonCardSkeleton = () => (
-  <div className="font-jb border border-[rgba(95,255,96,0.08)] bg-[rgba(10,12,10,0.6)] rounded-[4px] overflow-hidden">
+  <div className="font-jb border border-[rgba(var(--hk-accent-rgb),0.08)] bg-[rgba(var(--hk-card-bg),0.6)] rounded-[4px] overflow-hidden">
     <div className="flex flex-col lg:flex-row">
       <div className="lg:w-72 lg:h-52 h-44 w-full relative flex-shrink-0">
         <Skeleton className="w-full h-full rounded-none" />
@@ -91,18 +91,18 @@ const TabButton = ({
   const colors = {
     green: {
       active:
-        "bg-[rgba(95,255,96,0.1)] border-[rgba(95,255,96,0.3)] text-[#5fff60]",
-      dot: "bg-[#5fff60]",
+        "bg-[rgba(var(--hk-accent-rgb),0.1)] border-[rgba(var(--hk-accent-rgb),0.3)] text-[var(--hk-accent-solid)]",
+      dot: "bg-[var(--hk-accent-solid)]",
     },
     blue: {
       active:
-        "bg-[rgba(96,200,255,0.1)] border-[rgba(96,200,255,0.3)] text-[#60c8ff]",
-      dot: "bg-[#60c8ff]",
+        "bg-[rgba(var(--hk-blue-rgb),0.1)] border-[rgba(var(--hk-blue-rgb),0.3)] text-[rgb(var(--hk-blue-rgb))]",
+      dot: "bg-[rgb(var(--hk-blue-rgb))]",
     },
     red: {
       active:
-        "bg-[rgba(255,96,96,0.08)] border-[rgba(255,96,96,0.25)] text-[#ff9090]",
-      dot: "bg-[#ff9090]",
+        "bg-[rgba(var(--hk-red-rgb),0.08)] border-[rgba(var(--hk-red-rgb),0.25)] text-[rgb(var(--hk-red-rgb))]",
+      dot: "bg-[rgb(var(--hk-red-rgb))]",
     },
   };
   const c = colors[color];
@@ -113,22 +113,16 @@ const TabButton = ({
         ${
           active
             ? `${c.active}`
-            : "bg-[rgba(10,12,10,0.6)] border-[rgba(95,255,96,0.1)] text-[rgba(180,220,180,0.45)] hover:border-[rgba(95,255,96,0.22)] hover:text-[rgba(180,220,180,0.7)]"
+            : "bg-[rgba(var(--hk-card-bg),0.6)] border-[rgba(var(--hk-accent-rgb),0.1)] text-[rgba(var(--hk-text-rgb),0.45)] hover:border-[rgba(var(--hk-accent-rgb),0.22)] hover:text-[rgba(var(--hk-text-rgb),0.7)]"
         }`}
     >
-      {active && (
-        <div
-          className={`hk-tab-pulse absolute inset-0 rounded-[3px] opacity-20`}
-          style={{ background: c.dot }}
-        />
-      )}
       <Icon size={12} />
       {children}
       <span
         className={`font-jb text-[0.55rem] px-1.5 py-[1px] rounded-[2px] ${
           active
-            ? "bg-[rgba(95,255,96,0.15)] text-inherit"
-            : "bg-[rgba(95,255,96,0.05)] text-[rgba(180,220,180,0.35)]"
+            ? "bg-[rgba(var(--hk-accent-rgb),0.15)] text-inherit"
+            : "bg-[rgba(var(--hk-accent-rgb),0.05)] text-[rgba(var(--hk-text-rgb),0.35)]"
         }`}
       >
         {count}
@@ -177,50 +171,33 @@ const HackathonCard = ({ hackathon }) => {
 
   const status = hackathon.lifecycleStatus;
   const isCompleted = status === "COMPLETED";
-  const isUpcoming = status === "UPCOMING";
   const isActive = status === "ACTIVE";
 
-  const statusStyle = isCompleted
-    ? {
-        dot: "bg-[#ff6060]",
-        text: "text-[#ff9090]",
-        border: "border-[rgba(255,96,96,0.2)]",
-        bg: "bg-[rgba(255,96,96,0.06)]",
-      }
-    : isUpcoming
-    ? {
-        dot: "bg-[#60c8ff]",
-        text: "text-[#60c8ff]",
-        border: "border-[rgba(96,200,255,0.2)]",
-        bg: "bg-[rgba(96,200,255,0.06)]",
-      }
-    : {
-        dot: "bg-[#5fff60]",
-        text: "text-[#5fff60]",
-        border: "border-[rgba(95,255,96,0.2)]",
-        bg: "bg-[rgba(95,255,96,0.06)]",
-      };
+  const statusStyle = {
+    dot: "bg-[var(--hk-accent-solid)]",
+    text: "text-[var(--hk-accent-solid)]",
+    border: "border-[rgba(var(--hk-accent-rgb),0.2)]",
+    bg: "bg-[rgba(var(--hk-accent-rgb),0.06)]",
+  };
 
   const activePhase = getActivePhase(hackathon);
   const isFeatured = !!hackathon.featured;
 
   return (
     <div
-      className={`hk-card font-jb relative bg-[rgba(10,12,10,0.88)] rounded-[4px] backdrop-blur-sm cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-[2px] ${
+      className={`hk-card font-jb relative bg-[rgba(var(--hk-card-bg),0.88)] rounded-[4px] backdrop-blur-sm cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-[2px] ${
         isFeatured
-          ? "border border-[rgba(95,255,96,0.4)] shadow-[0_0_20px_rgba(95,255,96,0.1)] hover:border-[rgba(95,255,96,0.65)] hover:shadow-[0_0_32px_rgba(95,255,96,0.18)]"
-          : "border border-[rgba(95,255,96,0.1)] hover:border-[rgba(95,255,96,0.32)] hover:shadow-[0_0_28px_rgba(95,255,96,0.08)]"
+          ? "border border-[rgba(var(--hk-accent-rgb),0.4)] shadow-[0_0_20px_rgba(var(--hk-accent-rgb),0.1)] hover:border-[rgba(var(--hk-accent-rgb),0.65)] hover:shadow-[0_0_32px_rgba(var(--hk-accent-rgb),0.18)]"
+          : "border border-[rgba(var(--hk-card-border-rgb),0.16)] dark:border-[rgba(var(--hk-card-border-rgb),0.1)] hover:border-[rgba(var(--hk-accent-rgb),0.32)] hover:shadow-[0_0_28px_rgba(var(--hk-accent-rgb),0.08)]"
       }`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onClick={() => {
-        if (!isUpcoming) navigate(`/hackathon/${hackathon.slug}`);
-      }}
+      onClick={() => navigate(`/hackathon/${hackathon.slug}`)}
     >
       {/* featured banner */}
       {isFeatured && (
-        <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-center gap-1.5 py-1 bg-[#5fff60] text-[#050905]">
-          <Star size={10} className="fill-[#050905]" />
+        <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-center gap-1.5 py-1 bg-[var(--hk-accent-solid)] text-[var(--hk-accent-solid-text)]">
+          <Star size={10} className="fill-current" />
           <span className="font-jb text-[0.55rem] font-bold tracking-[0.18em] uppercase">
             Featured
           </span>
@@ -229,12 +206,12 @@ const HackathonCard = ({ hackathon }) => {
 
       {/* hover sweep */}
       {hovered && (
-        <div className="hk-card-sweep absolute inset-0 w-1/3 bg-gradient-to-r from-transparent via-[rgba(95,255,96,0.04)] to-transparent pointer-events-none z-0" />
+        <div className="hk-card-sweep absolute inset-0 w-1/3 bg-gradient-to-r from-transparent via-[rgba(var(--hk-accent-rgb),0.04)] to-transparent pointer-events-none z-0" />
       )}
 
       <div className={`flex flex-col lg:flex-row ${isFeatured ? "pt-[22px]" : ""}`}>
         {/* ── Image ── */}
-        <div className="lg:w-72 lg:h-52 h-44 w-full relative flex-shrink-0 overflow-hidden bg-[rgba(95,255,96,0.04)]">
+        <div className="lg:w-72 h-44 lg:h-auto lg:min-h-52 lg:self-stretch w-full relative flex-shrink-0 overflow-hidden bg-[rgba(var(--hk-accent-rgb),0.04)]">
           {hackathon.image?.url && !imgError ? (
             <>
               <img
@@ -246,13 +223,13 @@ const HackathonCard = ({ hackathon }) => {
                 onLoad={() => setImgLoaded(true)}
                 onError={() => setImgError(true)}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[rgba(10,12,10,0.7)] via-transparent to-[rgba(10,12,10,0.2)]" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[rgba(var(--hk-card-bg),0.7)] via-transparent to-[rgba(var(--hk-card-bg),0.2)]" />
             </>
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center gap-2">
-              <Code size={32} className="text-[rgba(95,255,96,0.25)]" />
-              <span className="font-jb text-[0.55rem] tracking-[0.16em] uppercase text-[rgba(95,255,96,0.22)]">
-                Hackathon
+              <Code size={32} className="text-[rgba(var(--hk-accent-rgb),0.25)]" />
+              <span className="font-jb text-[0.55rem] tracking-[0.16em] uppercase text-[rgba(var(--hk-accent-rgb),0.22)]">
+                Event
               </span>
             </div>
           )}
@@ -276,13 +253,13 @@ const HackathonCard = ({ hackathon }) => {
             {(hackathon.techStacks || []).slice(0, 3).map((tech, i) => (
               <span
                 key={i}
-                className="font-jb text-[0.55rem] tracking-[0.05em] px-1.5 py-[3px] rounded-[2px] bg-[rgba(10,12,10,0.8)] border border-[rgba(95,255,96,0.18)] text-[rgba(95,255,96,0.65)] backdrop-blur-sm"
+                className="font-jb text-[0.55rem] tracking-[0.05em] px-1.5 py-[3px] rounded-[2px] bg-[rgba(var(--hk-card-bg),0.8)] border border-[rgba(var(--hk-accent-rgb),0.18)] text-[rgba(var(--hk-accent-rgb),0.65)] backdrop-blur-sm"
               >
                 {tech}
               </span>
             ))}
             {hackathon.techStacks?.length > 3 && (
-              <span className="font-jb text-[0.55rem] px-1.5 py-[3px] rounded-[2px] bg-[rgba(10,12,10,0.8)] border border-[rgba(95,255,96,0.12)] text-[rgba(95,255,96,0.4)]">
+              <span className="font-jb text-[0.55rem] px-1.5 py-[3px] rounded-[2px] bg-[rgba(var(--hk-card-bg),0.8)] border border-[rgba(var(--hk-accent-rgb),0.12)] text-[rgba(var(--hk-accent-rgb),0.4)]">
                 +{hackathon.techStacks.length - 3}
               </span>
             )}
@@ -310,15 +287,15 @@ const HackathonCard = ({ hackathon }) => {
           <div className="pr-28">
             {/* title + tags */}
             <div className="mb-3">
-              <h3 className="font-syne font-extrabold text-white text-[1.05rem] leading-tight tracking-tight mb-2">
+              <h3 className="font-syne font-extrabold text-[var(--hk-text)] text-[1.05rem] leading-tight tracking-tight mb-2">
                 {hackathon.title}
               </h3>
               <div className="flex flex-wrap gap-1.5">
                 <span
                   className={`font-jb inline-flex items-center gap-1 text-[0.55rem] tracking-[0.08em] uppercase px-2 py-[3px] rounded-[2px] border ${
                     hackathon.participationType === "TEAM"
-                      ? "bg-[rgba(190,120,255,0.07)] border-[rgba(190,120,255,0.2)] text-[rgba(190,120,255,0.75)]"
-                      : "bg-[rgba(255,255,255,0.05)] border-[rgba(255,255,255,0.14)] text-[rgba(220,220,220,0.6)]"
+                      ? "bg-[rgba(var(--hk-purple-rgb),0.07)] border-[rgba(var(--hk-purple-rgb),0.2)] text-[rgba(var(--hk-purple-rgb),0.85)]"
+                      : "bg-[rgba(var(--hk-text-rgb),0.05)] border-[rgba(var(--hk-text-rgb),0.14)] text-[rgba(var(--hk-text-rgb),0.7)]"
                   }`}
                 >
                   {hackathon.participationType === "TEAM" ? (
@@ -331,14 +308,14 @@ const HackathonCard = ({ hackathon }) => {
                     : "Individual"}
                 </span>
                 {hackathon.difficulty && (
-                  <span className="font-jb text-[0.55rem] tracking-[0.08em] uppercase px-2 py-[3px] rounded-[2px] bg-[rgba(255,184,77,0.07)] border border-[rgba(255,184,77,0.2)] text-[rgba(255,184,77,0.75)]">
+                  <span className="font-jb text-[0.55rem] tracking-[0.08em] uppercase px-2 py-[3px] rounded-[2px] bg-[rgba(var(--hk-amber-rgb),0.1)] border border-[rgba(var(--hk-amber-rgb),0.25)] text-[rgba(var(--hk-amber-rgb),0.9)]">
                     {hackathon.difficulty}
                   </span>
                 )}
                 {(hackathon.category || []).map((cat, i) => (
                   <span
                     key={i}
-                    className="font-jb text-[0.55rem] tracking-[0.08em] uppercase px-2 py-[3px] rounded-[2px] bg-[rgba(96,200,255,0.07)] border border-[rgba(96,200,255,0.18)] text-[rgba(96,200,255,0.65)]"
+                    className="font-jb text-[0.55rem] tracking-[0.08em] uppercase px-2 py-[3px] rounded-[2px] bg-[rgba(var(--hk-blue-rgb),0.08)] border border-[rgba(var(--hk-blue-rgb),0.2)] text-[rgba(var(--hk-blue-rgb),0.85)]"
                   >
                     {cat}
                   </span>
@@ -346,7 +323,7 @@ const HackathonCard = ({ hackathon }) => {
                 {(hackathon.tags || []).slice(0, 2).map((tag, i) => (
                   <span
                     key={`tag-${i}`}
-                    className="font-jb text-[0.55rem] tracking-[0.08em] uppercase px-2 py-[3px] rounded-[2px] bg-[rgba(95,255,96,0.06)] border border-[rgba(95,255,96,0.14)] text-[rgba(95,255,96,0.5)]"
+                    className="font-jb text-[0.55rem] tracking-[0.08em] uppercase px-2 py-[3px] rounded-[2px] bg-[rgba(var(--hk-accent-rgb),0.06)] border border-[rgba(var(--hk-accent-rgb),0.14)] text-[rgba(var(--hk-accent-rgb),0.75)]"
                   >
                     {tag}
                   </span>
@@ -355,31 +332,31 @@ const HackathonCard = ({ hackathon }) => {
             </div>
 
             {/* description */}
-            <p className="font-jb text-[0.67rem] text-[rgba(180,220,180,0.45)] leading-relaxed mb-4 line-clamp-2">
+            <p className="font-jb text-[0.67rem] text-[rgba(var(--hk-text-rgb),0.55)] leading-relaxed mb-4 line-clamp-2">
               {hackathon.description}
             </p>
 
             {/* meta row */}
             <div className="flex flex-wrap gap-4">
-              <span className="font-jb inline-flex items-center gap-1.5 text-[0.62rem] text-[rgba(180,220,180,0.4)]">
-                <Users size={11} className="text-[rgba(95,255,96,0.4)]" />
+              <span className="font-jb inline-flex items-center gap-1.5 text-[0.62rem] text-[rgba(var(--hk-text-rgb),0.5)]">
+                <Users size={11} className="text-[rgba(var(--hk-accent-rgb),0.6)]" />
                 {hackathon.numParticipants || 0} participants
               </span>
               {hackathon.totalPrize > 0 && (
-                <span className="font-jb inline-flex items-center gap-1.5 text-[0.62rem] text-[rgba(180,220,180,0.4)]">
-                  <Trophy size={11} className="text-[rgba(255,184,77,0.5)]" />₹
+                <span className="font-jb inline-flex items-center gap-1.5 text-[0.62rem] text-[rgba(var(--hk-text-rgb),0.5)]">
+                  <Trophy size={11} className="text-[rgba(var(--hk-amber-rgb),0.8)]" />₹
                   {hackathon.totalPrize.toLocaleString("en-IN")}
                 </span>
               )}
               {hackathon.formattedDate && (
-                <span className="font-jb inline-flex items-center gap-1.5 text-[0.62rem] text-[rgba(180,220,180,0.4)]">
-                  <Calendar size={11} className="text-[rgba(95,255,96,0.4)]" />
+                <span className="font-jb inline-flex items-center gap-1.5 text-[0.62rem] text-[rgba(var(--hk-text-rgb),0.5)]">
+                  <Calendar size={11} className="text-[rgba(var(--hk-accent-rgb),0.6)]" />
                   {hackathon.formattedDate}
                 </span>
               )}
               {hackathon.venue && (
-                <span className="font-jb inline-flex items-center gap-1.5 text-[0.62rem] text-[rgba(180,220,180,0.4)]">
-                  <MapPin size={11} className="text-[rgba(95,255,96,0.4)]" />
+                <span className="font-jb inline-flex items-center gap-1.5 text-[0.62rem] text-[rgba(var(--hk-text-rgb),0.5)]">
+                  <MapPin size={11} className="text-[rgba(var(--hk-accent-rgb),0.6)]" />
                   {hackathon.venue}
                 </span>
               )}
@@ -390,9 +367,9 @@ const HackathonCard = ({ hackathon }) => {
 
       {/* progress bar — tracks the currently active phase */}
       {isActive && activePhase && (
-        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[rgba(95,255,96,0.06)]">
+        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[rgba(var(--hk-accent-rgb),0.06)]">
           <div
-            className="h-full bg-[#5fff60] hk-progress transition-all duration-300"
+            className="h-full bg-[var(--hk-accent-solid)] hk-progress transition-all duration-300"
             style={{
               width: `${getProgress(
                 activePhase.startDate,
@@ -518,38 +495,38 @@ const Hackathons = () => {
       label: "Upcoming",
       icon: Calendar,
       count: upcomingHackathons.length,
-      color: "blue",
+      color: "green",
     },
     completed: {
       label: "Completed",
       icon: Timer,
       count: completedHackathons.length,
-      color: "red",
+      color: "green",
     },
   };
 
   const tabTitle = {
-    active: "Active Hackathons",
-    upcoming: "Upcoming Hackathons",
-    completed: "Completed Hackathons",
+    active: "Active Events",
+    upcoming: "Upcoming Events",
+    completed: "Completed Events",
   };
   const tabGradient = {
-    active: "from-[#5fff60] to-[#2d8030]",
-    upcoming: "from-[#60c8ff] to-[#2060a0]",
-    completed: "from-[#ff9090] to-[#a03030]",
+    active: "from-[var(--hk-accent-solid)] to-[var(--hk-accent-solid)]",
+    upcoming: "from-[var(--hk-accent-solid)] to-[var(--hk-accent-solid)]",
+    completed: "from-[var(--hk-accent-solid)] to-[var(--hk-accent-solid)]",
   };
 
   const selectCls =
-    "font-jb w-full px-3 py-2 text-[0.65rem] tracking-[0.05em] border border-[rgba(95,255,96,0.12)] rounded-[3px] bg-[rgba(10,12,10,0.7)] text-[#e8ffe8] focus:outline-none focus:border-[rgba(95,255,96,0.38)] focus:shadow-[0_0_0_2px_rgba(95,255,96,0.05)] transition-all [color-scheme:dark]";
+    "font-jb w-full px-3 py-2 text-[0.65rem] tracking-[0.05em] border border-[rgba(var(--hk-accent-rgb),0.12)] rounded-[3px] bg-[rgba(var(--hk-input-bg),0.7)] text-[var(--hk-text)] focus:outline-none focus:border-[rgba(var(--hk-accent-rgb),0.38)] focus:shadow-[0_0_0_2px_rgba(var(--hk-accent-rgb),0.05)] transition-all [color-scheme:light] dark:[color-scheme:dark]";
 
   return (
     <>
       <SEO
-        title="Browse Hackathons"
-        description="Browse live, upcoming, and completed hackathons on HackSprint. Register solo or with a team and start building."
+        title="Browse Events"
+        description="Browse live, upcoming, and completed events on HackSprint. Register solo or with a team and start building."
         path="/hackathons"
       />
-      <div className="font-jb hk-bg min-h-screen bg-[#0a0a0a] text-[#e8ffe8] overflow-hidden -mt-16">
+      <div className="font-jb hk-bg min-h-screen bg-[var(--hk-bg)] text-[var(--hk-text)] overflow-hidden -mt-16">
         <Loader />
 
         <div className="relative z-10 max-w-[1100px] mx-auto px-5 pt-32 pb-20">
@@ -577,19 +554,19 @@ const Hackathons = () => {
             <div className="relative">
               <Search
                 size={14}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-[rgba(95,255,96,0.35)] pointer-events-none"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-[rgba(var(--hk-accent-rgb),0.35)] pointer-events-none"
               />
               <input
                 type="text"
-                placeholder="Search hackathons by title…"
+                placeholder="Search events by title…"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="font-jb w-full pl-9 pr-10 py-2.5 text-[0.68rem] tracking-[0.04em] border border-[rgba(95,255,96,0.12)] rounded-[3px] bg-[rgba(10,12,10,0.7)] text-[#e8ffe8] placeholder-[rgba(95,255,96,0.25)] focus:outline-none focus:border-[rgba(95,255,96,0.38)] focus:shadow-[0_0_0_2px_rgba(95,255,96,0.05)] transition-all"
+                className="font-jb w-full pl-9 pr-10 py-2.5 text-[0.68rem] tracking-[0.04em] border border-[rgba(var(--hk-accent-rgb),0.12)] rounded-[3px] bg-[rgba(var(--hk-input-bg),0.7)] text-[var(--hk-text)] placeholder-[rgba(var(--hk-placeholder-rgb),0.25)] focus:outline-none focus:border-[rgba(var(--hk-accent-rgb),0.38)] focus:shadow-[0_0_0_2px_rgba(var(--hk-accent-rgb),0.05)] transition-all"
               />
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgba(95,255,96,0.35)] hover:text-[#5fff60] transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgba(var(--hk-accent-rgb),0.4)] hover:text-[var(--hk-accent-solid)] transition-colors"
                 >
                   <X size={13} />
                 </button>
@@ -603,13 +580,13 @@ const Hackathons = () => {
                 className={`font-jb inline-flex items-center gap-1.5 text-[0.62rem] tracking-[0.08em] uppercase px-3 py-2 rounded-[3px] border cursor-pointer transition-all duration-150
                   ${
                     showFilters || hasFilters
-                      ? "bg-[rgba(95,255,96,0.1)] border-[rgba(95,255,96,0.3)] text-[#5fff60]"
-                      : "bg-[rgba(10,12,10,0.6)] border-[rgba(95,255,96,0.1)] text-[rgba(180,220,180,0.45)] hover:border-[rgba(95,255,96,0.22)] hover:text-[rgba(180,220,180,0.7)]"
+                      ? "bg-[rgba(var(--hk-accent-rgb),0.1)] border-[rgba(var(--hk-accent-rgb),0.3)] text-[var(--hk-accent-solid)]"
+                      : "bg-[rgba(var(--hk-card-bg),0.6)] border-[rgba(var(--hk-accent-rgb),0.1)] text-[rgba(var(--hk-text-rgb),0.45)] hover:border-[rgba(var(--hk-accent-rgb),0.22)] hover:text-[rgba(var(--hk-text-rgb),0.7)]"
                   }`}
               >
                 <Filter size={11} /> Filters
                 {hasFilters && (
-                  <span className="font-jb text-[0.52rem] px-1.5 py-[1px] rounded-[2px] bg-[rgba(95,255,96,0.15)] text-[#5fff60]">
+                  <span className="font-jb text-[0.52rem] px-1.5 py-[1px] rounded-[2px] bg-[rgba(var(--hk-accent-rgb),0.15)] text-[var(--hk-accent-solid)]">
                     {
                       [searchTerm, selectedCategory, selectedTag, selectedDifficulty].filter(
                         Boolean
@@ -622,7 +599,7 @@ const Hackathons = () => {
               {hasFilters && (
                 <button
                   onClick={clearFilters}
-                  className="font-jb inline-flex items-center gap-1.5 text-[0.62rem] tracking-[0.08em] uppercase px-3 py-2 rounded-[3px] border border-[rgba(255,96,96,0.2)] bg-[rgba(255,96,96,0.06)] text-[rgba(255,120,120,0.6)] hover:text-[#ff9090] hover:border-[rgba(255,96,96,0.38)] transition-all cursor-pointer"
+                  className="font-jb inline-flex items-center gap-1.5 text-[0.62rem] tracking-[0.08em] uppercase px-3 py-2 rounded-[3px] border border-[rgba(var(--hk-red-rgb),0.2)] bg-[rgba(var(--hk-red-rgb),0.06)] text-[rgba(var(--hk-red-rgb),0.8)] hover:text-[rgb(var(--hk-red-rgb))] hover:border-[rgba(var(--hk-red-rgb),0.38)] transition-all cursor-pointer"
                 >
                   <X size={11} /> Clear
                 </button>
@@ -631,11 +608,11 @@ const Hackathons = () => {
 
             {/* filter panel */}
             {showFilters && (
-              <div className="relative flex flex-wrap gap-4 p-4 bg-[rgba(10,12,10,0.88)] border border-[rgba(95,255,96,0.12)] rounded-[4px]">
-                <span className="absolute top-[-1px] left-[-1px] w-[8px] h-[8px] border-t-2 border-l-2 border-[rgba(95,255,96,0.4)]" />
-                <span className="absolute bottom-[-1px] right-[-1px] w-[8px] h-[8px] border-b-2 border-r-2 border-[rgba(95,255,96,0.4)]" />
+              <div className="relative flex flex-wrap gap-4 p-4 bg-[rgba(var(--hk-card-bg),0.88)] border border-[rgba(var(--hk-accent-rgb),0.12)] rounded-[4px]">
+                <span className="absolute top-[-1px] left-[-1px] w-[8px] h-[8px] border-t-2 border-l-2 border-[rgba(var(--hk-accent-rgb),0.4)]" />
+                <span className="absolute bottom-[-1px] right-[-1px] w-[8px] h-[8px] border-b-2 border-r-2 border-[rgba(var(--hk-accent-rgb),0.4)]" />
                 <div className="min-w-[160px]">
-                  <label className="font-jb block text-[0.55rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.45)] mb-1.5">
+                  <label className="font-jb block text-[0.55rem] tracking-[0.14em] uppercase text-[rgba(var(--hk-accent-rgb),0.6)] mb-1.5">
                     Category
                   </label>
                   <select
@@ -653,7 +630,7 @@ const Hackathons = () => {
                   </select>
                 </div>
                 <div className="min-w-[160px]">
-                  <label className="font-jb block text-[0.55rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.45)] mb-1.5">
+                  <label className="font-jb block text-[0.55rem] tracking-[0.14em] uppercase text-[rgba(var(--hk-accent-rgb),0.6)] mb-1.5">
                     Tag
                   </label>
                   <select
@@ -671,7 +648,7 @@ const Hackathons = () => {
                   </select>
                 </div>
                 <div className="min-w-[160px]">
-                  <label className="font-jb block text-[0.55rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.45)] mb-1.5">
+                  <label className="font-jb block text-[0.55rem] tracking-[0.14em] uppercase text-[rgba(var(--hk-accent-rgb),0.6)] mb-1.5">
                     Difficulty
                   </label>
                   <select
@@ -700,29 +677,29 @@ const Hackathons = () => {
             >
               {activeTab === "active" && (
                 <span className="relative inline-flex">
-                  <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#5fff60] inline-block" />
-                  <span className="absolute inset-0 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#5fff60] animate-ping opacity-60" />
+                  <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[var(--hk-accent-solid)] inline-block" />
+                  <span className="absolute inset-0 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[var(--hk-accent-solid)] animate-ping opacity-60" />
                 </span>
               )}
 
               {activeTab === "upcoming" && (
-                <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#60c8ff] inline-block" />
+                <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[var(--hk-accent-solid)] inline-block" />
               )}
 
               {activeTab === "completed" && (
-                <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[#ff9090] opacity-50 inline-block" />
+                <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-[var(--hk-accent-solid)] opacity-50 inline-block" />
               )}
 
               {tabTitle[activeTab]}
             </h2>
 
-            <div className="font-jb text-[0.6rem] sm:text-[0.65rem] tracking-[0.08em] text-[rgba(180,220,180,0.4)]">
-              <span className="text-[#5fff60]">
+            <div className="font-jb text-[0.6rem] sm:text-[0.65rem] tracking-[0.08em] text-[rgba(var(--hk-text-rgb),0.5)]">
+              <span className="text-[var(--hk-accent-solid)]">
                 {loading ? "…" : getCurrentHackathons().length}
               </span>{" "}
               {activeTab}
               {hasFilters && (
-                <span className="text-[#ffb84d] ml-2">(filtered)</span>
+                <span className="text-[rgba(var(--hk-amber-rgb),0.9)] ml-2">(filtered)</span>
               )}
             </div>
           </div>
@@ -742,12 +719,12 @@ const Hackathons = () => {
                 <span className="text-5xl opacity-15">
                   {hasFilters ? "🔍" : "🏆"}
                 </span>
-                <p className="text-[0.75rem] text-[rgba(180,220,180,0.4)] tracking-[0.06em]">
+                <p className="text-[0.75rem] text-[rgba(var(--hk-text-rgb),0.5)] tracking-[0.06em]">
                   {hasFilters
-                    ? "No hackathons match your filters"
-                    : `No ${activeTab} hackathons`}
+                    ? "No events match your filters"
+                    : `No ${activeTab} events`}
                 </p>
-                <p className="text-[0.62rem] text-[rgba(180,220,180,0.25)]">
+                <p className="text-[0.62rem] text-[rgba(var(--hk-text-rgb),0.35)]">
                   {hasFilters
                     ? "Try adjusting your search or filters"
                     : "Check back later for updates!"}

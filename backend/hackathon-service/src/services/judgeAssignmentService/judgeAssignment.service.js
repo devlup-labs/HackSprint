@@ -8,7 +8,8 @@ export class JudgeAssignmentService {
     judgeAssignmentRepository,
     hackathonRepository,
     adminRepository,
-    logger
+    logger,
+    notificationClient
   ) {
     this.judgeAssignmentRepository = judgeAssignmentRepository;
 
@@ -17,11 +18,13 @@ export class JudgeAssignmentService {
     this.adminRepository = adminRepository;
 
     this.logger = logger;
+
+    this.notificationClient = notificationClient;
   }
 
   async assignJudge({ hackathonId, judgeId, adminId, isController }) {
     if (!mongoose.Types.ObjectId.isValid(hackathonId)) {
-      throw new BadRequestError("Invalid hackathon id");
+      throw new BadRequestError("Invalid event id");
     }
 
     if (!mongoose.Types.ObjectId.isValid(judgeId)) {
@@ -31,7 +34,7 @@ export class JudgeAssignmentService {
     const hackathon = await this.hackathonRepository.getById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     const canManage =
@@ -48,31 +51,52 @@ export class JudgeAssignmentService {
       throw new NotFoundError("Judge not found");
     }
 
-    const existing = await this.judgeAssignmentRepository.exists(
+    if (judgeId.toString() === adminId.toString()) {
+      throw new BadRequestError("You can't invite yourself — you already manage this event");
+    }
+
+    const existing = await this.judgeAssignmentRepository.findAnyAssignment(
       hackathonId,
       judgeId
     );
 
-    if (existing) {
-      throw new BadRequestError("Judge already assigned");
+    if (existing?.status === "ACCEPTED") {
+      throw new BadRequestError("Already a judge for this event");
     }
 
-    const assignment = await this.judgeAssignmentRepository.create({
-      hackathon: hackathonId,
+    if (existing?.status === "PENDING") {
+      throw new BadRequestError("An invitation is already waiting for a reply");
+    }
 
-      judge: judgeId,
+    const inviter = await this.adminRepository.getById(adminId);
 
-      assignedBy: adminId,
+    // A declined invitation can be sent again; reuse the row so the unique
+    // (hackathon, judge) index stays satisfied.
+    let assignment;
+    if (existing) {
+      existing.status = "PENDING";
+      existing.respondedAt = null;
+      existing.assignedBy = adminId;
+      assignment = await existing.save();
+    } else {
+      assignment = await this.judgeAssignmentRepository.create({
+        hackathon: hackathonId,
+        judge: judgeId,
+        assignedBy: adminId,
+        status: "PENDING",
+      });
+    }
+
+    await this.notificationClient.createNotification({
+      userId: judgeId,
+      title: "Judge invitation",
+      message: `${inviter?.adminName || "An organizer"} invited you to judge "${hackathon.title}". Accept or decline from your dashboard.`,
+      type: "SYSTEM",
+      actionUrl: "/admin",
+      metadata: { judgeInvitationId: assignment._id.toString(), hackathonId },
     });
 
-    this.logger.info(
-      {
-        hackathonId,
-        judgeId,
-        adminId,
-      },
-      "Judge assigned"
-    );
+    this.logger.info({ hackathonId, judgeId, adminId }, "Judge invited");
 
     return assignment;
   }
@@ -81,7 +105,7 @@ export class JudgeAssignmentService {
     const hackathon = await this.hackathonRepository.getById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     const canView =
@@ -92,14 +116,14 @@ export class JudgeAssignmentService {
       throw new ForbiddenError("Unauthorized");
     }
 
-    return this.judgeAssignmentRepository.getHackathonJudges(hackathonId);
+    return this.judgeAssignmentRepository.getHackathonJudges(hackathonId, { includeAll: true });
   }
 
   async removeJudge({ hackathonId, judgeId, adminId, isController }) {
     const hackathon = await this.hackathonRepository.getById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     const canManage =
@@ -110,7 +134,7 @@ export class JudgeAssignmentService {
       throw new ForbiddenError("Unauthorized");
     }
 
-    const assignment = await this.judgeAssignmentRepository.findJudgeAssignment(
+    const assignment = await this.judgeAssignmentRepository.findAnyAssignment(
       hackathonId,
       judgeId
     );
@@ -138,5 +162,50 @@ export class JudgeAssignmentService {
 
   async getAssignedHackathons(judgeId) {
     return this.judgeAssignmentRepository.getJudgeHackathons(judgeId);
+  }
+
+  async getMyInvitations(judgeId) {
+    return this.judgeAssignmentRepository.getPendingInvitations(judgeId);
+  }
+
+  async respondToInvitation({ invitationId, judgeId, accept }) {
+    if (!mongoose.Types.ObjectId.isValid(invitationId)) {
+      throw new BadRequestError("Invalid invitation id");
+    }
+
+    const invitation = await this.judgeAssignmentRepository.findById(invitationId);
+
+    if (!invitation || invitation.judge.toString() !== judgeId.toString()) {
+      throw new NotFoundError("Invitation not found");
+    }
+
+    if (invitation.status !== "PENDING") {
+      throw new BadRequestError("You've already replied to this invitation");
+    }
+
+    invitation.status = accept ? "ACCEPTED" : "DECLINED";
+    invitation.respondedAt = new Date();
+    await invitation.save();
+
+    const [judge, hackathon] = await Promise.all([
+      this.adminRepository.getById(judgeId),
+      this.hackathonRepository.getById(invitation.hackathon),
+    ]);
+
+    await this.notificationClient.createNotification({
+      userId: invitation.assignedBy,
+      title: accept ? "Judge invitation accepted" : "Judge invitation declined",
+      message: `${judge?.adminName || "An organizer"} ${accept ? "accepted" : "declined"} your invitation to judge "${hackathon?.title || "your hackathon"}".`,
+      type: "SYSTEM",
+      actionUrl: "/admin",
+    });
+
+    this.logger.info({ invitationId, judgeId, accept }, "Judge invitation answered");
+
+    return {
+      success: true,
+      message: accept ? "You're now a judge for this event" : "Invitation declined",
+      status: invitation.status,
+    };
   }
 }

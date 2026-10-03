@@ -1,3 +1,4 @@
+import { JudgeAssignmentRepository } from "./repositories/judgeAssignment.repository.js";
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
@@ -11,7 +12,6 @@ import { connectDB } from "./config/db.js";
 import { connectRedis, redisClient } from "./config/redis.js";
 import hackathonRoutes from "./routes/hackathon.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
-import adminAuthRoutes from "./routes/adminAuth.routes.js";
 import discussionRoutes from "./routes/discussion.routes.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import { logger } from "./utils/logger.js";
@@ -68,7 +68,6 @@ app.get("/health", async (req, res) => {
 app.use("/", hackathonRoutes);
 app.use("/api/discussions", discussionRoutes);
 app.use("/platform/admin", adminRoutes);
-app.use("/admin/auth", adminAuthRoutes);
 
 app.use((error, req, res, next) => {
   if (error instanceof multer.MulterError) {
@@ -87,10 +86,12 @@ const startServer = async () => {
   try {
     await connectDB();
 
+    await new JudgeAssignmentRepository().backfillAcceptedStatus();
+
     await connectRedis();
 
     const server = app.listen(process.env.PORT, () => {
-      logger.info(`Hackathon service running on port ${process.env.PORT}`);
+      logger.info(`Event service running on port ${process.env.PORT}`);
     });
 
     startPhaseReminderJob();

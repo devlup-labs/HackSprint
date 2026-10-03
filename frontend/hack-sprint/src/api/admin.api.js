@@ -51,4 +51,20 @@ export const AdminAPI = {
   lookupAdminByEmail(email) {
     return client.get(`${API.ADMIN}/admins/lookup`, { params: { email } });
   },
+
+  searchUsers(params = {}, config = {}) {
+    return client.get(`${API.ADMIN}/users`, { params, ...config });
+  },
+
+  deleteUser(userId, data) {
+    return client.delete(`${API.ADMIN}/users/${userId}`, { data });
+  },
+
+  listEnquiries(params = {}) {
+    return client.get(`${API.ADMIN}/enquiries`, { params });
+  },
+
+  updateEnquiry(id, data) {
+    return client.patch(`${API.ADMIN}/enquiries/${id}`, data);
+  },
 };

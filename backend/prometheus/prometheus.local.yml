@@ -12,7 +12,7 @@ scrape_configs:
       - targets:
           - host.docker.internal:5000
 
-  - job_name: "auth-service"
+  - job_name: "user-service"
     static_configs:
       - targets:
           - host.docker.internal:5001
@@ -21,6 +21,11 @@ scrape_configs:
     static_configs:
       - targets:
           - host.docker.internal:5002
+
+  - job_name: "admin-service"
+    static_configs:
+      - targets:
+          - host.docker.internal:5006
 
   - job_name: "media-service"
     static_configs:

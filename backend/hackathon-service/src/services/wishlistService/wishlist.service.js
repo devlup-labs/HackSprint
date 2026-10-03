@@ -15,7 +15,7 @@ export class WishlistService {
     }
 
     if (!mongoose.Types.ObjectId.isValid(hackathonId)) {
-      throw new NotFoundError("Invalid hackathon id");
+      throw new NotFoundError("Invalid event id");
     }
 
     const hackathonExists = await this.hackathonRepository.existsPublic(
@@ -23,7 +23,7 @@ export class WishlistService {
     );
 
     if (!hackathonExists) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     const user = await this.userRepository.getWishlistIds(userId);
@@ -44,7 +44,7 @@ export class WishlistService {
           userId,
           hackathonId,
         },
-        "Hackathon removed from wishlist"
+        "Event removed from wishlist"
       );
 
       return {
@@ -60,7 +60,7 @@ export class WishlistService {
         userId,
         hackathonId,
       },
-      "Hackathon added to wishlist"
+      "Event added to wishlist"
     );
 
     return {

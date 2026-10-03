@@ -1,34 +1,13 @@
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Syne:wght@700;800&display=swap");
-
-:root {
-  --green: #5fff60;
-  --green-dim: rgba(95, 255, 96, 0.45);
-  --green-faint: rgba(95, 255, 96, 0.1);
-  --bg: #0a0a0a;
-  --bg-card: rgba(10, 12, 10, 0.88);
-  --border: rgba(95, 255, 96, 0.12);
-  --text: #e8ffe8;
-  --text-muted: rgba(180, 220, 180, 0.48);
-  --text-dim: rgba(120, 160, 120, 0.32);
-  --amber: #ffb84d;
-  --blue: #60c8ff;
-  --purple: #b478ff;
-  --red: #ff6060;
-  --font-mono: "JetBrains Mono", monospace;
-  --font-display: "Syne", sans-serif;
-}
-
 /* ── Base ── */
 .hm-root {
-  font-family: var(--font-mono);
-  background: var(--bg);
-  color: var(--text);
+  background: var(--background);
+  color: var(--foreground);
   min-height: 100vh;
-  overflow-x: hidden;
   position: relative;
 }
 
-/* ── Fixed grid bg ── */
+/* ── Fixed grid backdrop — theme-aware, so it reads in both modes
+   instead of the old hardcoded-green-on-black version ── */
 .hm-bg {
   position: fixed;
   inset: 0;
@@ -39,76 +18,55 @@
   content: "";
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(
-      rgba(95, 255, 96, 0.028) 1px,
-      transparent 1px
-    ),
-    linear-gradient(90deg, rgba(95, 255, 96, 0.028) 1px, transparent 1px);
+  background-image: linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
   background-size: 44px 44px;
+  opacity: 0.22;
 }
 .hm-bg::after {
   content: "";
   position: absolute;
-  width: 800px;
-  height: 800px;
-  background: radial-gradient(
-    circle,
-    rgba(95, 255, 96, 0.065) 0%,
-    transparent 65%
-  );
-  top: -80px;
+  width: 900px;
+  height: 900px;
+  background: radial-gradient(circle, var(--accent) 0%, transparent 65%);
+  opacity: 0.32;
+  top: -120px;
   left: 50%;
   transform: translateX(-50%);
 }
 
-/* ── Navbar scanline ── */
-.hm-nav::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(95, 255, 96, 0.28),
-    transparent
-  );
-  pointer-events: none;
+/* ── Corner-bracket frame — a quiet nod to the "bounded viewport" look,
+   applied to the hero and product mockups instead of decorating every
+   card (which read as HUD/gamer chrome in the old design) ── */
+.hm-bracket {
+  position: relative;
 }
-
-/* ── Corner bracket card ── */
-.hm-card::before,
-.hm-card::after {
+.hm-bracket::before,
+.hm-bracket::after {
   content: "";
   position: absolute;
-  width: 9px;
-  height: 9px;
+  width: 22px;
+  height: 22px;
   border-style: solid;
-  border-color: rgba(95, 255, 96, 0.42);
-  transition: border-color 0.2s;
+  border-color: var(--primary);
+  opacity: 0.55;
 }
-.hm-card::before {
-  top: -1px;
-  left: -1px;
+.hm-bracket::before {
+  top: -10px;
+  left: -10px;
   border-width: 2px 0 0 2px;
 }
-.hm-card::after {
-  bottom: -1px;
-  right: -1px;
+.hm-bracket::after {
+  bottom: -10px;
+  right: -10px;
   border-width: 0 2px 2px 0;
-}
-.hm-card:hover::before,
-.hm-card:hover::after {
-  border-color: rgba(95, 255, 96, 0.75);
 }
 
 /* ── Fade section scroll reveal ── */
 .hm-fade {
   opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
 }
 .hm-fade.hm-visible {
   opacity: 1;
@@ -119,117 +77,27 @@
 @keyframes hm-up {
   from {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
-.hm-a1 {
-  animation: hm-up 0.7s ease 0.1s forwards;
-  opacity: 0;
-}
 .hm-a2 {
-  animation: hm-up 0.7s ease 0.25s forwards;
-  opacity: 0;
-}
-.hm-a3 {
-  animation: hm-up 0.7s ease 0.4s forwards;
+  animation: hm-up 0.6s ease 0.15s forwards;
   opacity: 0;
 }
 .hm-a4 {
-  animation: hm-up 0.7s ease 0.55s forwards;
+  animation: hm-up 0.6s ease 0.35s forwards;
   opacity: 0;
 }
 .hm-a5 {
-  animation: hm-up 0.7s ease 0.7s forwards;
+  animation: hm-up 0.6s ease 0.45s forwards;
   opacity: 0;
 }
 
-/* ── Slow rotating rings ── */
-@keyframes hm-spin-slow {
-  to {
-    transform: translateX(-50%) translateY(-50%) rotate(360deg);
-  }
-}
-.hm-ring {
-  position: absolute;
-  border-radius: 50%;
-  border: 1px solid rgba(95, 255, 96, 0.05);
-  top: 50%;
-  left: 50%;
-  transform: translateX(-50%) translateY(-50%);
-  animation: hm-spin-slow 20s linear infinite;
-  pointer-events: none;
-}
-.hm-ring-2 {
-  animation-duration: 28s;
-  animation-direction: reverse;
-}
-
-/* ── Typing cursor blink ── */
-@keyframes hm-blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-}
-.hm-cursor {
-  animation: hm-blink 0.9s step-end infinite;
-}
-
-/* ── Float (quote boxes) ── */
-@keyframes hm-float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-14px);
-  }
-}
-.hm-float-1 {
-  animation: hm-float 6s ease-in-out infinite;
-}
-.hm-float-2 {
-  animation: hm-float 6s ease-in-out 2s infinite;
-}
-.hm-float-3 {
-  animation: hm-float 6s ease-in-out 4s infinite;
-}
-.hm-float-4 {
-  animation: hm-float 6s ease-in-out 6s infinite;
-}
-
-/* ── Spinner ── */
-@keyframes hm-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-.hm-spin {
-  animation: hm-spin 0.7s linear infinite;
-}
-
-/* ── Scroll pulse ── */
-@keyframes hm-pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.4;
-  }
-}
-.hm-pulse {
-  animation: hm-pulse 2.4s ease infinite;
-}
-
-/* ── Timeline vertical bar ── */
+/* ── Timeline vertical bar (How It Works) ── */
 .hm-timeline-bar {
   position: absolute;
   left: 50%;
@@ -240,8 +108,8 @@
   background: linear-gradient(
     to bottom,
     transparent,
-    rgba(95, 255, 96, 0.35) 20%,
-    rgba(95, 255, 96, 0.35) 80%,
+    var(--border) 20%,
+    var(--border) 80%,
     transparent
   );
 }
@@ -250,7 +118,7 @@
 @keyframes hm-slide-left {
   from {
     opacity: 0;
-    transform: translateX(-40px);
+    transform: translateX(-32px);
   }
   to {
     opacity: 1;
@@ -260,7 +128,7 @@
 @keyframes hm-slide-right {
   from {
     opacity: 0;
-    transform: translateX(40px);
+    transform: translateX(32px);
   }
   to {
     opacity: 1;
@@ -274,22 +142,37 @@
   opacity: 0;
 }
 .hm-journey-left.hm-visible {
-  animation: hm-slide-left 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: hm-slide-left 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 .hm-journey-right.hm-visible {
-  animation: hm-slide-right 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: hm-slide-right 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 /* ── Skill chip slide ── */
 @keyframes hm-chip {
   from {
     opacity: 0;
-    transform: translateX(16px);
+    transform: translateX(12px);
   }
   to {
     opacity: 1;
     transform: translateX(0);
   }
+}
+
+/* ── Hero wordmark accent — a gradient fill instead of a flat color, so
+   the brand moment has some depth without a distracting animation ── */
+.hm-gradient-text {
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklch, var(--primary) 100%, white 35%),
+    var(--primary) 55%,
+    color-mix(in oklch, var(--primary) 100%, black 15%)
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
 /* ── Testimonial marquee ── */
@@ -329,14 +212,6 @@
   }
 }
 
-/* ── CTA gradient text ── */
-.hm-gradient-text {
-  background: linear-gradient(135deg, #5fff60 0%, #a0ff80 50%, #5fff60 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
 /* ── Scrollbar ── */
 .hm-root::-webkit-scrollbar {
   width: 4px;
@@ -345,6 +220,6 @@
   background: transparent;
 }
 .hm-root::-webkit-scrollbar-thumb {
-  background: rgba(95, 255, 96, 0.18);
+  background: var(--border);
   border-radius: 2px;
 }

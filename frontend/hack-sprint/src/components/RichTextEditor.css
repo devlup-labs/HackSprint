@@ -1,7 +1,7 @@
 .rte-root {
-  border: 1px solid rgba(95, 255, 96, 0.13);
+  border: 1px solid rgba(var(--ac-rgb), 0.13);
   border-radius: 3px;
-  background: rgba(18, 22, 18, 0.7);
+  background: rgba(var(--cd-rgb), 0.7);
   overflow: hidden;
 }
 
@@ -11,8 +11,8 @@
   align-items: center;
   gap: 0.15rem;
   padding: 0.4rem;
-  background: rgba(10, 12, 10, 0.6);
-  border-bottom: 1px solid rgba(95, 255, 96, 0.1);
+  background: rgba(var(--cd-rgb), 0.6);
+  border-bottom: 1px solid rgba(var(--ac-rgb), 0.1);
 }
 
 .rte-tool-btn {
@@ -24,18 +24,18 @@
   border-radius: 2px;
   border: 1px solid transparent;
   background: transparent;
-  color: rgba(180, 220, 180, 0.5);
+  color: rgba(var(--tx-rgb), calc(0.5 + var(--fade-boost)));
   cursor: pointer;
   transition: all 0.12s;
 }
 .rte-tool-btn:hover:not(:disabled) {
-  background: rgba(95, 255, 96, 0.08);
-  color: #5fff60;
+  background: rgba(var(--ac-rgb), 0.08);
+  color: var(--green);
 }
 .rte-tool-btn--active {
-  background: rgba(95, 255, 96, 0.14);
-  border-color: rgba(95, 255, 96, 0.3);
-  color: #5fff60;
+  background: rgba(var(--ac-rgb), 0.14);
+  border-color: rgba(var(--ac-rgb), 0.3);
+  color: var(--green);
 }
 .rte-tool-btn:disabled {
   opacity: 0.3;
@@ -45,7 +45,7 @@
 .rte-divider {
   width: 1px;
   height: 1.1rem;
-  background: rgba(95, 255, 96, 0.12);
+  background: rgba(var(--ac-rgb), 0.12);
   margin: 0 0.25rem;
 }
 
@@ -57,7 +57,7 @@
   font-family: "JetBrains Mono", monospace;
   font-size: 0.75rem;
   line-height: 1.7;
-  color: #e8ffe8;
+  color: var(--text);
   outline: none;
 }
 
@@ -66,14 +66,14 @@
   float: left;
   height: 0;
   pointer-events: none;
-  color: rgba(120, 160, 120, 0.4);
+  color: rgba(var(--tx-rgb), calc(0.4 + var(--fade-boost)));
 }
 
 .rte-content h2,
 .rte-content h3 {
   font-family: "Syne", sans-serif;
   font-weight: 800;
-  color: #fff;
+  color: var(--strong);
   letter-spacing: -0.01em;
   margin: 1rem 0 0.5rem;
 }
@@ -98,15 +98,15 @@
 }
 
 .rte-content strong {
-  color: #fff;
+  color: var(--strong);
   font-weight: 600;
 }
 .rte-content em {
-  color: rgba(180, 220, 180, 0.75);
+  color: rgba(var(--tx-rgb), calc(0.75 + var(--fade-boost)));
 }
 
 .rte-content a {
-  color: #5fff60;
+  color: var(--green);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -114,13 +114,13 @@
 .rte-content blockquote {
   margin: 0.75rem 0;
   padding: 0.6rem 0.9rem;
-  border-left: 2px solid #5fff60;
-  background: rgba(95, 255, 96, 0.04);
-  color: rgba(180, 220, 180, 0.75);
+  border-left: 2px solid var(--green);
+  background: rgba(var(--ac-rgb), 0.04);
+  color: rgba(var(--tx-rgb), calc(0.75 + var(--fade-boost)));
 }
 
 .rte-content hr {
   border: none;
-  border-top: 1px solid rgba(95, 255, 96, 0.15);
+  border-top: 1px solid rgba(var(--ac-rgb), 0.15);
   margin: 1rem 0;
 }

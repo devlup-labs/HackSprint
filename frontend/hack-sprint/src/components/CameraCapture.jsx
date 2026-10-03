@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import "../pages/Styles/AllHackathons.css";
 import { createPortal } from "react-dom";
 import toast from "react-hot-toast";
 import { Camera, RefreshCw, X, Check } from "lucide-react";
@@ -84,20 +85,20 @@ const CameraCapture = ({ onCapture, onClose }) => {
   return createPortal(
     <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 font-[family-name:'JetBrains_Mono',monospace]">
       <div className="absolute inset-0 bg-black/85 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-sm bg-[#0b0f0b] border border-[rgba(95,255,96,0.2)] rounded-[4px] p-5">
+      <div className="relative w-full max-w-sm bg-[rgb(var(--hk-card-bg))] border border-[rgba(var(--hk-card-border-rgb),0.32)] dark:border-[rgba(var(--hk-card-border-rgb),0.2)] rounded-[4px] p-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-[family-name:'Syne',sans-serif] font-extrabold text-white text-[0.95rem]">
+          <h3 className="font-[family-name:'Syne',sans-serif] font-extrabold text-[var(--hk-text)] text-[0.95rem]">
             Take a Photo
           </h3>
           <button
             onClick={onClose}
-            className="text-[rgba(180,220,180,0.4)] hover:text-white transition-colors"
+            className="text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-text-rgb),0.4)] hover:text-[var(--hk-text)] transition-colors"
           >
             <X size={16} />
           </button>
         </div>
 
-        <div className="relative w-full aspect-square rounded-[3px] overflow-hidden bg-black border border-[rgba(95,255,96,0.15)]">
+        <div className="relative w-full aspect-square rounded-[3px] overflow-hidden bg-black border border-[rgba(var(--hk-card-border-rgb),0.24)] dark:border-[rgba(var(--hk-card-border-rgb),0.15)]">
           {error && (
             <div className="absolute inset-0 flex items-center justify-center p-4 text-center text-[0.7rem] text-[rgba(255,144,144,0.85)]">
               {error}
@@ -127,13 +128,13 @@ const CameraCapture = ({ onCapture, onClose }) => {
             <>
               <button
                 onClick={handleRetake}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 text-[0.62rem] tracking-[0.08em] uppercase px-3 py-2 rounded-[3px] border border-[rgba(95,255,96,0.25)] text-[#5fff60] bg-[rgba(95,255,96,0.08)] hover:bg-[rgba(95,255,96,0.15)] transition-all cursor-pointer"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 text-[0.62rem] tracking-[0.08em] uppercase px-3 py-2 rounded-[3px] border border-[rgba(var(--hk-card-border-rgb),0.4)] dark:border-[rgba(var(--hk-card-border-rgb),0.25)] text-[var(--hk-accent-solid)] bg-[rgba(var(--hk-accent-rgb),0.08)] hover:bg-[rgba(var(--hk-accent-rgb),0.15)] transition-all cursor-pointer"
               >
                 <RefreshCw size={12} /> Retake
               </button>
               <button
                 onClick={handleUsePhoto}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 text-[0.62rem] tracking-[0.08em] uppercase px-3 py-2 rounded-[3px] border border-[#5fff60] bg-[#5fff60] text-[#050905] font-bold hover:bg-[#7fff80] transition-all cursor-pointer"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 text-[0.62rem] tracking-[0.08em] uppercase px-3 py-2 rounded-[3px] border border-[var(--hk-accent-solid)] bg-[var(--hk-accent-solid)] text-[#050905] font-bold hover:bg-[#7fff80] transition-all cursor-pointer"
               >
                 <Check size={12} /> Use Photo
               </button>
@@ -142,7 +143,7 @@ const CameraCapture = ({ onCapture, onClose }) => {
             <button
               onClick={handleCapture}
               disabled={!!error}
-              className="flex-1 inline-flex items-center justify-center gap-1.5 text-[0.62rem] tracking-[0.08em] uppercase px-3 py-2 rounded-[3px] border border-[#5fff60] bg-[#5fff60] text-[#050905] font-bold hover:bg-[#7fff80] disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+              className="flex-1 inline-flex items-center justify-center gap-1.5 text-[0.62rem] tracking-[0.08em] uppercase px-3 py-2 rounded-[3px] border border-[var(--hk-accent-solid)] bg-[var(--hk-accent-solid)] text-[#050905] font-bold hover:bg-[#7fff80] disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
             >
               <Camera size={12} /> Capture
             </button>

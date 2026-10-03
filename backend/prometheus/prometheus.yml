@@ -8,19 +8,28 @@ scrape_configs:
           - localhost:9090
 
   - job_name: "api-gateway"
-    static_configs:
-      - targets:
-          - api-gateway:5000
+    # one target per running copy
+    dns_sd_configs:
+      - names: ["api-gateway"]
+        type: A
+        port: 5000
 
-  - job_name: "auth-service"
+  - job_name: "user-service"
     static_configs:
       - targets:
-          - auth-service:5001
+          - user-service:5001
 
   - job_name: "hackathon-service"
+    # one target per running copy
+    dns_sd_configs:
+      - names: ["hackathon-service"]
+        type: A
+        port: 5002
+
+  - job_name: "admin-service"
     static_configs:
       - targets:
-          - hackathon-service:5002
+          - admin-service:5006
 
   - job_name: "media-service"
     static_configs:

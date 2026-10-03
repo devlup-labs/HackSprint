@@ -11,7 +11,7 @@ const SEO = ({
   jsonLd,
   noindex = false,
 }) => {
-  const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} — Hackathon Platform`;
+  const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} — Event Platform`;
   const url = `${SITE_URL}${path}`;
 
   return (

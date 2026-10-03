@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { confirmAction } from "../../utils/dialogs.js";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import * as XLSX from "xlsx";
@@ -26,6 +27,7 @@ import { JudgeAPI } from "../../api/judge.api.js";
 import { AdminAPI } from "../../api/admin.api.js";
 import MatchManagement from "./MatchManagement.jsx";
 import "./UserList.css";
+import "../Styles/AllHackathons.css";
 
 const PAGE_SIZE = 10;
 
@@ -64,6 +66,24 @@ const SubmissionBadge = ({ submitted }) =>
       <XCircle size={11} /> Not Submitted
     </span>
   );
+
+// The judge's own progress on a team / participant / single submission, so it
+// is obvious what they've already scored without opening each one.
+const ReviewBadge = ({ review, hasSubmitted = true }) => {
+  if (!review || !hasSubmitted) return null;
+  const total = review.total ?? 1;
+  const done = review.total !== undefined ? review.reviewed : review.reviewed ? 1 : 0;
+  if (total === 0) return null;
+  if (done >= total)
+    return (
+      <span className="hu-badge hu-badge--reviewed">
+        <CheckCircle size={11} /> You reviewed{review.score !== undefined ? ` · ${review.score}` : ""}
+      </span>
+    );
+  if (done > 0)
+    return <span className="hu-badge hu-badge--partial">Reviewed {done}/{total}</span>;
+  return <span className="hu-badge hu-badge--todo">To review</span>;
+};
 
 const QualificationBadge = ({ status }) => {
   if (status === "QUALIFIED") {
@@ -114,7 +134,7 @@ const Pagination = ({ page, totalPages, onChange }) => {
 
 /* ── Excel export ── */
 const exportParticipantsToExcel = (hackathon, teams, individualParticipants) => {
-  const title = hackathon.title || "Hackathon";
+  const title = hackathon.title || "Event";
   const wb = XLSX.utils.book_new();
 
   if (teams.length > 0) {
@@ -176,7 +196,7 @@ const exportResultsToExcel = (hackathon, results) => {
     return;
   }
 
-  const title = hackathon.title || "Hackathon";
+  const title = hackathon.title || "Event";
 
   // Canonical round order/names come from the hackathon's own phase list,
   // not from whatever order happens to show up in the results — otherwise
@@ -259,18 +279,19 @@ const JudgesSection = ({ hackathonId }) => {
       const lookupRes = await AdminAPI.lookupAdminByEmail(email.trim());
       const judge = lookupRes.data.admin;
       await JudgeAPI.assignJudge(hackathonId, { judgeId: judge._id });
-      toast.success(`${judge.adminName} assigned as judge.`);
+      toast.success(`Invitation sent to ${judge.adminName}. They become a judge once they accept.`);
       setEmail("");
       loadJudges();
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to assign judge.");
+      toast.error(err.response?.data?.message || "Failed to send the invitation.");
     } finally {
       setAssigning(false);
     }
   };
 
   const handleRemove = async (judgeId, name) => {
-    if (!window.confirm(`Remove ${name} as a judge for this hackathon?`)) return;
+    if (!judgeId) { toast.error("This judge's account no longer exists."); return; }
+    if (!(await confirmAction({ title: `Remove ${name || "this judge"}?`, message: "They're removed from this event's judges, and any pending invitation is cancelled.", confirmLabel: "Remove", danger: true }))) return;
     try {
       await JudgeAPI.removeJudge(hackathonId, judgeId);
       toast.success("Judge removed.");
@@ -284,8 +305,8 @@ const JudgesSection = ({ hackathonId }) => {
     <div className="hu-card">
       <div className="hu-section-title">
         <Gavel size={16} />
-        Judges Assigned
-        <span className="hu-section-count">({judges.length})</span>
+        Judges
+        <span className="hu-section-count">({judges.filter((j) => j.status === "ACCEPTED").length} active)</span>
       </div>
 
       <form onSubmit={handleAssign} className="hu-assign-row">
@@ -300,7 +321,7 @@ const JudgesSection = ({ hackathonId }) => {
           />
         </div>
         <button type="submit" disabled={assigning || !email.trim()} className="hu-assign-btn">
-          <Plus size={13} /> {assigning ? "Assigning…" : "Assign Judge"}
+          <Plus size={13} /> {assigning ? "Sending…" : "Invite as judge"}
         </button>
       </form>
 
@@ -325,7 +346,15 @@ const JudgesSection = ({ hackathonId }) => {
                 <div className="hu-judge-email">{j.judge?.email}</div>
               </div>
               <div className="hu-judge-meta">
-                Assigned by {j.assignedBy?.adminName || "—"}
+                <span
+                  style={{
+                    display: "inline-block", marginRight: 8, padding: "1px 8px", borderRadius: 99, fontSize: "0.55rem", letterSpacing: "0.1em", textTransform: "uppercase", border: "1px solid currentColor",
+                    color: j.status === "ACCEPTED" ? "var(--green)" : j.status === "DECLINED" ? "var(--red)" : "var(--amber)",
+                  }}
+                >
+                  {j.status === "ACCEPTED" ? "Accepted" : j.status === "DECLINED" ? "Declined" : "Awaiting reply"}
+                </span>
+                Invited by {j.assignedBy?.adminName || "—"}
                 {j.createdAt ? ` · ${new Date(j.createdAt).toLocaleDateString("en-IN")}` : ""}
               </div>
               <button
@@ -339,7 +368,7 @@ const JudgesSection = ({ hackathonId }) => {
           ))}
         </div>
       ) : (
-        <EmptyState message="No judges assigned yet." />
+        <EmptyState message="No judges yet. Invite an admin by email — they'll get a notification and become a judge only if they accept." />
       )}
     </div>
   );
@@ -447,18 +476,16 @@ const HackathonUsersPage = () => {
 
   const handleConcludeRound = async () => {
     if (!selectedPhaseId) return;
-    if (
-      !window.confirm(
-        "Conclude this round now? This applies the round's qualification rule and notifies everyone whose status changes. You can still manually override individual results after."
-      )
-    )
-      return;
+    if (!(await confirmAction({ title: "Conclude this round?", message: "This applies the round's qualification rule and notifies everyone whose status changes. You can still override individual results afterwards.", confirmLabel: "Conclude round" }))) return;
 
     setConcluding(true);
     try {
       const res = await HackathonAPI.concludeRound(hackathon._id, selectedPhaseId);
       toast.success(
         `Round concluded — ${res.data.qualifiedCount} qualified, ${res.data.eliminatedCount} not advancing.` +
+          (res.data.manualCount
+            ? ` ${res.data.manualCount} set by hand were left as you set them.`
+            : "") +
           (res.data.unreviewedCount
             ? ` (${res.data.unreviewedCount} submission(s) had no reviews.)`
             : "")
@@ -532,12 +559,7 @@ const HackathonUsersPage = () => {
   };
 
   const handleReleaseResults = async () => {
-    if (
-      !window.confirm(
-        "Release results now? Every reviewed team/participant will immediately see their score and feedback, and get notified. This can't be undone."
-      )
-    )
-      return;
+    if (!(await confirmAction({ title: "Release results now?", message: "Every reviewed team or participant will immediately see their score and feedback, and be notified. This can't be undone.", confirmLabel: "Release results", danger: true }))) return;
 
     setReleasingResults(true);
     try {
@@ -570,7 +592,7 @@ const HackathonUsersPage = () => {
     return (
       <div className="hu-notfound">
         <div>
-          <h1>Hackathon Not Found</h1>
+          <h1>Event Not Found</h1>
           <Link to="/admin">← Back to Dashboard</Link>
         </div>
       </div>
@@ -742,7 +764,10 @@ const HackathonUsersPage = () => {
                                 ))}
                             </td>
                             <td className="hu-td-center">
-                              <SubmissionBadge submitted={team.hasSubmitted} />
+                              <div className="hu-badge-stack">
+                                <SubmissionBadge submitted={team.hasSubmitted} />
+                                <ReviewBadge review={team.myReview} hasSubmitted={team.hasSubmitted} />
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -803,7 +828,10 @@ const HackathonUsersPage = () => {
                             <td className="hu-td-name">{participant.user?.name || "N/A"}</td>
                             <td className="hu-td-muted">{participant.user?.email || "N/A"}</td>
                             <td className="hu-td-center">
-                              <SubmissionBadge submitted={participant.hasSubmitted} />
+                              <div className="hu-badge-stack">
+                                <SubmissionBadge submitted={participant.hasSubmitted} />
+                                <ReviewBadge review={participant.myReview} hasSubmitted={participant.hasSubmitted} />
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -900,6 +928,7 @@ const HackathonUsersPage = () => {
                           <tr>
                             <th>Name</th>
                             <th className="center">Score</th>
+                            {phaseData.canScore && <th className="center">Your review</th>}
                             <th className="center">Status</th>
                             {!isJudgeViewer && <th className="center">Override</th>}
                           </tr>
@@ -915,6 +944,11 @@ const HackathonUsersPage = () => {
                                   ? submission.averageScore?.toFixed?.(1) ?? submission.averageScore
                                   : "—"}
                               </td>
+                              {phaseData.canScore && (
+                                <td className="hu-td-center">
+                                  <ReviewBadge review={submission.myReview} />
+                                </td>
+                              )}
                               <td className="hu-td-center">
                                 <QualificationBadge status={submission.qualificationStatus} />
                               </td>
@@ -972,15 +1006,12 @@ const HackathonUsersPage = () => {
               <Trophy size={18} style={{ color: "var(--amber)", flexShrink: 0 }} />
               <div className="hu-modal-title">Scoreboard</div>
 
-              <div
-                style={{
-                  marginLeft: "auto",
-                  marginRight: "0.5rem",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.6rem",
-                }}
-              >
+              <button onClick={() => setShowScoreboard(false)} className="hu-modal-close">
+                <X size={15} />
+              </button>
+            </div>
+
+            <div className="hu-modal-actions">
                 {result && result.length > 0 && (
                   <button
                     onClick={() => exportResultsToExcel(hackathon, result)}
@@ -992,15 +1023,8 @@ const HackathonUsersPage = () => {
 
                 {!isJudgeViewer &&
                   (hackathon.showResult ? (
-                    <span
-                      style={{
-                        fontSize: "0.62rem",
-                        letterSpacing: "0.06em",
-                        textTransform: "uppercase",
-                        color: "var(--green)",
-                      }}
-                    >
-                      Results released
+                    <span className="hu-released">
+                      <CheckCircle size={12} /> Results released
                     </span>
                   ) : (
                     <button
@@ -1013,11 +1037,6 @@ const HackathonUsersPage = () => {
                     </button>
                   ))}
               </div>
-
-              <button onClick={() => setShowScoreboard(false)} className="hu-modal-close">
-                <X size={15} />
-              </button>
-            </div>
 
             {result === null ? (
               <div className="hu-modal-empty">

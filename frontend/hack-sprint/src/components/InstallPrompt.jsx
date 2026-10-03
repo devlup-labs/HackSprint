@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import "../pages/Styles/AllHackathons.css";
 import { Download, Share, X } from "lucide-react";
 
 const DISMISSED_KEY = "installPromptDismissed";
@@ -82,22 +83,22 @@ const InstallPrompt = () => {
   return (
     <div className="fixed bottom-24 right-5 z-[9999] font-[family-name:'JetBrains_Mono',monospace]">
       {showIosTip && (
-        <div className="absolute bottom-full right-0 mb-2 w-56 bg-[rgba(8,10,8,0.98)] border border-[rgba(95,255,96,0.2)] rounded-[4px] p-3 text-[0.65rem] text-[rgba(180,220,180,0.8)] leading-relaxed shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
-          Tap <Share size={11} className="inline text-[#5fff60] mx-0.5 -mt-0.5" /> in Safari's
+        <div className="absolute bottom-full right-0 mb-2 w-56 bg-[rgba(var(--hk-bg-rgb),0.98)] border border-[rgba(var(--hk-card-border-rgb),0.32)] dark:border-[rgba(var(--hk-card-border-rgb),0.2)] rounded-[4px] p-3 text-[0.65rem] text-[rgba(var(--hk-text-rgb),0.95)] dark:text-[rgba(var(--hk-text-rgb),0.8)] leading-relaxed shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
+          Tap <Share size={11} className="inline text-[var(--hk-accent-solid)] mx-0.5 -mt-0.5" /> in Safari's
           toolbar, then "Add to Home Screen".
         </div>
       )}
-      <div className="flex items-center gap-1 bg-[rgba(8,10,8,0.98)] border border-[rgba(95,255,96,0.25)] rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.6)] pl-4 pr-1.5 py-1.5">
+      <div className="flex items-center gap-1 bg-[rgba(var(--hk-bg-rgb),0.98)] border border-[rgba(var(--hk-card-border-rgb),0.4)] dark:border-[rgba(var(--hk-card-border-rgb),0.25)] rounded-full shadow-[0_8px_32px_rgba(0,0,0,0.6)] pl-4 pr-1.5 py-1.5">
         <button
           onClick={handleClick}
-          className="flex items-center gap-2 text-[0.65rem] tracking-[0.05em] uppercase text-[#5fff60] hover:text-[#7fff80] transition-colors cursor-pointer"
+          className="flex items-center gap-2 text-[0.65rem] tracking-[0.05em] uppercase text-[var(--hk-accent-solid)] hover:text-[#7fff80] transition-colors cursor-pointer"
         >
           <Download size={14} /> Install App
         </button>
         <button
           onClick={dismiss}
           title="Dismiss"
-          className="w-6 h-6 rounded-full flex items-center justify-center text-[rgba(180,220,180,0.4)] hover:text-white hover:bg-[rgba(95,255,96,0.1)] transition-colors cursor-pointer"
+          className="w-6 h-6 rounded-full flex items-center justify-center text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-text-rgb),0.4)] hover:text-[var(--hk-text)] hover:bg-[rgba(var(--hk-accent-rgb),0.1)] transition-colors cursor-pointer"
         >
           <X size={13} />
         </button>

@@ -3,6 +3,7 @@ import { logger } from "../utils/logger.js";
 import { MatchRepository } from "../repositories/match.repository.js";
 import { NotificationClient } from "../clients/notification.client.js";
 import { Sentry } from "../config/sentry.js";
+import { runExclusive } from "../utils/clusterLock.js";
 
 const matchRepository = new MatchRepository();
 const notificationClient = new NotificationClient(logger);
@@ -64,7 +65,7 @@ export const startMatchReminderJob = () => {
   // Every 5 minutes — the 15-minute window would mostly be missed on an
   // hourly cadence like the phase-reminder job uses.
   cron.schedule("*/5 * * * *", () => {
-    runMatchReminderSweep().catch((error) => {
+    runExclusive("match-reminders", 120, runMatchReminderSweep).catch((error) => {
       logger.error({ err: error }, "Match reminder sweep failed");
       Sentry.captureException(error);
     });

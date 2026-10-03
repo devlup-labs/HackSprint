@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import "../pages/Styles/AllHackathons.css";
 import { createPortal } from "react-dom";
 import { X, Clock, Users, Code } from "lucide-react";
 import toast from "react-hot-toast";
@@ -14,18 +15,18 @@ import {
 const mono = "font-[family-name:'JetBrains_Mono',monospace]";
 const syne = "font-[family-name:'Syne',sans-serif]";
 
-const inp = `${mono} w-full bg-[rgba(18,22,18,0.7)] border border-[rgba(95,255,96,0.15)] rounded-[3px] px-3 py-2.5 text-[0.7rem] text-[#e8ffe8] placeholder-[rgba(95,255,96,0.25)] focus:outline-none focus:border-[rgba(95,255,96,0.42)] focus:shadow-[0_0_0_2px_rgba(95,255,96,0.06)] transition-all`;
+const inp = `${mono} w-full bg-[rgba(var(--hk-input-bg),0.7)] border border-[rgba(var(--hk-card-border-rgb),0.24)] dark:border-[rgba(var(--hk-card-border-rgb),0.15)] rounded-[4px] px-3.5 py-3 text-[0.78rem] text-[var(--hk-text)] placeholder-[rgba(var(--hk-accent-rgb),0.55)] dark:placeholder-[rgba(var(--hk-accent-rgb),0.25)] focus:outline-none focus:border-[rgba(var(--hk-card-border-rgb),0.67)] dark:focus:border-[rgba(var(--hk-card-border-rgb),0.42)] focus:shadow-[0_0_0_2px_rgba(var(--hk-accent-rgb),0.06)] transition-all`;
 
 const StatCard = ({ icon: Icon, label, value }) => (
-  <div className="relative bg-[rgba(95,255,96,0.04)] border border-[rgba(95,255,96,0.12)] rounded-[3px] p-3 sm:p-4 min-w-0">
-    <Icon size={13} className="text-[rgba(95,255,96,0.55)] mb-2" />
+  <div className="relative bg-[rgba(var(--hk-accent-rgb),0.04)] border border-[rgba(var(--hk-card-border-rgb),0.19)] dark:border-[rgba(var(--hk-card-border-rgb),0.12)] rounded-[3px] p-3 sm:p-4 min-w-0">
+    <Icon size={13} className="text-[rgba(var(--hk-accent-rgb),0.85)] dark:text-[rgba(var(--hk-accent-rgb),0.55)] mb-2" />
     <div
-      className={`${mono} text-[0.52rem] tracking-[0.12em] uppercase text-[rgba(180,220,180,0.45)] mb-0.5`}
+      className={`${mono} text-[0.52rem] tracking-[0.12em] uppercase text-[rgba(var(--hk-text-rgb),0.8)] dark:text-[rgba(var(--hk-text-rgb),0.45)] mb-0.5`}
     >
       {label}
     </div>
     <div
-      className={`${syne} font-extrabold text-white text-sm tracking-tight break-words`}
+      className={`${syne} font-extrabold text-[var(--hk-text)] text-sm tracking-tight break-words`}
     >
       {value}
     </div>
@@ -40,11 +41,11 @@ const PrimaryBtn = ({
 }) => {
   const c =
     color === "amber"
-      ? "bg-[#ffb84d] border-[#ffb84d] hover:bg-[#ffc96e] hover:shadow-[0_0_18px_rgba(255,184,77,0.3)]"
+      ? "bg-[rgb(var(--hk-amber-rgb))] border-[rgb(var(--hk-amber-rgb))] hover:brightness-110"
       : color === "gray"
-      ? "bg-[rgba(95,255,96,0.04)] border-[rgba(95,255,96,0.1)] text-[rgba(95,255,96,0.25)] cursor-not-allowed"
-      : "bg-[#5fff60] border-[#5fff60] hover:bg-[#7fff80] hover:shadow-[0_0_20px_rgba(95,255,96,0.3)]";
-  const textColor = color === "gray" ? "" : "text-[#050905]";
+      ? "bg-[rgba(var(--hk-accent-rgb),0.04)] border-[rgba(var(--hk-card-border-rgb),0.16)] dark:border-[rgba(var(--hk-card-border-rgb),0.1)] text-[rgba(var(--hk-accent-rgb),0.55)] dark:text-[rgba(var(--hk-accent-rgb),0.25)] cursor-not-allowed"
+      : "bg-[var(--hk-accent-solid)] border-[var(--hk-accent-solid)] hover:brightness-110 hover:shadow-[0_6px_20px_rgba(var(--hk-accent-rgb),0.3)]";
+  const textColor = color === "gray" ? "" : "text-[var(--hk-accent-solid-text)]";
   return (
     <button
       type={type}
@@ -194,24 +195,24 @@ const SubmissionForm = ({ isOpen, onClose, hackathonId }) => {
   return createPortal(
     <>
       <div
-        className={`${mono} fixed inset-0 bg-black/85 backdrop-blur-sm z-[99999] flex items-center justify-center p-3 sm:p-4`}
+        className={`${mono} fixed inset-0 bg-black/55 backdrop-blur-sm z-[99999] flex items-center justify-center p-3 sm:p-4`}
         onClick={onClose}
       >
         <div
-          className="relative w-full max-w-2xl bg-[rgba(8,10,8,0.98)] border border-[rgba(95,255,96,0.18)] rounded-[4px] p-4 sm:p-6 shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-y-auto overflow-x-hidden max-h-[90vh] [scrollbar-width:thin] [scrollbar-color:rgba(95,255,96,0.2)_transparent]"
+          className="relative w-full max-w-2xl bg-[rgba(var(--hk-bg-rgb),0.98)] border border-[rgba(var(--hk-card-border-rgb),0.29)] dark:border-[rgba(var(--hk-card-border-rgb),0.18)] rounded-[4px] p-4 sm:p-6 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.5)] overflow-y-auto overflow-x-hidden max-h-[90vh] [scrollbar-width:thin] [scrollbar-color:rgba(var(--hk-accent-rgb),0.2)_transparent]"
           onClick={(e) => e.stopPropagation()}
         >
-          <span className="absolute top-[-1px] left-[-1px] w-3 h-3 border-t-2 border-l-2 border-[rgba(95,255,96,0.55)]" />
-          <span className="absolute bottom-[-1px] right-[-1px] w-3 h-3 border-b-2 border-r-2 border-[rgba(95,255,96,0.55)]" />
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[rgba(95,255,96,0.3)] to-transparent" />
+          <span className="absolute top-[-1px] left-[-1px] w-3 h-3 border-t-2 border-l-2 border-[rgba(var(--hk-card-border-rgb),0.88)] dark:border-[rgba(var(--hk-card-border-rgb),0.55)]" />
+          <span className="absolute bottom-[-1px] right-[-1px] w-3 h-3 border-b-2 border-r-2 border-[rgba(var(--hk-card-border-rgb),0.88)] dark:border-[rgba(var(--hk-card-border-rgb),0.55)]" />
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[rgba(var(--hk-accent-rgb),0.3)] to-transparent" />
 
           <div className="flex items-start justify-between gap-4 mb-5">
-            <h2 className={`${syne} font-extrabold text-white text-xl tracking-tight`}>
+            <h2 className={`${syne} font-extrabold text-[var(--hk-text)] text-xl tracking-tight`}>
               {hackathon.title}
             </h2>
             <button
               onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-[3px] border border-[rgba(95,255,96,0.15)] text-[rgba(95,255,96,0.45)] hover:text-[#5fff60] hover:border-[rgba(95,255,96,0.35)] transition-all cursor-pointer flex-shrink-0"
+              className="w-8 h-8 flex items-center justify-center rounded-[3px] border border-[rgba(var(--hk-card-border-rgb),0.24)] dark:border-[rgba(var(--hk-card-border-rgb),0.15)] text-[rgba(var(--hk-accent-rgb),0.75)] dark:text-[rgba(var(--hk-accent-rgb),0.45)] hover:text-[var(--hk-accent-solid)] hover:border-[rgba(var(--hk-card-border-rgb),0.56)] dark:hover:border-[rgba(var(--hk-card-border-rgb),0.35)] transition-all cursor-pointer flex-shrink-0"
             >
               <X size={14} />
             </button>
@@ -234,22 +235,22 @@ const SubmissionForm = ({ isOpen, onClose, hackathonId }) => {
           </div>
 
           {existingSubmissionId && (
-            <div className="relative bg-[rgba(95,255,96,0.05)] border border-[rgba(95,255,96,0.2)] rounded-[3px] p-4 mb-5">
-              <p className={`${syne} font-extrabold text-[#5fff60] text-sm tracking-tight`}>
+            <div className="relative bg-[rgba(var(--hk-accent-rgb),0.05)] border border-[rgba(var(--hk-card-border-rgb),0.32)] dark:border-[rgba(var(--hk-card-border-rgb),0.2)] rounded-[3px] p-4 mb-5">
+              <p className={`${syne} font-extrabold text-[var(--hk-accent-solid)] text-sm tracking-tight`}>
                 Already Submitted — you can update before the deadline.
               </p>
             </div>
           )}
 
           {!canSubmit && !existingSubmissionId ? (
-            <p className={`${mono} text-[0.68rem] text-[rgba(255,184,77,0.7)]`}>
-              Submissions are not open for this hackathon right now.
+            <p className={`${mono} text-[0.68rem] text-[rgba(var(--hk-amber-rgb),0.95)] dark:text-[rgba(var(--hk-amber-rgb),0.7)]`}>
+              Submissions are not open for this event right now.
             </p>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
               <div>
-                <label className={`${mono} block text-[0.55rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.5)] mb-1.5`}>
-                  Title <span className="text-[#ff9090]">*</span>
+                <label className={`${mono} block text-[0.6rem] tracking-[0.12em] uppercase text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-accent-rgb),0.6)] mb-1.5`}>
+                  Title <span className="text-[rgb(var(--hk-red-rgb))]">*</span>
                 </label>
                 <input
                   type="text"
@@ -261,8 +262,8 @@ const SubmissionForm = ({ isOpen, onClose, hackathonId }) => {
               </div>
 
               <div>
-                <label className={`${mono} block text-[0.55rem] tracking-[0.14em] uppercase text-[rgba(95,255,96,0.5)] mb-1.5`}>
-                  Description <span className="text-[#ff9090]">*</span>
+                <label className={`${mono} block text-[0.6rem] tracking-[0.12em] uppercase text-[rgba(var(--hk-text-rgb),0.75)] dark:text-[rgba(var(--hk-accent-rgb),0.6)] mb-1.5`}>
+                  Description <span className="text-[rgb(var(--hk-red-rgb))]">*</span>
                 </label>
                 <textarea
                   rows={3}

@@ -13,11 +13,22 @@ services:
     image: redis:8-alpine
     restart: unless-stopped
 
-  auth-service:
+  user-service:
     build:
-      context: ./auth-service
+      context: ./user-service
     env_file:
-      - ./auth-service/.env.docker
+      - ./user-service/.env.docker
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:5001/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    # Keeps http://auth-service:5001 in existing .env.docker files working.
+    networks:
+      default:
+        aliases:
+          - auth-service
     expose:
       - "5001"
     depends_on:
@@ -29,17 +40,45 @@ services:
       context: ./hackathon-service
     env_file:
       - ./hackathon-service/.env.docker
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:5002/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     expose:
       - "5002"
     depends_on:
       - mongodb
       - redis
 
+  admin-service:
+    build:
+      context: ./admin-service
+    env_file:
+      - ./admin-service/.env.docker
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:5006/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    expose:
+      - "5006"
+    depends_on:
+      - mongodb
+
   media-service:
     build:
       context: ./media-service
     env_file:
       - ./media-service/.env.docker
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:5003/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     expose:
       - "5003"
     depends_on:
@@ -50,6 +89,12 @@ services:
       context: ./notification-service
     env_file:
       - ./notification-service/.env.docker
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:5004/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     expose:
       - "5004"
     depends_on:
@@ -61,6 +106,12 @@ services:
       context: ./chatbot-service
     env_file:
       - ./chatbot-service/.env.docker
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:5005/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     expose:
       - "5005"
 
@@ -69,11 +120,19 @@ services:
       context: ./api-gateway
     env_file:
       - ./api-gateway/.env.docker
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:5000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     ports:
       - "5000:5000"
     depends_on:
-      - auth-service
+      - redis
+      - user-service
       - hackathon-service
+      - admin-service
       - media-service
       - notification-service
       - chatbot-service
@@ -88,8 +147,9 @@ services:
       - prometheus_data:/prometheus
     depends_on:
       - api-gateway
-      - auth-service
+      - user-service
       - hackathon-service
+      - admin-service
       - media-service
       - notification-service
       - chatbot-service

@@ -11,6 +11,10 @@ export const AuthAPI = {
   googleLogin(code) {
     return client.get(`${API.AUTH}/google`, { params: { code } });
   },
+  // One Tap / auto sign-in: Google's signed ID token, no popup involved.
+  googleOneTap(credential) {
+    return client.post(`${API.AUTH}/google/one-tap`, { credential });
+  },
   verifyEmail(token) {
     return client.get(`${API.AUTH}/verify-email?token=${token}`);
   },

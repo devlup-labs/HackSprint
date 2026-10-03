@@ -1,9 +1,16 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { gatewayClaims } from "../utils/gatewayIdentity.js";
 
 dotenv.config();
 
 const verifyAuth = async (req, res, next) => {
+  const trusted = gatewayClaims(req);
+  if (trusted?._id) {
+    req.user = trusted;
+    return next();
+  }
+
   const authHeader = req.headers.authorization;
   const verifyToken = authHeader && authHeader.split(" ")[1]; // Format: Bearer <token>
 

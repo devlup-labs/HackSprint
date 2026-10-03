@@ -35,7 +35,7 @@ export class VoteService {
     );
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     if (!hackathon.votingConfig?.enabled) {
@@ -127,7 +127,7 @@ export class VoteService {
     const hackathon = await this.hackathonRepository.getPhases(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     if (!hackathon.votingConfig?.enabled) {
@@ -164,7 +164,7 @@ export class VoteService {
     );
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     if (!hackathon.votingConfig?.enabled) {

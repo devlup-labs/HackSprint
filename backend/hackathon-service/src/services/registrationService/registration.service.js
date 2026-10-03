@@ -3,6 +3,7 @@ import { getNowUTC } from "../../utils/dateUtils.js";
 import { BadRequestError } from "../../errors/BadRequestError.js";
 import { NotFoundError } from "../../errors/NotFoundError.js";
 import { validateRegistrationData } from "../../utils/validateRegistrationData.js";
+import { getMissingProfileFields, ProfileIncompleteError } from "../../utils/profileCompleteness.js";
 
 export class RegistrationService {
   constructor(
@@ -32,7 +33,7 @@ export class RegistrationService {
 
   async registerParticipant({ userId, hackathonId, registrationData }) {
     if (!mongoose.Types.ObjectId.isValid(hackathonId)) {
-      throw new BadRequestError("Invalid hackathon id");
+      throw new BadRequestError("Invalid event id");
     }
 
     const user = await this.userRepository.getById(userId);
@@ -41,10 +42,16 @@ export class RegistrationService {
       throw new NotFoundError("User not found");
     }
 
+    const missingProfileFields = getMissingProfileFields(user);
+
+    if (missingProfileFields.length > 0) {
+      throw new ProfileIncompleteError(missingProfileFields);
+    }
+
     const hackathon = await this.hackathonRepository.getById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     const existingRegistration =
@@ -54,7 +61,7 @@ export class RegistrationService {
       );
 
     if (existingRegistration) {
-      throw new BadRequestError("User already registered for this hackathon");
+      throw new BadRequestError("User already registered for this event");
     }
 
     const now = getNowUTC();
@@ -222,7 +229,7 @@ export class RegistrationService {
     const hackathon = await this.hackathonRepository.getById(hackathonId);
 
     if (!hackathon) {
-      throw new NotFoundError("Hackathon not found");
+      throw new NotFoundError("Event not found");
     }
 
     const now = getNowUTC();
